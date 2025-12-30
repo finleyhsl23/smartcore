@@ -1,284 +1,719 @@
 <!doctype html>
-<html lang="en" class="h-full scroll-smooth">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>SmartCore Technology — Practical Technology. Built to Last.</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Tailwind CDN (ok for now) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ["Inter","ui-sans-serif","system-ui","Segoe UI","Roboto","Arial"] },
-          colors: {
-            ink: "#070A12",
-            line: "rgba(255,255,255,0.10)",
-            line2:"rgba(255,255,255,0.20)",
-            accent: "#6FA3FF",
-          },
-          borderRadius: { xl2: "16px" }
-        }
-      }
-    }
-  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmartCore Technology</title>
+  <meta name="theme-color" content="#050814" />
 
   <style>
-    :root { color-scheme: dark; }
-    html, body { height: 100%; overflow-x: hidden; }
+    :root{
+      --bg0:#050814;
+      --bg1:#08102a;
+      --bg2:#0a1b44;
+      --ink:#e7ecff;
+      --muted:rgba(231,236,255,.72);
+      --muted2:rgba(231,236,255,.55);
+      --line:rgba(255,255,255,.10);
+      --glass:rgba(12,18,40,.58);
+      --glass2:rgba(12,18,40,.36);
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
+      --shadow2: 0 14px 40px rgba(0,0,0,.45);
+      --radius:18px;
+      --radius2:14px;
+      --accent:#5aa0ff;
+      --good:#35d07f;
+      --warn:#ffbf3b;
+      --bad:#ff5b6a;
+      --btn:#0f1b3a;
+      --btn2:#0b1330;
+      --focus: 0 0 0 3px rgba(90,160,255,.22);
+      --max: 1120px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--ink);
       background:
-        radial-gradient(900px 520px at 50% 18%, rgba(66,120,255,.20), rgba(0,0,0,0) 65%),
-        radial-gradient(800px 480px at 50% 110%, rgba(66,120,255,.10), rgba(0,0,0,0) 70%),
-        linear-gradient(180deg, #070A12 0%, #070A12 100%);
+        radial-gradient(1200px 780px at 50% 20%, rgba(90,160,255,.24), transparent 62%),
+        radial-gradient(980px 680px at 18% 78%, rgba(90,160,255,.14), transparent 60%),
+        radial-gradient(980px 680px at 86% 76%, rgba(90,160,255,.10), transparent 62%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 30%, var(--bg0) 100%);
+      overflow-x:hidden;
     }
-    .glass {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
+
+    a{color:inherit; text-decoration:none}
+    button{font:inherit}
+    input,select,textarea{font:inherit}
+
+    /* ---------- Layout ---------- */
+    .container{width:min(var(--max), calc(100% - 40px)); margin:0 auto}
+    .hero{
+      position:relative;
+      min-height:100svh;
+      display:flex;
+      align-items:center;
+      padding:110px 0 40px;
+      overflow:hidden;
+    }
+
+    /* Center glow */
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-10% -10% -10% -10%;
+      background:
+        radial-gradient(900px 520px at 50% 25%, rgba(90,160,255,.22), transparent 64%),
+        radial-gradient(1200px 900px at 50% 110%, rgba(0,0,0,.55), transparent 70%);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .navwrap{
+      position:fixed;
+      top:16px;
+      left:0;
+      right:0;
+      z-index:50;
+      display:flex;
+      justify-content:center;
+      pointer-events:none;
+      transition: transform .35s ease, opacity .35s ease;
+    }
+    .navwrap.hidden{
+      transform: translateY(-18px);
+      opacity:0;
+    }
+    .nav{
+      pointer-events:auto;
+      width:min(var(--max), calc(100% - 28px));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:linear-gradient(180deg, rgba(16,22,46,.58), rgba(10,14,34,.38));
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow2);
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:260px;
+    }
+    .brand .logo{
+      width:36px; height:36px;
+      border-radius:11px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+    .brand .logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      transform: translateY(-2px); /* fixes clipped glyphs */
+    }
+    .brand .name{
+      line-height:1.15;
+      display:flex;
+      flex-direction:column;
+    }
+    .brand .name strong{
+      font-size:13px;
+      letter-spacing:.2px;
+    }
+    .brand .name span{
+      font-size:11px;
+      color:var(--muted2);
+      margin-top:2px;
+    }
+
+    .nav .actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(15,27,58,.70), rgba(11,19,48,.55));
+      color:var(--ink);
+      cursor:pointer;
+      transition: transform .12s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18)}
+    .btn:active{transform: translateY(0)}
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(90,160,255,.22), rgba(15,27,58,.60));
+      border-color: rgba(90,160,255,.32);
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.04);
+      border-color: rgba(255,255,255,.10);
+    }
+    .btn:focus{outline:none; box-shadow: var(--focus)}
+    .btn[disabled]{opacity:.55; cursor:not-allowed; transform:none}
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:rgba(231,236,255,.78);
+      font-size:12px;
+      width:fit-content;
+    }
+    .dot{width:6px;height:6px;border-radius:99px;background:rgba(90,160,255,.75);box-shadow:0 0 0 3px rgba(90,160,255,.12)}
+
+    /* ---------- Hero content ---------- */
+    .heroGrid{
+      position:relative;
+      z-index:2;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:26px;
+      align-items:center;
+    }
+    .heroCopy{
+      max-width: 640px;
+    }
+    h1{
+      margin:14px 0 14px;
+      font-size: clamp(44px, 6vw, 78px);
+      letter-spacing: -1.4px;
+      line-height:1.02;
+    }
+    h1 .dim{
+      opacity:.72; /* “Technology” lower opacity */
+      display:inline-block;
+    }
+    .lead{
+      margin:0 0 20px;
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--muted);
+      line-height:1.45;
+      max-width: 560px;
+    }
+    .heroBtns{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+    }
+    .scrollHint{
+      margin-top:18px;
+      color:rgba(231,236,255,.60);
+      font-size:12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .arrow{
+      width:10px;height:10px; border-right:2px solid rgba(231,236,255,.55); border-bottom:2px solid rgba(231,236,255,.55);
+      transform: rotate(45deg);
+      margin-top:-2px;
+    }
+
+    /* Right hero card preview */
+    .heroCard{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(16,22,46,.56), rgba(10,14,34,.34));
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .heroCard h3{margin:0; font-size:13px; color:rgba(231,236,255,.82); letter-spacing:.2px}
+    .heroCard p{margin:6px 0 0; color:rgba(231,236,255,.58); font-size:12px; line-height:1.45}
+    .miniStats{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: repeat(3,1fr);
+      gap:10px;
+    }
+    .mini{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius: 12px;
+      padding:10px;
+    }
+    .mini b{display:block; font-size:16px; letter-spacing:.2px}
+    .mini span{font-size:11px; color:rgba(231,236,255,.56)}
+    .heroCard .note{
+      margin-top:10px;
+      border:1px dashed rgba(255,255,255,.14);
+      border-radius: 12px;
+      padding:10px;
+      color:rgba(231,236,255,.62);
+      font-size:12px;
+    }
+
+    /* ---------- Floating icons (scattered, non-overlapping w/ text) ---------- */
+    .iconsLayer{
+      position:absolute;
+      inset:0;
+      z-index:1; /* behind content, but above background */
+      pointer-events:none;
+    }
+    .iconBubble{
+      position:absolute;
+      width:150px;
+      height:150px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.09);
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.05), rgba(255,255,255,.02));
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      display:grid;
+      place-items:center;
+      opacity:.18; /* lower opacity */
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,.35));
+      transform: translateZ(0);
+      transition: opacity .25s ease;
     }
-    .reveal { opacity: 0; transform: translateY(10px); transition: opacity .65s ease, transform .65s ease; }
-    .reveal.show { opacity: 1; transform: translateY(0); }
-
-    /* hero bubbles */
-    .bubbles-layer, .bubble, .bubble * { pointer-events: none !important; }
-    .bubble {
-      position: absolute;
-      width: var(--s, 180px);
-      height: var(--s, 180px);
-      left: var(--x, 10%);
-      top: var(--y, 10%);
-      opacity: var(--o, .08);
-      border-radius: 9999px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.022);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      display: grid;
-      place-items: center;
-      z-index: 1;
+    .iconBubble svg{
+      width:44px; height:44px;
+      opacity:.85;
+      stroke: rgba(231,236,255,.70);
+      fill: none;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
-    .bubble svg { width: 40%; height: 40%; opacity: .9; }
-    .hero-content { position: relative; z-index: 10; }
+    /* Keep icons OUT of the text block area (approx). */
+    .iconBubble.safeZone{
+      opacity:.14;
+    }
 
-    /* nav hide when leaving hero */
-    .navHidden { transform: translateY(-14px); opacity: 0; pointer-events: none; }
-    .navShown { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    /* ---------- Sections ---------- */
+    section{position:relative; z-index:2}
+    .section{
+      padding: 44px 0 34px;
+    }
 
-    /* modals */
-    .modal-backdrop {
-      background: rgba(0,0,0,0.60);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+    .glassPanel{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(16,22,46,.54), rgba(10,14,34,.32));
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow2);
+      padding: 18px;
+    }
+
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      align-items:start;
+    }
+
+    .sectionTitle{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      margin-bottom: 10px;
+    }
+    .sectionTitle h2{
+      margin:0;
+      font-size:14px;
+      color:rgba(231,236,255,.78);
+      letter-spacing:.3px;
+      text-transform:none;
+    }
+    .sectionTitle .right{
+      font-size:12px;
+      color:rgba(231,236,255,.55);
+      white-space:nowrap;
+    }
+
+    .grid4{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+    }
+    .grid3{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+
+    .card{
+      position:relative;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius: 14px;
+      padding:14px;
+      min-height: 92px;
+      overflow:hidden;
+      transition: border-color .2s ease, transform .15s ease, background .2s ease;
+    }
+    .card:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.16)}
+    .card h4{margin:0; font-size:13px}
+    .card .sub{margin-top:4px; color:rgba(231,236,255,.58); font-size:12px}
+    .card .price{margin-top:6px; color:rgba(231,236,255,.72); font-size:12px}
+
+    .pickBtn{
+      position:absolute;
+      right:12px; top:12px;
+      width:30px; height:30px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.15);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+    }
+    .pickBtn svg{width:14px;height:14px;stroke:rgba(231,236,255,.65);fill:none;stroke-width:2.4}
+
+    .card.selected{
+      border-color: rgba(90,160,255,.36);
+      background: linear-gradient(180deg, rgba(90,160,255,.12), rgba(255,255,255,.04));
+      box-shadow: 0 0 0 3px rgba(90,160,255,.10) inset;
+    }
+    .card.selected .pickBtn{
+      border-color: rgba(90,160,255,.40);
+      background: rgba(90,160,255,.16);
+    }
+    .card.selected .pickBtn svg{stroke: rgba(231,236,255,.92)}
+
+    .learnRow{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .learnBtn{
+      padding:7px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:rgba(231,236,255,.78);
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap; /* one line */
+    }
+    .learnBtn:hover{border-color: rgba(255,255,255,.18)}
+    .tick{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:rgba(231,236,255,.55);
+      font-size:12px;
+    }
+    .tick strong{color:rgba(231,236,255,.82); font-weight:600}
+
+    /* Sticky total bar (hidden until company size selected) */
+    .totalBar{
+      position:sticky;
+      bottom:14px;
+      z-index:5;
+      margin-top:14px;
+      display:none;
+    }
+    .totalBarInner{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(16,22,46,.58), rgba(10,14,34,.38));
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow2);
+      padding:12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .totalLeft{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .totalLeft b{font-size:14px}
+    .totalLeft span{font-size:12px; color:rgba(231,236,255,.60)}
+    .totalRight{display:flex; gap:10px; align-items:center}
+
+    /* About */
+    .about h3{margin:0 0 10px; font-size:14px; color:rgba(231,236,255,.84)}
+    .about p{margin:0 0 10px; color:rgba(231,236,255,.62); font-size:13px; line-height:1.55}
+    .about ul{margin:10px 0 0; padding:0 0 0 18px; color:rgba(231,236,255,.62); font-size:13px; line-height:1.55}
+    .about li{margin:6px 0}
+
+    /* Footer */
+    .footer{
+      margin-top:22px;
+      padding:16px 0 34px;
+      color:rgba(231,236,255,.55);
+      font-size:12px;
+    }
+    .footerRow{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    /* ---------- Modal ---------- */
+    .backdrop{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.54);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:100;
+      padding: 18px;
+    }
+    .backdrop.show{display:flex}
+    .modal{
+      width:min(520px, 100%);
+      max-height: min(80svh, 760px);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(16,22,46,.70), rgba(10,14,34,.52));
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      display:flex;
+      flex-direction:column;
+    }
+    .modalHeader{
+      padding: 14px 14px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .modalHeader b{font-size:13px}
+    .modalBody{
+      padding: 14px;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    .modalBody p{margin:0 0 10px; color:rgba(231,236,255,.62); font-size:13px; line-height:1.5}
+    .modalFooter{
+      padding: 12px 14px 14px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .field{margin-bottom:12px}
+    .field label{display:block; font-size:12px; color:rgba(231,236,255,.68); margin:0 0 6px}
+    .input{
+      width:100%;
+      padding:11px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:var(--ink);
+      outline:none;
+    }
+    .input:focus{box-shadow: var(--focus); border-color: rgba(90,160,255,.32)}
+    .row2{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+
+    .pwWrap{position:relative}
+    .pwToggle{
+      position:absolute;
+      right:10px;
+      top:50%;
+      transform: translateY(-50%);
+      width:34px;height:34px;
+      border-radius: 10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+    }
+    .pwToggle svg{width:16px;height:16px;stroke:rgba(231,236,255,.72);fill:none;stroke-width:2.2}
+
+    .msg{
+      margin-top:8px;
+      font-size:12px;
+      color:rgba(231,236,255,.64);
+      min-height: 16px;
+    }
+    .msg.bad{color: rgba(255,91,106,.9)}
+    .msg.good{color: rgba(53,208,127,.9)}
+
+    /* ---------- Pages ---------- */
+    .page{display:none}
+    .page.show{display:block}
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 980px){
+      .heroGrid{grid-template-columns: 1fr; gap:16px}
+      .heroCard{display:none}
+      .grid4{grid-template-columns: 1fr 1fr}
+      .grid3{grid-template-columns: 1fr}
+      .twoCol{grid-template-columns: 1fr}
+      .brand{min-width:auto}
+    }
+    @media (max-width: 520px){
+      .container{width:min(var(--max), calc(100% - 28px))}
+      .grid4{grid-template-columns: 1fr}
+      .row2{grid-template-columns: 1fr}
+      .iconBubble{width:124px;height:124px}
+      .iconBubble svg{width:38px;height:38px}
+    }
+
+    /* ---------- Animations ---------- */
+    .fadeUp{
+      opacity:0;
+      transform: translateY(10px);
+      animation: fadeUp .75s ease forwards;
+    }
+    .d1{animation-delay:.06s}
+    .d2{animation-delay:.14s}
+    .d3{animation-delay:.22s}
+    .d4{animation-delay:.30s}
+    @keyframes fadeUp{
+      to{opacity:1; transform: translateY(0)}
+    }
+
+    /* Prevent background scrolling when modal open */
+    body.modalOpen{
+      overflow:hidden;
+      touch-action:none;
     }
   </style>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
-<body class="min-h-screen text-white/90">
+<body>
+  <!-- NAV -->
+  <div class="navwrap" id="navwrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <!-- Update path if needed -->
+          <img src="SmartCore Official Logos/SC Icon - Black Background.png" alt="SmartCore logo">
+        </div>
+        <div class="name">
+          <strong>SmartCore Technology</strong>
+          <span>Practical Technology. Built to Last.</span>
+        </div>
+      </div>
 
-  <!-- TOP NAV -->
-  <header id="topNav" class="fixed top-4 left-0 right-0 z-50 transition-all duration-300 navShown">
-    <div class="mx-auto max-w-6xl px-4">
-      <div class="glass rounded-xl border border-line px-3 sm:px-4 py-2 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg overflow-hidden bg-black/35 border border-line flex items-center justify-center">
-            <img
-              src="SmartCore%20Official%20Logos/SC%20Icon%20-%20Black%20Background.png"
-              alt="SmartCore"
-              class="w-[92%] h-[92%] object-contain translate-y-[-2px]"
-            />
+      <div class="actions">
+        <button class="btn ghost" id="navLoginBtn">Log in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero" id="hero">
+    <!-- Floating icons -->
+    <div class="iconsLayer" id="iconsLayer" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="heroGrid">
+        <div class="heroCopy">
+          <div class="chip fadeUp d1"><span class="dot"></span> Calm systems for real workplaces</div>
+
+          <h1 class="fadeUp d2">
+            SmartCore <span class="dim">Technology</span>
+          </h1>
+
+          <p class="lead fadeUp d3">
+            Reliable software systems for workspace management — practical tools that stay clean, consistent, and easy to run.
+          </p>
+
+          <div class="heroBtns fadeUp d4">
+            <button class="btn primary" id="buildPlanBtn">Build your plan →</button>
+            <button class="btn" id="employeeSignupBtn">Sign up as an employee</button>
+            <button class="btn ghost" id="scrollDownBtn">Scroll down <span class="arrow" aria-hidden="true"></span></button>
           </div>
-          <div class="leading-tight">
-            <div class="text-sm font-semibold text-white">SmartCore Technology</div>
-            <div class="text-[11px] text-white/55">Practical Technology. Built to Last.</div>
+
+          <div class="scrollHint">
+            <span class="arrow" aria-hidden="true"></span>
+            Scroll to build your plan
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button id="navDashboardBtn" class="hidden px-3 py-1.5 rounded-lg border border-line hover:bg-white/5 text-sm transition">
-            Dashboard
-          </button>
-          <button id="navLoginBtn" class="px-3 py-1.5 rounded-lg border border-line hover:bg-white/5 text-sm transition">
-            Log in
-          </button>
-          <button id="navLogoutBtn" class="hidden px-3 py-1.5 rounded-lg border border-line bg-white/5 hover:bg-white/8 text-sm transition">
-            Log out
-          </button>
-        </div>
+        <aside class="heroCard fadeUp d4" aria-hidden="true">
+          <h3>Platform preview</h3>
+          <p>Simple layouts, clear actions, minimal visual noise.</p>
+          <div class="miniStats">
+            <div class="mini"><b>Live</b><span>Presence view</span></div>
+            <div class="mini"><b>Audit</b><span>Clean records</span></div>
+            <div class="mini"><b>Fast</b><span>Kiosk-friendly</span></div>
+          </div>
+          <div class="note">Choose a company size, select modules, then continue to create your account.</div>
+        </aside>
       </div>
     </div>
   </header>
 
-  <!-- HOME VIEW -->
-  <main id="viewHome">
-    <!-- HERO -->
-    <section id="home" class="relative min-h-[100svh] flex items-center">
-      <div aria-hidden="true" class="bubbles-layer absolute inset-0 overflow-hidden">
-        <!-- 8 scattered bubbles/icons -->
-        <div class="bubble hidden md:grid" style="--x: 8%; --y: 16%; --s: 220px; --o:.07">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-        </div>
-        <div class="bubble hidden md:grid" style="--x: 28%; --y: 64%; --s: 240px; --o:.07">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="4.5" width="14" height="15" rx="2.5"/>
-            <path d="M8 9l1.3 1.3L12 7.6"/>
-            <path d="M8 14h8"/>
-          </svg>
-        </div>
-        <div class="bubble hidden md:grid" style="--x: 78%; --y: 14%; --s: 210px; --o:.06">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="6.5" width="18" height="12" rx="2.5"/>
-            <path d="M7 10h10M7 14h6"/>
-          </svg>
-        </div>
-        <div class="bubble hidden md:grid" style="--x: 70%; --y: 60%; --s: 230px; --o:.06">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2.8l7 4v7.2l-7 4-7-4V6.8l7-4z"/>
-            <path d="M12 8v8"/>
-          </svg>
-        </div>
-        <div class="bubble hidden md:grid" style="--x: 18%; --y: 36%; --s: 200px; --o:.055">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 21s8-4.5 8-10V7l-8-4-8 4v4c0 5.5 8 10 8 10z"/>
-            <path d="M9.5 12l1.6 1.6L14.8 10"/>
-          </svg>
-        </div>
-        <div class="bubble hidden md:grid" style="--x: 46%; --y: 12%; --s: 190px; --o:.05">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 7h16M7 4v6M17 4v6"/>
-            <path d="M6 13h6M6 17h10"/>
-          </svg>
-        </div>
-        <div class="bubble hidden md:grid" style="--x: 86%; --y: 36%; --s: 200px; --o:.05">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 20h4"/>
-            <path d="M12 4a6 6 0 0 0-3.6 10.8c.3.2.6.6.7 1l.3 1.2h5.2l.3-1.2c.1-.4.4-.8.7-1A6 6 0 0 0 12 4z"/>
-          </svg>
-        </div>
-        <div class="bubble hidden md:grid" style="--x: 52%; --y: 72%; --s: 220px; --o:.06">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 12h16"/>
-            <path d="M12 4v16"/>
-          </svg>
-        </div>
-
-        <!-- mobile: just 2 bubbles so text never clashes -->
-        <div class="bubble md:hidden" style="--x: 10%; --y: 12%; --s: 160px; --o:.06">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-        </div>
-        <div class="bubble md:hidden" style="--x: 76%; --y: 78%; --s: 160px; --o:.05">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="6" y="11" width="12" height="10" rx="2.5"/>
-            <path d="M8 11V8.5A4 4 0 0 1 12 4.5a4 4 0 0 1 4 4V11"/>
-          </svg>
-        </div>
-      </div>
-
-      <!-- sentinel used for hiding nav when scrolling past hero -->
-      <div id="heroSentinel" class="absolute bottom-0 left-0 right-0 h-2"></div>
-
-      <div class="mx-auto max-w-6xl px-4 w-full">
-        <div class="hero-content pt-28 pb-16 md:pt-32 md:pb-24">
-          <div class="max-w-3xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-line bg-white/5 text-xs text-white/70 reveal">
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-accent"></span>
-              Calm systems for real workplaces
+  <!-- MAIN -->
+  <main>
+    <!-- PLAN -->
+    <section class="section" id="planSection">
+      <div class="container">
+        <div class="glassPanel" id="planPanel">
+          <div class="sectionTitle">
+            <div>
+              <h2>Build your plan</h2>
+              <div style="margin-top:4px; color:rgba(231,236,255,.55); font-size:12px">Choose a company size, then select modules.</div>
             </div>
-
-            <h1 class="mt-5 font-extrabold tracking-tight text-white reveal
-                       text-5xl sm:text-6xl md:text-7xl lg:text-[88px] leading-[0.95]">
-              SmartCore<br><span class="text-white/70">Technology</span>
-            </h1>
-
-            <p class="mt-6 text-white/70 max-w-xl reveal text-base sm:text-lg md:text-xl">
-              Practical, reliable systems that businesses can depend on every day.
-            </p>
-
-            <div class="mt-8 flex flex-wrap items-center gap-3 reveal">
-              <button id="goBuildPlanBtn"
-                class="px-4 py-2.5 rounded-xl border border-line bg-white/5 hover:bg-white/8 transition text-sm font-medium">
-                Build your plan →
-              </button>
-
-              <button id="goEmployeeSignupBtn"
-                class="px-4 py-2.5 rounded-xl border border-line bg-transparent hover:bg-white/5 transition text-sm font-medium">
-                Sign up as an employee
-              </button>
-            </div>
-
-            <div class="mt-8 reveal">
-              <button id="downArrowBtn"
-                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-line bg-transparent hover:bg-white/5 transition text-sm">
-                Scroll down
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M6 9l6 6 6-6"></path>
-                </svg>
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- BUILD PLAN -->
-    <section id="pricing" class="relative">
-      <div class="mx-auto max-w-6xl px-4 pb-20">
-        <div class="pt-24 md:pt-28">
-          <div class="flex items-end justify-between gap-6">
-            <div class="max-w-xl reveal">
-              <h2 class="text-xl font-semibold text-white">Build your plan</h2>
-              <p class="mt-2 text-sm text-white/60">Select company size, then modules. Checkout will verify your email.</p>
-            </div>
-            <div class="hidden sm:block text-xs text-white/50 reveal">Monthly subscription (GBP)</div>
+            <div class="right">Monthly subscription (GBP)</div>
           </div>
 
-          <div class="mt-6 glass rounded-xl2 p-4 md:p-5 reveal">
-            <div class="flex items-center justify-between">
-              <div class="text-sm font-medium text-white/85">Select your company size</div>
-              <div id="sizeHint" class="text-xs text-white/45">Select one</div>
+          <!-- Company size -->
+          <div style="margin-top:14px">
+            <div class="sectionTitle" style="margin-bottom:8px">
+              <h2>Select your company size</h2>
+              <div class="right" id="sizeRight">Select one</div>
             </div>
-            <div id="companySizeGrid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+            <div class="grid4" id="sizeGrid"></div>
           </div>
 
-          <div id="modulesWrap" class="mt-6 glass rounded-xl2 p-4 md:p-5 hidden">
-            <div class="flex items-center justify-between">
-              <div class="text-sm font-medium text-white/85">Select your modules</div>
-              <div class="text-xs text-white/45">Select any</div>
+          <!-- Modules (hidden until size selected) -->
+          <div style="margin-top:16px; display:none" id="modulesWrap">
+            <div class="sectionTitle" style="margin-bottom:8px">
+              <h2>Select your modules</h2>
+              <div class="right">Select any</div>
             </div>
-            <div id="modulesGrid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            <div class="grid3" id="modulesGrid"></div>
           </div>
 
-          <!-- Summary bar hidden until company size selected -->
-          <div id="summaryBar" class="fixed left-0 right-0 bottom-4 z-40 hidden">
-            <div class="mx-auto max-w-6xl px-4">
-              <div class="glass rounded-xl2 border border-line px-4 py-3 flex items-center justify-between gap-4">
-                <div class="min-w-0">
-                  <div class="text-xs text-white/55">Monthly total</div>
-                  <div class="text-base font-semibold text-white" id="totalText">£0 / month</div>
-                  <div class="text-[11px] text-white/45 truncate" id="totalSub">Select a company size to begin</div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button id="clearBtn" class="px-3 py-2 rounded-xl border border-line bg-transparent hover:bg-white/5 transition text-sm">
-                    Clear
-                  </button>
-                  <button id="checkoutBtn" class="px-4 py-2 rounded-xl border border-line bg-white/5 hover:bg-white/8 transition text-sm font-medium">
-                    Checkout →
-                  </button>
-                </div>
+          <!-- Sticky total (hidden until size selected) -->
+          <div class="totalBar" id="totalBar">
+            <div class="totalBarInner">
+              <div class="totalLeft">
+                <b id="monthlyTotal">£0 / month</b>
+                <span id="monthlyNote">Select a company size to begin</span>
+              </div>
+              <div class="totalRight">
+                <button class="btn ghost" id="clearBtn">Clear</button>
+                <button class="btn primary" id="checkoutBtn">Checkout →</button>
               </div>
             </div>
           </div>
@@ -288,1146 +723,852 @@
     </section>
 
     <!-- ABOUT -->
-    <section id="about" class="relative">
-      <div class="mx-auto max-w-6xl px-4 pb-16">
-        <div class="glass rounded-xl2 p-5 md:p-6 reveal">
-          <h3 class="text-lg font-semibold text-white">About SmartCore Technology</h3>
+    <section class="section">
+      <div class="container">
+        <div class="glassPanel about">
+          <h3>About SmartCore Technology</h3>
+          <p>
+            SmartCore Technology was built by Finley Hassall, a young founder with a long-standing passion for technology and a strong business mindset.
+            Interested in IT from the age of six, Finley always knew he wanted to build a career creating systems that solve real-world problems.
+          </p>
+          <p>
+            Rather than focusing on trends or hype, SmartCore Technology was created with a clear goal: to build practical, reliable systems that businesses can depend on every day.
+          </p>
+          <p>
+            The company was developed with guidance and support from Finley’s mother, a business owner herself, but every system within SmartCore has been hand-crafted from the ground up by Finley.
+            Each feature, workflow, and decision has been designed with real workplaces in mind — prioritising clarity, usability, and long-term reliability over unnecessary complexity.
+          </p>
+          <p>
+            SmartCore Technology is not about flashy software. It’s about building tools that work properly, scale sensibly, and quietly do their job in the background.
+          </p>
 
-          <div class="mt-4 space-y-4 text-sm text-white/65 leading-relaxed">
-            <p>
-              SmartCore Technology was built by Finley Hassall, a young founder with a long-standing passion for technology and a strong business mindset. Interested in IT from the age of six, Finley always knew he wanted to build a career creating systems that solve real-world problems.
-            </p>
-            <p>
-              Rather than focusing on trends or hype, SmartCore Technology was created with a clear goal: to build practical, reliable systems that businesses can depend on every day.
-            </p>
-            <p>
-              The company was developed with guidance and support from Finley’s mother, a business owner herself, but every system within SmartCore has been hand-crafted from the ground up by Finley. Each feature, workflow, and decision has been designed with real workplaces in mind — prioritising clarity, usability, and long-term reliability over unnecessary complexity.
-            </p>
-            <p>
-              SmartCore Technology is not about flashy software. It’s about building tools that work properly, scale sensibly, and quietly do their job in the background.
-            </p>
-
-            <div class="pt-2">
-              <div class="text-white/85 font-medium">The SmartCore Technology Approach</div>
-              <p class="mt-2">SmartCore Technology is built on a simple philosophy: technology should make work easier, not more complicated.</p>
-              <ul class="mt-3 list-disc pl-5 space-y-1">
-                <li>solve a specific, real business problem</li>
-                <li>be easy to understand and use</li>
-                <li>create clear, auditable records</li>
-                <li>scale as organisations grow</li>
-                <li>remain reliable over time</li>
-              </ul>
-              <p class="mt-3">
-                Instead of offering one large, bloated platform, SmartCore provides modular systems that companies can choose and combine based on their actual needs. This keeps costs fair, reduces complexity, and allows businesses to stay in control of how they operate.
-              </p>
-              <p class="mt-3">
-                SmartCore Technology focuses on the areas that matter most — people, safety, and operational clarity — delivering tools that support organisations without getting in the way.
-              </p>
-            </div>
-          </div>
-
-          <div class="mt-5 text-sm text-white/60">
-            Support: <a class="text-accent hover:underline" href="mailto:support@smartcoretechnology.co.uk">support@smartcoretechnology.co.uk</a>
-          </div>
+          <h3 style="margin-top:16px">The SmartCore Technology Approach</h3>
+          <p>SmartCore Technology is built on a simple philosophy: technology should make work easier, not more complicated.</p>
+          <ul>
+            <li>solve a specific, real business problem</li>
+            <li>be easy to understand and use</li>
+            <li>create clear, auditable records</li>
+            <li>scale as organisations grow</li>
+            <li>remain reliable over time</li>
+          </ul>
+          <p style="margin-top:12px">
+            Instead of offering one large, bloated platform, SmartCore provides modular systems that companies can choose and combine based on their actual needs.
+            This keeps costs fair, reduces complexity, and allows businesses to stay in control of how they operate.
+          </p>
+          <p>
+            SmartCore Technology focuses on the areas that matter most — people, safety, and operational clarity — delivering tools that support organisations without getting in the way.
+          </p>
         </div>
 
-        <footer class="mt-6 glass rounded-xl2 p-4 flex items-center justify-between text-xs text-white/55 reveal">
-          <div>
-            <div class="text-white/80 font-semibold">SmartCore Technology</div>
-            <div>Practical Technology. Built to Last.</div>
+        <div class="footer">
+          <div class="footerRow">
+            <div>SmartCore Technology — Practical Technology. Built to Last.</div>
+            <div>Support: support@smartcoretechnology.co.uk</div>
           </div>
-          <div>
-            <a class="text-accent hover:underline" href="mailto:support@smartcoretechnology.co.uk">support@smartcoretechnology.co.uk</a>
-          </div>
-        </footer>
-      </div>
-    </section>
-  </main>
-
-  <!-- DASHBOARD VIEW -->
-  <main id="viewDashboard" class="hidden">
-    <section class="pt-28 pb-16">
-      <div class="mx-auto max-w-6xl px-4">
-        <div class="glass rounded-xl2 p-5 md:p-6">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-semibold text-white">Dashboard</h2>
-              <p class="mt-1 text-sm text-white/60">Company details, owned systems, onboarding, and employee setup.</p>
-            </div>
-            <div class="text-right text-xs text-white/55">
-              <div id="dashCompanyCode" class="font-semibold text-white/80"></div>
-              <div id="dashUserEmail"></div>
-            </div>
-          </div>
-
-          <!-- Company onboarding -->
-          <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="glass rounded-xl2 p-4 border border-line">
-              <div class="text-sm font-semibold text-white/85">Company onboarding</div>
-              <p class="mt-1 text-xs text-white/55">Upload a logo, confirm full name and address.</p>
-
-              <div class="mt-4 grid grid-cols-1 gap-3">
-                <label class="block">
-                  <div class="text-xs text-white/55 mb-1">Company logo (PNG preferred)</div>
-                  <input id="companyLogo" type="file" accept="image/*"
-                    class="w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border file:border-line file:bg-white/5 file:text-white/80 file:hover:bg-white/10" />
-                </label>
-
-                <label class="block">
-                  <div class="text-xs text-white/55 mb-1">Full company name</div>
-                  <input id="companyName" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40" />
-                </label>
-
-                <label class="block">
-                  <div class="text-xs text-white/55 mb-1">Address</div>
-                  <textarea id="companyAddress" rows="3"
-                    class="w-full px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40"></textarea>
-                </label>
-
-                <div class="flex items-center gap-2">
-                  <button id="saveCompanyBtn" class="px-4 py-2.5 rounded-xl border border-line bg-white/5 hover:bg-white/8 transition text-sm font-medium">
-                    Save company
-                  </button>
-                  <div id="companySaveMsg" class="text-sm text-white/65"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Owned modules / Buy more -->
-            <div class="glass rounded-xl2 p-4 border border-line">
-              <div class="text-sm font-semibold text-white/85">Your systems</div>
-              <p class="mt-1 text-xs text-white/55">Links only show for systems your company owns (temporary links for now).</p>
-
-              <div class="mt-4">
-                <div class="text-xs text-white/55 mb-2">Owned</div>
-                <div id="ownedLinks" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-
-                <div class="mt-5 pt-4 border-t border-line">
-                  <div class="text-xs text-white/55 mb-2">Buy more systems (testing = free)</div>
-                  <div id="buyMoreGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-                  <button id="saveModulesBtn" class="mt-3 w-full px-4 py-2.5 rounded-xl border border-line bg-white/5 hover:bg-white/8 transition text-sm font-medium">
-                    Continue (free testing) →
-                  </button>
-                  <div id="modulesSaveMsg" class="mt-2 text-sm text-white/65"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Employees -->
-          <div class="mt-6 glass rounded-xl2 p-4 border border-line">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <div class="text-sm font-semibold text-white/85">Employees</div>
-                <p class="mt-1 text-xs text-white/55">Add employees and generate unique employee IDs automatically.</p>
-              </div>
-              <div class="text-right text-xs text-white/55">
-                <div class="font-semibold text-white/80">Company ID</div>
-                <div id="dashCompanyId"></div>
-              </div>
-            </div>
-
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-              <label class="block">
-                <div class="text-xs text-white/55 mb-1">Full name</div>
-                <input id="empName" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40" placeholder="Finley Hassall" />
-              </label>
-              <label class="block">
-                <div class="text-xs text-white/55 mb-1">Job title</div>
-                <input id="empTitle" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40" placeholder="Founder" />
-              </label>
-              <label class="block">
-                <div class="text-xs text-white/55 mb-1">Job category</div>
-                <input id="empCategory" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40" placeholder="Senior management team" />
-              </label>
-            </div>
-
-            <div class="mt-3 flex items-center gap-2">
-              <button id="addEmployeeBtn" class="px-4 py-2.5 rounded-xl border border-line bg-white/5 hover:bg-white/8 transition text-sm font-medium">
-                Add employee
-              </button>
-              <div id="empMsg" class="text-sm text-white/65"></div>
-            </div>
-
-            <div class="mt-4 overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead class="text-white/55">
-                  <tr class="border-b border-line">
-                    <th class="text-left py-2 pr-3 font-medium">Employee ID</th>
-                    <th class="text-left py-2 pr-3 font-medium">Name</th>
-                    <th class="text-left py-2 pr-3 font-medium">Title</th>
-                    <th class="text-left py-2 pr-3 font-medium">Category</th>
-                  </tr>
-                </thead>
-                <tbody id="empTable" class="text-white/80"></tbody>
-              </table>
-            </div>
-          </div>
-
         </div>
       </div>
     </section>
   </main>
 
-  <!-- MODAL: MODULE DETAILS -->
-  <div id="moduleModal" class="fixed inset-0 z-[60] hidden">
-    <div class="absolute inset-0 modal-backdrop"></div>
-    <div class="absolute inset-0 overflow-y-auto p-4" style="-webkit-overflow-scrolling: touch;">
-      <div class="min-h-full flex items-center justify-center">
-        <div class="w-full max-w-4xl glass rounded-xl2 border border-line overflow-hidden">
-          <div class="px-5 py-4 border-b border-line flex items-center justify-between">
-            <div>
-              <div id="modalTitle" class="text-sm font-semibold text-white/90">Module</div>
-              <div id="modalPrice" class="text-xs text-white/55 mt-0.5">£0 / month</div>
-            </div>
-            <button id="closeModuleModalBtn" class="px-3 py-2 rounded-xl border border-line hover:bg-white/5 transition text-sm">Close</button>
-          </div>
-
-          <div class="p-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="glass rounded-xl2 p-4 border border-line">
-              <div class="text-sm font-medium text-white/85">Preview</div>
-              <div class="mt-3 aspect-video rounded-xl overflow-hidden border border-line bg-black/30">
-                <iframe id="modalVideo" class="w-full h-full" src="" title="Module preview"
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowfullscreen></iframe>
-              </div>
-              <div class="mt-3 text-xs text-white/50">Use fullscreen in the player controls.</div>
-            </div>
-
-            <div class="glass rounded-xl2 p-4 border border-line">
-              <div class="text-sm font-medium text-white/85">Overview</div>
-              <p id="modalSummary" class="mt-3 text-sm text-white/70 leading-relaxed whitespace-pre-line"></p>
-
-              <div class="mt-4 text-sm font-medium text-white/85">Key features</div>
-              <ul id="modalFeatures" class="mt-3 space-y-2 text-sm text-white/65 list-disc pl-5"></ul>
-            </div>
-          </div>
-        </div>
+  <!-- LEARN MORE MODAL -->
+  <div class="backdrop" id="learnBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <div class="modalHeader">
+        <b id="learnTitle">Module</b>
+        <button class="btn ghost" id="learnCloseBtn">Close</button>
+      </div>
+      <div class="modalBody" id="learnBody">
+        <!-- injected -->
+      </div>
+      <div class="modalFooter">
+        <button class="btn ghost" id="learnGotItBtn">Got it</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: OWNER SIGNUP (2-step: details -> code) -->
-  <div id="signupModal" class="fixed inset-0 z-[60] hidden">
-    <div class="absolute inset-0 modal-backdrop"></div>
-    <div class="absolute inset-0 overflow-y-auto p-4" style="-webkit-overflow-scrolling: touch;">
-      <div class="min-h-full flex items-center justify-center">
-        <div class="w-full max-w-lg glass rounded-xl2 border border-line overflow-hidden">
-          <div class="px-5 py-4 border-b border-line flex items-center justify-between">
-            <div class="text-sm font-semibold text-white/90">Create account</div>
-            <button id="closeSignupBtn" class="px-3 py-2 rounded-xl border border-line hover:bg-white/5 transition text-sm">Close</button>
+  <!-- SIGNUP / CHECKOUT MODAL (Owner) -->
+  <div class="backdrop" id="signupBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <div class="modalHeader">
+        <b id="suTitle">Create account</b>
+        <button class="btn ghost" id="suCloseBtn">Close</button>
+      </div>
+
+      <div class="modalBody">
+        <div id="signupStep1">
+          <div class="field">
+            <label>Company name</label>
+            <input id="suCompany" class="input" placeholder="SmartCore Technology" autocomplete="organization" />
           </div>
 
-          <div class="p-5 space-y-3">
-            <label class="block">
-              <div class="text-xs text-white/55 mb-1">Company name</div>
-              <input id="suCompanyName" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40" />
-            </label>
+          <div class="field">
+            <label>Your full name</label>
+            <input id="suFullName" class="input" placeholder="Finley Hassall" autocomplete="name" />
+          </div>
 
-            <label class="block">
-              <div class="text-xs text-white/55 mb-1">Email</div>
-              <input id="suEmail" type="email" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40" />
-            </label>
+          <div class="field">
+            <label>Email</label>
+            <input id="suEmail" class="input" placeholder="you@company.co.uk" autocomplete="email" />
+          </div>
 
-            <label class="block">
-              <div class="text-xs text-white/55 mb-1">Password</div>
-              <div class="relative">
-                <input id="suPassword" type="password" class="w-full pr-12 px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40" />
-                <button id="suTogglePw" type="button" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg border border-line bg-white/5 hover:bg-white/10 grid place-items-center">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2">
-                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-              </div>
-              <div class="mt-1 text-[11px] text-white/45">Min 8 characters.</div>
-            </label>
-
-            <label id="codeWrap" class="block hidden">
-              <div class="text-xs text-white/55 mb-1">6-digit code</div>
-              <input id="suCode" inputmode="numeric" maxlength="6"
-                class="w-full px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40"
-                placeholder="123456" />
-              <div class="mt-1 text-[11px] text-white/45">We sent a code to your email.</div>
-            </label>
-
-            <!-- Step controls -->
-            <div id="signupStep1" class="grid grid-cols-1 gap-2">
-              <button id="continueBtn"
-                class="px-4 py-2.5 rounded-xl border border-line bg-white/5 hover:bg-white/8 transition text-sm font-medium">
-                Continue →
-              </button>
-              <div class="text-[11px] text-white/45">Testing mode: checkout is free for now.</div>
-            </div>
-
-            <div id="signupStep2" class="grid grid-cols-1 sm:grid-cols-2 gap-2 hidden">
-              <button id="backToDetailsBtn"
-                class="px-4 py-2.5 rounded-xl border border-line bg-transparent hover:bg-white/5 transition text-sm font-medium">
-                Back
-              </button>
-              <button id="verifyBtn"
-                class="px-4 py-2.5 rounded-xl border border-line bg-white/5 hover:bg-white/8 transition text-sm font-medium">
-                Verify + create →
-              </button>
-            </div>
-
-            <div id="suMsg" class="text-sm text-white/70"></div>
-
-            <div class="pt-3 border-t border-line">
-              <button id="openLoginBtn" class="w-full px-4 py-2.5 rounded-xl border border-line bg-transparent hover:bg-white/5 transition text-sm font-medium">
-                Log in instead
+          <div class="field">
+            <label>Password</label>
+            <div class="pwWrap">
+              <input id="suPassword" class="input" type="password" placeholder="Min 8 characters" autocomplete="new-password" />
+              <button class="pwToggle" id="suPwToggle" type="button" aria-label="Show password">
+                <svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
               </button>
             </div>
           </div>
 
+          <div class="msg" id="suMsg"></div>
         </div>
+
+        <div id="signupStep2" style="display:none">
+          <div class="field">
+            <label>6-digit code</label>
+            <input id="suCode" class="input" inputmode="numeric" placeholder="123456" />
+            <div style="margin-top:6px; font-size:12px; color:rgba(231,236,255,.55)">We sent a code to your email.</div>
+          </div>
+          <div class="msg" id="suMsg2"></div>
+        </div>
+
+        <div style="margin-top:10px">
+          <button class="btn ghost" id="loginInsteadBtn" style="width:100%">Log in instead</button>
+        </div>
+      </div>
+
+      <div class="modalFooter">
+        <button class="btn ghost" id="suBackBtn" style="display:none">Back</button>
+        <button class="btn primary" id="continueBtn">Continue →</button>
+        <button class="btn primary" id="verifyBtn" style="display:none">Verify + create →</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: LOGIN -->
-  <div id="loginModal" class="fixed inset-0 z-[60] hidden">
-    <div class="absolute inset-0 modal-backdrop"></div>
-    <div class="absolute inset-0 overflow-y-auto p-4" style="-webkit-overflow-scrolling: touch;">
-      <div class="min-h-full flex items-center justify-center">
-        <div class="w-full max-w-lg glass rounded-xl2 border border-line overflow-hidden">
-          <div class="px-5 py-4 border-b border-line flex items-center justify-between">
-            <div class="text-sm font-semibold text-white/90">Log in</div>
-            <button id="closeLoginBtn" class="px-3 py-2 rounded-xl border border-line hover:bg-white/5 transition text-sm">Close</button>
-          </div>
-
-          <div class="p-5 space-y-3">
-            <label class="block">
-              <div class="text-xs text-white/55 mb-1">Email</div>
-              <input id="liEmail" type="email" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40" />
-            </label>
-
-            <label class="block">
-              <div class="text-xs text-white/55 mb-1">Password</div>
-              <div class="relative">
-                <input id="liPassword" type="password" class="w-full pr-12 px-3 py-2 rounded-xl bg-white/5 border border-line focus:outline-none focus:ring-2 focus:ring-accent/40" />
-                <button id="liTogglePw" type="button" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg border border-line bg-white/5 hover:bg-white/10 grid place-items-center">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2">
-                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-              </div>
-            </label>
-
-            <button id="loginBtn" class="w-full px-4 py-2.5 rounded-xl border border-line bg-white/5 hover:bg-white/8 transition text-sm font-medium">
-              Log in
-            </button>
-
-            <div id="liMsg" class="text-sm text-white/70"></div>
-          </div>
-
-        </div>
+  <!-- LOGIN MODAL -->
+  <div class="backdrop" id="loginBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <div class="modalHeader">
+        <b>Log in</b>
+        <button class="btn ghost" id="loginCloseBtn">Close</button>
       </div>
-    </div>
-  </div>
-
-  <!-- MODAL: EMPLOYEE SIGNUP (placeholder for later) -->
-  <div id="employeeModal" class="fixed inset-0 z-[60] hidden">
-    <div class="absolute inset-0 modal-backdrop"></div>
-    <div class="absolute inset-0 overflow-y-auto p-4" style="-webkit-overflow-scrolling: touch;">
-      <div class="min-h-full flex items-center justify-center">
-        <div class="w-full max-w-lg glass rounded-xl2 border border-line overflow-hidden">
-          <div class="px-5 py-4 border-b border-line flex items-center justify-between">
-            <div class="text-sm font-semibold text-white/90">Employee sign up</div>
-            <button id="closeEmployeeBtn" class="px-3 py-2 rounded-xl border border-line hover:bg-white/5 transition text-sm">Close</button>
-          </div>
-
-          <div class="p-5 space-y-3">
-            <div class="text-sm text-white/70">
-              Employee signup will be enabled after the owner onboarding flow is finalised.
-            </div>
-            <button id="closeEmployeeBtn2" class="w-full px-4 py-2.5 rounded-xl border border-line bg-white/5 hover:bg-white/8 transition text-sm font-medium">
-              Close
+      <div class="modalBody">
+        <div class="field">
+          <label>Email</label>
+          <input id="liEmail" class="input" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="pwWrap">
+            <input id="liPassword" class="input" type="password" autocomplete="current-password" />
+            <button class="pwToggle" id="liPwToggle" type="button" aria-label="Show password">
+              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
             </button>
           </div>
-
         </div>
+        <div class="msg" id="liMsg"></div>
+      </div>
+      <div class="modalFooter">
+        <button class="btn primary" id="loginBtn">Log in →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE SIGNUP MODAL (placeholder UI) -->
+  <div class="backdrop" id="empBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <div class="modalHeader">
+        <b>Sign up as an employee</b>
+        <button class="btn ghost" id="empCloseBtn">Close</button>
+      </div>
+      <div class="modalBody">
+        <p>Employee signup will use your company ID (e.g. THR624564) and a verification code. We’ll wire this up once owner onboarding is fully stable.</p>
+        <div class="msg" id="empMsg"></div>
+      </div>
+      <div class="modalFooter">
+        <button class="btn ghost" id="empOkBtn">OK</button>
       </div>
     </div>
   </div>
 
   <script>
-    // ====== CONFIG ======
-    // Your project values:
-    const SUPABASE_URL = "https://hjdpcfhozhoyeqevnupm.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZHBjZmhvemhveWVxZXZudXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MTk3MzYsImV4cCI6MjA4MjQ5NTczNn0.BXosJO4NmEZOe73GXSGPa3z-i_4ZzF9zBAMBIf6Mkts";
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    /* ================================
+       Helpers
+    ================================= */
+    const $ = (id) => document.getElementById(id);
 
-    // ====== DATA ======
+    function money(n){
+      if (n == null) return "";
+      return "£" + Number(n).toFixed(0);
+    }
+
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+    async function apiPost(path, payload){
+      const res = await fetch(path, {
+        method:"POST",
+        headers: {"content-type":"application/json"},
+        body: JSON.stringify(payload || {})
+      });
+      const text = await res.text();
+      let data = null;
+      try { data = JSON.parse(text); } catch { data = { raw: text }; }
+      if (!res.ok) {
+        const msg = (data && (data.error || data.message)) ? (data.error || data.message) : text;
+        throw new Error(msg || ("Request failed: " + res.status));
+      }
+      return data;
+    }
+
+    function openModal(backdropId){
+      const bd = $(backdropId);
+      bd.classList.add("show");
+      bd.setAttribute("aria-hidden","false");
+      document.body.classList.add("modalOpen");
+    }
+    function closeModal(backdropId){
+      const bd = $(backdropId);
+      bd.classList.remove("show");
+      bd.setAttribute("aria-hidden","true");
+      document.body.classList.remove("modalOpen");
+    }
+
+    function setMsg(el, text, kind){
+      el.textContent = text || "";
+      el.classList.remove("bad","good");
+      if (kind) el.classList.add(kind);
+    }
+
+    /* ================================
+       Data
+    ================================= */
     const COMPANY_SIZES = [
-      { id: "up_to_25", label: "Up to 25 people", price_gbp: 39, note: "£39 / month" },
-      { id: "26_100", label: "26–100 people", price_gbp: 79, note: "£79 / month" },
-      { id: "101_250", label: "101–250 people", price_gbp: 149, note: "£149 / month" },
-      { id: "250_plus", label: "250+ people", price_gbp: 0, note: "Contact us" }
+      { id:"up_to_25", label:"Up to 25 people", price:39, note:"£39 / month" },
+      { id:"26_100", label:"26–100 people", price:79, note:"£79 / month" },
+      { id:"101_250", label:"101–250 people", price:149, note:"£149 / month" },
+      { id:"250_plus", label:"250+ people", price:null, note:"Contact us" }
     ];
-
-    const YT_EMBED = "https://www.youtube.com/embed/S2kymv60ndQ?rel=0&modestbranding=1";
 
     const MODULES = [
-      { id: "presence_fire", name: "Presence & Fire Safety", price_gbp: 10,
-        summary: "A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.\n\nDesigned to be simple, fast, and reliable when it matters most, with clear records for audits and incident reviews.",
-        features: ["Live on-site list for staff and visitors","Instant evacuation roll call view","Audit-ready sign in/out history","Visitor sign-in with basic details","Fast kiosk-friendly workflows","Exportable logs for reviews"]
+      {
+        id:"presence_fire",
+        name:"Presence & Fire Safety",
+        price:10,
+        summary:"A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.",
+        extra:"Designed to be simple, fast, and reliable when it matters most, with clear records for audits and incident reviews.",
+        video:"https://youtu.be/S2kymv60ndQ?si=7AGk-tN09k0g5qf3",
       },
-      { id: "policies_handbook", name: "Policies & Staff Handbook", price_gbp: 7,
-        summary: "A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document. Managers can update policies, request re-acknowledgement, and view clear records at any time.\n\nHelps organisations demonstrate that information has been issued and acknowledged without relying on paper or email chains.",
-        features: ["Central policy library","Read & acknowledgement tracking","Re-acknowledgement requests","Clear, exportable records","Version history support","Simple manager overview"]
+      {
+        id:"policies_handbook",
+        name:"Policies & Staff Handbook",
+        price:7,
+        summary:"A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document.",
+        extra:"Managers can update policies, request re-acknowledgement, and view clear records at any time. Helps organisations demonstrate that information has been issued and acknowledged without relying on paper or email chains.",
+        video:"https://youtu.be/S2kymv60ndQ?si=7AGk-tN09k0g5qf3",
       },
-      { id: "holiday_booking", name: "Holiday Booking", price_gbp: 8,
-        summary: "A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place.\n\nIntentionally simple and focused, with no payroll or salary management.",
-        features: ["Request + approve/decline flow","Team absence visibility","Simple calendar overview","Notes and audit trail","Approver controls","Exportable reports"]
+      {
+        id:"holiday_booking",
+        name:"Holiday Booking",
+        price:8,
+        summary:"A straightforward holiday request and approval system that removes unnecessary back-and-forth.",
+        extra:"Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place. Intentionally simple and focused, with no payroll or salary management.",
+        video:"https://youtu.be/S2kymv60ndQ?si=7AGk-tN09k0g5qf3",
       },
-      { id: "accident_injury", name: "Accident & Injury Book", price_gbp: 3,
-        summary: "A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required.\n\nKeeps incident records organised, secure, and easy to access if they are ever needed.",
-        features: ["Fast incident logging","Photo attachments","Witness details capture","Exportable incident reports","Secure record storage","Clear audit trail"]
+      {
+        id:"accident_book",
+        name:"Accident & Injury Book",
+        price:3,
+        summary:"A digital accident and injury reporting system that replaces paper accident books.",
+        extra:"Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required. Keeps incident records organised, secure, and easy to access if they are ever needed.",
+        video:"https://youtu.be/S2kymv60ndQ?si=7AGk-tN09k0g5qf3",
       },
-      { id: "training_compliance", name: "Training & Compliance", price_gbp: 9,
-        summary: "Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance.\n\nDesigned to support consistency and oversight without adding unnecessary complexity.",
-        features: ["Expiry date tracking","Scheduled checks overview","Automatic reminders","Compliance status visibility","Exportable records","Simple admin controls"]
+      {
+        id:"training_compliance",
+        name:"Training & Compliance",
+        price:9,
+        summary:"Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation.",
+        extra:"Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance. Designed to support consistency and oversight without adding unnecessary complexity.",
+        video:"https://youtu.be/S2kymv60ndQ?si=7AGk-tN09k0g5qf3",
       },
-      { id: "onboarding_offboarding", name: "Onboarding & Offboarding", price_gbp: 8,
-        summary: "Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments. From access setup to equipment returns, nothing is forgotten.\n\nProvides a clear record of what was completed and when, supporting smoother staff transitions.",
-        features: ["Structured checklists","Department task ownership","Completion timestamps","Leaver equipment return tracking","Access/permissions checklist","Exportable records"]
+      {
+        id:"onboarding_offboarding",
+        name:"Onboarding & Offboarding",
+        price:8,
+        summary:"Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments.",
+        extra:"From access setup to equipment returns, nothing is forgotten. Provides a clear record of what was completed and when, supporting smoother staff transitions.",
+        video:"https://youtu.be/S2kymv60ndQ?si=7AGk-tN09k0g5qf3",
       },
-      { id: "expenses_upload", name: "Expenses Upload", price_gbp: 6,
-        summary: "Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported for accounting or payroll systems.\n\nKeeps expense handling simple, organised, and traceable.",
-        features: ["Receipt upload","Notes and categories","Review queue","Export for accounting","Traceable submissions","Simple audit trail"]
+      {
+        id:"expenses_upload",
+        name:"Expenses Upload",
+        price:6,
+        summary:"Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts.",
+        extra:"Submissions can be reviewed and exported for accounting or payroll systems. Keeps expense handling simple, organised, and traceable.",
+        video:"https://youtu.be/S2kymv60ndQ?si=7AGk-tN09k0g5qf3",
       },
-      { id: "wellbeing_check", name: "Wellbeing Check", price_gbp: 4,
-        summary: "A lightweight wellbeing check-in that allows staff to quickly select one of three options:\n\n🙂 Positive (green)\n😐 Neutral (amber)\n🙁 Concerned (red)\n\nOver time, this provides managers with a simple, high-level view of wellbeing trends across teams.\n\nNo medical data, no intrusive questions — just a clear, visual pulse check designed to support awareness while respecting privacy.",
-        features: ["3-option quick check-in","Simple trend overview","Non-intrusive design","Team-level visibility","Privacy-respecting approach","Exportable summaries"]
-      }
+      {
+        id:"wellbeing_check",
+        name:"Wellbeing Check",
+        price:4,
+        summary:"A lightweight wellbeing check-in with three options: 🙂 Positive (green), 😐 Neutral (amber), 🙁 Concerned (red).",
+        extra:"Over time, this provides managers with a simple, high-level view of wellbeing trends across teams. No medical data, no intrusive questions — just a clear, visual pulse check designed to support awareness while respecting privacy.",
+        video:"https://youtu.be/S2kymv60ndQ?si=7AGk-tN09k0g5qf3",
+      },
     ];
 
-    // ====== HELPERS ======
-    const $ = (id) => document.getElementById(id);
-    const gbp = (n) => "£" + Number(n || 0).toFixed(0);
+    /* ================================
+       State
+    ================================= */
+    let selectedSizeId = null;
+    let selectedModuleIds = new Set();
+    let pendingSignup = null;
 
-    function show(el){ el.classList.remove("hidden"); }
-    function hide(el){ el.classList.add("hidden"); }
-
-    function openModal(id){
-      show($(id));
-      // prevent background scroll while modal open
-      document.documentElement.style.overflow = "hidden";
-      document.body.style.overflow = "hidden";
-    }
-    function closeModal(id){
-      hide($(id));
-      // restore scroll if no modals are open
-      const anyOpen = ["moduleModal","signupModal","loginModal","employeeModal"].some(mid => !$(mid).classList.contains("hidden"));
-      if (!anyOpen){
-        document.documentElement.style.overflow = "";
-        document.body.style.overflow = "";
-      }
-    }
-
-    function togglePw(inputId){
-      const el = $(inputId);
-      el.type = el.type === "password" ? "text" : "password";
-    }
-
-    // ====== NAV hide when leaving hero ======
-    function initNavHide(){
-      const nav = $("topNav");
-      const sentinel = $("heroSentinel");
-      const io = new IntersectionObserver((entries) => {
-        const e = entries[0];
-        if (e.isIntersecting) {
-          nav.classList.remove("navHidden"); nav.classList.add("navShown");
-        } else {
-          nav.classList.add("navHidden"); nav.classList.remove("navShown");
-        }
-      }, { threshold: 0.01 });
-      io.observe(sentinel);
-
-      window.addEventListener("scroll", () => {
-        if (window.scrollY < 40) { nav.classList.remove("navHidden"); nav.classList.add("navShown"); }
-      }, { passive: true });
-    }
-
-    function initReveal(){
-      const els = document.querySelectorAll(".reveal");
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting){
-            e.target.classList.add("show");
-            io.unobserve(e.target);
-          }
-        });
-      }, { threshold: 0.12 });
-      els.forEach(el => io.observe(el));
-    }
-
-    // ====== PLAN STATE ======
-    const plan = { companySize: null, modules: new Set() };
-
-    function calcTotal(){
-      const size = plan.companySize?.price_gbp ?? 0;
-      let mods = 0;
-      for (const id of plan.modules){
-        const m = MODULES.find(x => x.id === id);
-        mods += m ? m.price_gbp : 0;
-      }
-      return size + mods;
-    }
-
-    function updateSummary(){
-      if (!plan.companySize){
-        $("totalText").textContent = "£0 / month";
-        $("totalSub").textContent = "Select a company size to begin";
-        $("checkoutBtn").disabled = true;
-        $("checkoutBtn").classList.add("opacity-50","pointer-events-none");
-        return;
-      }
-      const total = calcTotal();
-      $("totalText").textContent = `${gbp(total)} / month`;
-      $("totalSub").textContent = `${plan.companySize.label} • ${plan.modules.size} module(s) selected`;
-      $("checkoutBtn").disabled = false;
-      $("checkoutBtn").classList.remove("opacity-50","pointer-events-none");
-    }
-
-    function renderCompanySizes(){
-      const grid = $("companySizeGrid");
+    /* ================================
+       Render: Company size & Modules
+    ================================= */
+    function renderSizes(){
+      const grid = $("sizeGrid");
       grid.innerHTML = "";
-      COMPANY_SIZES.forEach((s) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "text-left rounded-xl border border-line bg-white/5 hover:bg-white/7 transition p-4 flex items-center justify-between gap-3";
-        btn.innerHTML = `
-          <div class="min-w-0">
-            <div class="text-sm font-semibold text-white/85">${s.label}</div>
-            <div class="mt-1 text-xs text-white/55">${s.note}</div>
+      COMPANY_SIZES.forEach(sz => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.sizeId = sz.id;
+
+        card.innerHTML = `
+          <div class="pickBtn" title="Select">
+            <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
           </div>
-          <div class="w-9 h-9 rounded-full border border-line bg-white/5 grid place-items-center text-xs text-white/70">
-            <span>✓</span>
-          </div>
+          <h4>${sz.label}</h4>
+          <div class="price">${sz.note}</div>
+          <div class="sub">${sz.id === "250_plus" ? "We’ll quote based on requirements." : "Checkout online in minutes."}</div>
         `;
-        btn.addEventListener("click", () => {
-          plan.companySize = s;
-          $("modulesWrap").classList.remove("hidden");
-          $("summaryBar").classList.remove("hidden");
-          $("sizeHint").textContent = s.label;
 
-          [...grid.children].forEach((c) => {
-            c.classList.remove("bg-white/10");
-            c.style.borderColor = "rgba(255,255,255,0.10)";
-          });
-          btn.classList.add("bg-white/10");
-          btn.style.borderColor = "rgba(111,163,255,0.45)";
-
-          renderModules();
-          updateSummary();
+        card.addEventListener("click", () => {
+          if (sz.id === "250_plus"){
+            // still allow select, but checkout will show contact message.
+            selectedSizeId = sz.id;
+          } else {
+            selectedSizeId = sz.id;
+          }
+          // Reset modules on size change
+          selectedModuleIds = new Set();
+          updateSelectionUI();
+          $("modulesWrap").style.display = "block";
+          $("totalBar").style.display = "block";
+          $("sizeRight").textContent = sz.label;
+          scrollIntoPlanIfNeeded();
         });
-        grid.appendChild(btn);
+
+        grid.appendChild(card);
       });
     }
 
     function renderModules(){
       const grid = $("modulesGrid");
       grid.innerHTML = "";
-
-      MODULES.forEach((m) => {
-        const selected = plan.modules.has(m.id);
-
+      MODULES.forEach(m => {
         const card = document.createElement("div");
-        card.className = "rounded-xl border border-line bg-white/5 p-4 flex flex-col gap-3 transition";
-        if (selected){
-          card.classList.add("bg-white/12");
-          card.style.borderColor = "rgba(111,163,255,0.55)";
-          card.style.boxShadow = "0 0 0 2px rgba(111,163,255,0.18), 0 22px 70px rgba(0,0,0,0.30)";
-        }
+        card.className = "card";
+        card.dataset.moduleId = m.id;
 
+        // IMPORTANT: no summary text shown here (per your request)
         card.innerHTML = `
-          <div class="flex items-start justify-between gap-3">
-            <div class="min-w-0">
-              <div class="text-sm font-semibold text-white/90">${m.name}</div>
-              <div class="mt-1 text-xs text-white/55">£${m.price_gbp} / month</div>
-            </div>
-            <button type="button"
-              class="toggleMod w-11 h-11 rounded-full border ${selected ? "border-line2 bg-white/10" : "border-line bg-white/5"}
-                     hover:bg-white/10 transition grid place-items-center text-sm font-bold">
-              <span>${selected ? "✓" : "+"}</span>
-            </button>
+          <div class="pickBtn" title="Add/remove">
+            <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
           </div>
-          <div class="flex items-center justify-between gap-3">
-            <button type="button"
-              class="learnMore inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl border border-line
-                     bg-transparent hover:bg-white/5 transition whitespace-nowrap">
-              Learn more →
-            </button>
-            <div class="text-[11px] ${selected ? "text-accent" : "text-white/45"}">${selected ? "Selected" : "Optional module"}</div>
+          <h4>${m.name}</h4>
+          <div class="price">£${m.price} / month</div>
+
+          <div class="learnRow">
+            <button class="learnBtn" type="button" data-learn="${m.id}">Learn more</button>
+            <div class="tick"><strong>Selected</strong> <span class="miniDot" style="width:6px;height:6px;border-radius:99px;background:rgba(90,160,255,.6);display:inline-block"></span></div>
           </div>
         `;
 
-        card.querySelector(".toggleMod").addEventListener("click", () => {
-          if (plan.modules.has(m.id)) plan.modules.delete(m.id);
-          else plan.modules.add(m.id);
-          renderModules();
-          updateSummary();
+        // Toggle select on card click (but not learn button)
+        card.addEventListener("click", (e) => {
+          const learn = e.target.closest("[data-learn]");
+          if (learn) return;
+          if (!selectedSizeId){
+            return;
+          }
+          toggleModule(m.id);
         });
 
-        card.querySelector(".learnMore").addEventListener("click", () => openModuleModal(m.id));
+        // Learn more
+        card.querySelector("[data-learn]").addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openLearnMore(m.id);
+        });
+
         grid.appendChild(card);
       });
     }
 
-    function openModuleModal(id){
-      const m = MODULES.find(x => x.id === id);
+    function toggleModule(id){
+      if (selectedModuleIds.has(id)) selectedModuleIds.delete(id);
+      else selectedModuleIds.add(id);
+      updateSelectionUI();
+    }
+
+    function updateSelectionUI(){
+      // sizes
+      document.querySelectorAll("[data-size-id]").forEach(el => {
+        el.classList.toggle("selected", el.dataset.sizeId === selectedSizeId);
+      });
+
+      // modules
+      document.querySelectorAll("[data-module-id]").forEach(el => {
+        const on = selectedModuleIds.has(el.dataset.moduleId);
+        el.classList.toggle("selected", on);
+        // "Selected" label more obvious: hide unless selected
+        const tick = el.querySelector(".tick");
+        if (tick) tick.style.opacity = on ? "1" : "0";
+        if (tick) tick.style.transform = on ? "translateY(0)" : "translateY(4px)";
+      });
+
+      // totals
+      const size = COMPANY_SIZES.find(s => s.id === selectedSizeId);
+      let base = size ? (size.price || 0) : 0;
+      let mods = 0;
+      selectedModuleIds.forEach(mid => {
+        const m = MODULES.find(x => x.id === mid);
+        if (m) mods += m.price;
+      });
+
+      const total = base + mods;
+
+      if (!selectedSizeId){
+        $("monthlyTotal").textContent = "£0 / month";
+        $("monthlyNote").textContent = "Select a company size to begin";
+        $("checkoutBtn").disabled = true;
+      } else if (selectedSizeId === "250_plus"){
+        $("monthlyTotal").textContent = "Custom / month";
+        $("monthlyNote").textContent = "250+ people — contact us to quote";
+        $("checkoutBtn").disabled = false;
+      } else {
+        $("monthlyTotal").textContent = `£${total} / month`;
+        const sizeLabel = size?.label || "";
+        const modsCount = selectedModuleIds.size;
+        $("monthlyNote").textContent = `${sizeLabel} • ${modsCount} module${modsCount===1?"":"s"}`;
+        $("checkoutBtn").disabled = false;
+      }
+    }
+
+    function clearAll(){
+      selectedSizeId = null;
+      selectedModuleIds = new Set();
+      $("modulesWrap").style.display = "none";
+      $("totalBar").style.display = "none";
+      $("sizeRight").textContent = "Select one";
+      updateSelectionUI();
+    }
+
+    function scrollIntoPlanIfNeeded(){
+      const plan = $("planSection");
+      plan.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    /* ================================
+       Learn more modal (scroll-safe)
+    ================================= */
+    function openLearnMore(moduleId){
+      const m = MODULES.find(x => x.id === moduleId);
       if (!m) return;
-      $("modalTitle").textContent = m.name;
-      $("modalPrice").textContent = `£${m.price_gbp} / month`;
-      $("modalSummary").textContent = m.summary;
-      $("modalFeatures").innerHTML = "";
-      m.features.forEach(f => {
-        const li = document.createElement("li");
-        li.textContent = f;
-        $("modalFeatures").appendChild(li);
-      });
-      $("modalVideo").src = YT_EMBED;
-      openModal("moduleModal");
+
+      $("learnTitle").textContent = m.name;
+
+      const yt = makeYoutubeEmbed(m.video);
+      $("learnBody").innerHTML = `
+        <div style="display:grid; gap:12px">
+          <div style="border:1px solid rgba(255,255,255,.10); border-radius:14px; overflow:hidden; background:rgba(0,0,0,.18)">
+            ${yt}
+          </div>
+
+          <p><strong style="color:rgba(231,236,255,.86)">£${m.price} / month</strong></p>
+          <p>${escapeHtml(m.summary)}</p>
+          <p>${escapeHtml(m.extra)}</p>
+        </div>
+      `;
+
+      // open modal and lock scroll properly
+      openModal("learnBackdrop");
     }
 
-    function closeModuleModal(){
-      $("modalVideo").src = "";
-      closeModal("moduleModal");
-    }
-
-    // ====== ROUTING ======
-    function showHome(){
-      hide($("viewDashboard"));
-      show($("viewHome"));
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    function showDashboard(){
-      hide($("viewHome"));
-      show($("viewDashboard"));
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function setNavAuthed(isAuthed){
-      if (isAuthed){
-        show($("navLogoutBtn"));
-        show($("navDashboardBtn"));
-        hide($("navLoginBtn"));
-      } else {
-        hide($("navLogoutBtn"));
-        hide($("navDashboardBtn"));
-        show($("navLoginBtn"));
-      }
-    }
-
-    // ====== API helpers ======
-    async function apiPost(path, payload){
-      const res = await fetch(path, {
-        method: "POST",
-        headers: { "content-type":"application/json" },
-        body: JSON.stringify(payload || {})
-      });
-      const text = await res.text();
-      if (!res.ok) throw new Error(text || "Request failed");
-      return text ? JSON.parse(text) : {};
-    }
-
-    // ====== AUTH ======
-    async function signIn(email, password){
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      return { data, error };
-    }
-    async function signOut(){ await sb.auth.signOut(); }
-
-    // ====== DASHBOARD DATA ======
-    let currentCompany = null;
-    let currentSubscription = null;
-
-    async function loadDashboard(){
-      const { data: sessionData } = await sb.auth.getSession();
-      const session = sessionData?.session;
-      if (!session) return;
-
-      $("dashUserEmail").textContent = session.user.email;
-
-      // get company (owned by this user)
-      const { data: companyRows, error: cErr } = await sb
-        .from("companies")
-        .select("id,company_code,company_name,address,logo_url,owner_user_id")
-        .eq("owner_user_id", session.user.id)
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      if (cErr) { $("companySaveMsg").textContent = cErr.message; return; }
-      currentCompany = companyRows?.[0] || null;
-
-      if (!currentCompany){
-        $("companySaveMsg").textContent = "No company found for this user yet.";
-        return;
-      }
-
-      $("dashCompanyCode").textContent = `Company ID: ${currentCompany.company_code || "—"}`;
-      $("dashCompanyId").textContent = currentCompany.company_code || "—";
-
-      $("companyName").value = currentCompany.company_name || "";
-      $("companyAddress").value = currentCompany.address || "";
-
-      // subscription
-      const { data: subRows } = await sb
-        .from("subscriptions")
-        .select("selected_module_ids,company_size_label,total_gbp")
-        .eq("company_id", currentCompany.id)
-        .limit(1);
-
-      currentSubscription = subRows?.[0] || { selected_module_ids: [] };
-
-      renderOwnedLinks();
-      renderBuyMore();
-      await loadEmployees();
-    }
-
-    function renderOwnedLinks(){
-      const wrap = $("ownedLinks");
-      wrap.innerHTML = "";
-
-      const owned = new Set(currentSubscription?.selected_module_ids || []);
-      if (owned.size === 0){
-        const div = document.createElement("div");
-        div.className = "text-xs text-white/55";
-        div.textContent = "No systems selected yet.";
-        wrap.appendChild(div);
-        return;
-      }
-
-      MODULES.forEach((m) => {
-        if (!owned.has(m.id)) return;
-        const a = document.createElement("a");
-        a.href = "https://smartcoretechnology.co.uk";
-        a.target = "_blank";
-        a.className = "glass rounded-xl px-3 py-2 border border-line hover:bg-white/10 transition text-sm flex items-center justify-between";
-        a.innerHTML = `<span>${m.name}</span><span class="text-xs text-white/50">Open</span>`;
-        wrap.appendChild(a);
-      });
-    }
-
-    function renderBuyMore(){
-      const wrap = $("buyMoreGrid");
-      wrap.innerHTML = "";
-
-      const owned = new Set(currentSubscription?.selected_module_ids || []);
-      const available = MODULES.filter(m => !owned.has(m.id));
-
-      if (available.length === 0){
-        const div = document.createElement("div");
-        div.className = "text-xs text-white/55";
-        div.textContent = "You already have all systems.";
-        wrap.appendChild(div);
-        return;
-      }
-
-      available.forEach((m) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.dataset.mid = m.id;
-        btn.className = "text-left glass rounded-xl px-3 py-2 border border-line hover:bg-white/10 transition text-sm flex items-center justify-between";
-        btn.innerHTML = `<span>${m.name}</span><span class="text-xs text-white/50">Add</span>`;
-        btn.addEventListener("click", () => {
-          btn.classList.toggle("bg-white/10");
-          btn.classList.toggle("border-line2");
-          btn.classList.toggle("ring-2");
-          btn.classList.toggle("ring-accent/30");
-          btn.classList.toggle("selectedAdd");
-        });
-        wrap.appendChild(btn);
-      });
-    }
-
-    async function saveModules(){
-      $("modulesSaveMsg").textContent = "";
-      if (!currentCompany) return;
-
-      const addIds = [...document.querySelectorAll(".selectedAdd")].map(el => el.dataset.mid);
-      const current = new Set(currentSubscription?.selected_module_ids || []);
-      addIds.forEach(x => current.add(x));
-      const updated = Array.from(current);
-
-      const { error } = await sb
-        .from("subscriptions")
-        .update({ selected_module_ids: updated, updated_at: new Date().toISOString() })
-        .eq("company_id", currentCompany.id);
-
-      if (error){ $("modulesSaveMsg").textContent = error.message; return; }
-      $("modulesSaveMsg").textContent = "Saved. (Testing checkout complete)";
-      await loadDashboard();
-    }
-
-    async function saveCompany(){
-      $("companySaveMsg").textContent = "";
-      if (!currentCompany) return;
-
-      const company_name = $("companyName").value.trim();
-      const address = $("companyAddress").value.trim();
-
-      const { error } = await sb
-        .from("companies")
-        .update({ company_name, address })
-        .eq("id", currentCompany.id);
-
-      if (error){ $("companySaveMsg").textContent = error.message; return; }
-      $("companySaveMsg").textContent = "Company saved.";
-      await loadDashboard();
-    }
-
-    async function addEmployee() {
-  $("empMsg").textContent = "";
-  if (!currentCompany) {
-    $("empMsg").textContent = "Company not loaded.";
-    return;
-  }
-
-  const full_name = $("empName").value.trim();
-  const job_title = $("empTitle").value.trim();
-  const job_category = $("empCategory").value.trim();
-
-  if (!full_name) {
-    $("empMsg").textContent = "Enter a name.";
-    return;
-  }
-
-  // Generate employee ID:
-  // first 3 letters of name (letters only) + 9 digit number
-  const prefix = full_name
-    .replace(/[^a-zA-Z]/g, "")
-    .slice(0, 3)
-    .toUpperCase()
-    .padEnd(3, "X");
-
-  const randomDigits = Math.floor(100000000 + Math.random() * 900000000);
-  const employee_id = `${prefix}${randomDigits}`;
-
-  try {
-    const { error } = await supabase
-      .from("employees")
-      .insert([{
-        company_id: currentCompany.id,
-        full_name,
-        job_title,
-        job_category,
-        employee_code: employee_id
-      }]);
-
-    if (error) throw error;
-
-    // Clear inputs
-    $("empName").value = "";
-    $("empTitle").value = "";
-    $("empCategory").value = "";
-
-    $("empMsg").textContent = "Employee added.";
-    $("empMsg").className = "text-green-400 text-sm";
-
-    // Refresh employee list (if you have one)
-    if (typeof loadEmployees === "function") {
-      loadEmployees();
-    }
-
-  } catch (err) {
-    console.error(err);
-    $("empMsg").textContent = err.message || "Failed to add employee.";
-    $("empMsg").className = "text-red-400 text-sm";
-  }
-}
-
-
-      // generate employee_code via RPC
-      const { data: codeData, error: codeErr } = await sb.rpc("make_employee_code", { full_name });
-      if (codeErr) { $("empMsg").textContent = codeErr.message; return; }
-
-      const employee_code = codeData;
-
-      const { error } = await sb
-        .from("employees")
-        .insert([{ company_id: currentCompany.id, full_name, job_title, job_category, employee_code }]);
-
-      if (error){ $("empMsg").textContent = error.message; return; }
-
-      $("empMsg").textContent = `Added: ${employee_code}`;
-      $("empName").value = ""; $("empTitle").value = ""; $("empCategory").value = "";
-      await loadEmployees();
-    }
-
-    async function loadEmployees(){
-      const tbody = $("empTable");
-      tbody.innerHTML = "";
-      if (!currentCompany) return;
-
-      const { data, error } = await sb
-        .from("employees")
-        .select("employee_code,full_name,job_title,job_category")
-        .eq("company_id", currentCompany.id)
-        .order("created_at", { ascending: false });
-
-      if (error){
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td class="py-2 text-white/60" colspan="4">${error.message}</td>`;
-        tbody.appendChild(tr);
-        return;
-      }
-
-      if (!data || data.length === 0){
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td class="py-2 text-white/60" colspan="4">No employees added yet.</td>`;
-        tbody.appendChild(tr);
-        return;
-      }
-
-      data.forEach(r => {
-        const tr = document.createElement("tr");
-        tr.className = "border-b border-line/50";
-        tr.innerHTML = `
-          <td class="py-2 pr-3 font-mono text-xs text-white/80">${r.employee_code}</td>
-          <td class="py-2 pr-3">${r.full_name || ""}</td>
-          <td class="py-2 pr-3 text-white/75">${r.job_title || ""}</td>
-          <td class="py-2 pr-3 text-white/75">${r.job_category || ""}</td>
+    function makeYoutubeEmbed(url){
+      // Convert youtu.be to embed
+      try{
+        const u = new URL(url);
+        let id = "";
+        if (u.hostname.includes("youtu.be")) id = u.pathname.replace("/","");
+        if (u.hostname.includes("youtube.com") && u.searchParams.get("v")) id = u.searchParams.get("v");
+        const embed = `https://www.youtube.com/embed/${encodeURIComponent(id)}?rel=0&modestbranding=1`;
+        return `
+          <iframe
+            src="${embed}"
+            title="Module preview"
+            style="width:100%; aspect-ratio:16/9; border:0; display:block"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowfullscreen
+          ></iframe>
         `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // ====== SIGNUP (2-step) ======
-    let pendingSignup = null;
-
-    function setSignupStep(step){
-      if (step === 1){
-        $("signupStep1").classList.remove("hidden");
-        $("signupStep2").classList.add("hidden");
-        $("codeWrap").classList.add("hidden");
-      } else {
-        $("signupStep1").classList.add("hidden");
-        $("signupStep2").classList.remove("hidden");
-        $("codeWrap").classList.remove("hidden");
+      }catch{
+        return `<div style="padding:14px; color:rgba(231,236,255,.62); font-size:13px">Preview unavailable</div>`;
       }
     }
 
-    function openSignupModal(){
+    function escapeHtml(s){
+      return String(s||"").replace(/[&<>"']/g, (c)=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+
+    /* ================================
+       Signup flow (Owner) — CODE FIRST, THEN CREATE
+    ================================= */
+    function openSignup(){
+      // Must have size selected to checkout
+      if (!selectedSizeId){
+        scrollIntoPlanIfNeeded();
+        return;
+      }
+      // step 1 visible
+      $("signupStep1").style.display = "block";
+      $("signupStep2").style.display = "none";
+      $("continueBtn").style.display = "inline-flex";
+      $("verifyBtn").style.display = "none";
+      $("suBackBtn").style.display = "none";
+      setMsg($("suMsg"), "", null);
+      setMsg($("suMsg2"), "", null);
+
+      openModal("signupBackdrop");
+    }
+
+    function closeSignup(){
+      closeModal("signupBackdrop");
       pendingSignup = null;
-      $("suMsg").textContent = "";
       $("suCode").value = "";
-      setSignupStep(1);
-      openModal("signupModal");
     }
 
-    // ====== BUTTONS ======
-    function initButtons(){
-      $("goBuildPlanBtn").addEventListener("click", () => $("pricing").scrollIntoView({ behavior:"smooth", block:"start" }));
-      $("downArrowBtn").addEventListener("click", () => $("pricing").scrollIntoView({ behavior:"smooth", block:"start" }));
+    async function sendCodeForOwner(){
+      const company_name = $("suCompany").value.trim();
+      const full_name = $("suFullName").value.trim();
+      const email = $("suEmail").value.trim().toLowerCase();
+      const password = $("suPassword").value;
 
-      $("goEmployeeSignupBtn").addEventListener("click", () => openModal("employeeModal"));
-      $("closeEmployeeBtn").addEventListener("click", () => closeModal("employeeModal"));
-      $("closeEmployeeBtn2").addEventListener("click", () => closeModal("employeeModal"));
-
-      $("clearBtn").addEventListener("click", () => {
-        plan.companySize = null;
-        plan.modules.clear();
-        $("modulesWrap").classList.add("hidden");
-        $("summaryBar").classList.add("hidden");
-        $("sizeHint").textContent = "Select one";
-        renderCompanySizes();
-        renderModules();
-        updateSummary();
-      });
-
-      // Module modal
-      $("closeModuleModalBtn").addEventListener("click", closeModuleModal);
-
-      // Signup modal open from checkout
-      $("checkoutBtn").addEventListener("click", openSignupModal);
-      $("closeSignupBtn").addEventListener("click", () => closeModal("signupModal"));
-
-      $("openLoginBtn").addEventListener("click", () => { closeModal("signupModal"); openModal("loginModal"); });
-
-      $("suTogglePw").addEventListener("click", () => togglePw("suPassword"));
-      $("liTogglePw").addEventListener("click", () => togglePw("liPassword"));
-
-      // Step 1: Continue -> send code
-      $("continueBtn").addEventListener("click", async () => {
-        $("suMsg").textContent = "";
-
-        const company_name = $("suCompanyName").value.trim();
-        const email = $("suEmail").value.trim().toLowerCase();
-        const password = $("suPassword").value;
-
-        if (!plan.companySize) { $("suMsg").textContent = "Select a company size first."; return; }
-        if (!company_name) { $("suMsg").textContent = "Enter company name."; return; }
-        if (!email) { $("suMsg").textContent = "Enter email."; return; }
-        if (!password || password.length < 8) { $("suMsg").textContent = "Password must be at least 8 characters."; return; }
-
-        pendingSignup = {
-          company_name,
-          email,
-          password,
-          company_size: plan.companySize,
-          module_ids: Array.from(plan.modules),
-          full_name: $("suFullName").value.trim()
-        };
-
-        try {
-          $("continueBtn").disabled = true;
-          $("continueBtn").classList.add("opacity-50");
-
-          await apiPost("/api/send-code", { email, purpose: "owner_signup" });
-
-          $("suMsg").textContent = "Code sent. Check your inbox.";
-          setSignupStep(2);
-          $("suCode").focus();
-
-        } catch (e) {
-          $("suMsg").textContent = e.message || "Failed to send code.";
-        } finally {
-          $("continueBtn").disabled = false;
-          $("continueBtn").classList.remove("opacity-50");
-        }
-      });
-
-      $("backToDetailsBtn").addEventListener("click", () => {
-        $("suMsg").textContent = "";
-        setSignupStep(1);
-      });
-
-      // Step 2: Verify -> create -> login -> dashboard
-      $("verifyBtn").addEventListener("click", async () => {
-        $("suMsg").textContent = "";
-        if (!pendingSignup) { $("suMsg").textContent = "Press Continue first."; return; }
-
-        const code = $("suCode").value.trim();
-        if (!code || code.length !== 6) { $("suMsg").textContent = "Enter the 6-digit code."; return; }
-
-        try {
-          $("verifyBtn").disabled = true;
-          $("verifyBtn").classList.add("opacity-50");
-
-          await apiPost("/api/verify-code", {
-            purpose: "owner_signup",
-            email: pendingSignup.email,
-            code,
-            full_name: pendingSignup.full_name,
-            password: pendingSignup.password,
-            company_name: pendingSignup.company_name,
-            company_size: pendingSignup.company_size,
-            module_ids: pendingSignup.module_ids
-          });
-
-          // login
-          const { error } = await signIn(pendingSignup.email, pendingSignup.password);
-          if (error) throw new Error(error.message);
-
-          pendingSignup = null;
-          $("suCode").value = "";
-          setSignupStep(1);
-          closeModal("signupModal");
-
-          setNavAuthed(true);
-          showDashboard();
-          await loadDashboard();
-
-        } catch (e) {
-          $("suMsg").textContent = e.message || "Verification failed.";
-        } finally {
-          $("verifyBtn").disabled = false;
-          $("verifyBtn").classList.remove("opacity-50");
-        }
-      });
-
-      // Login modal
-      $("navLoginBtn").addEventListener("click", () => openModal("loginModal"));
-      $("closeLoginBtn").addEventListener("click", () => closeModal("loginModal"));
-
-      $("loginBtn").addEventListener("click", async () => {
-        $("liMsg").textContent = "";
-        const email = $("liEmail").value.trim().toLowerCase();
-        const password = $("liPassword").value;
-        if (!email || !password) { $("liMsg").textContent = "Enter email and password."; return; }
-
-        const { error } = await signIn(email, password);
-        if (error) { $("liMsg").textContent = error.message; return; }
-
-        closeModal("loginModal");
-        setNavAuthed(true);
-        showDashboard();
-        await loadDashboard();
-      });
-
-      // Logout
-      $("navLogoutBtn").addEventListener("click", async () => {
-        await signOut();
-        setNavAuthed(false);
-        currentCompany = null;
-        currentSubscription = null;
-        showHome();
-      });
-
-      $("navDashboardBtn").addEventListener("click", async () => {
-        showDashboard();
-        await loadDashboard();
-      });
-
-      // Dashboard actions
-      $("saveCompanyBtn").addEventListener("click", saveCompany);
-      $("addEmployeeBtn").addEventListener("click", addEmployee);
-      $("saveModulesBtn").addEventListener("click", saveModules);
-
-      // Escape closes
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape"){
-          closeModuleModal();
-          closeModal("signupModal");
-          closeModal("loginModal");
-          closeModal("employeeModal");
-        }
-      });
-    }
-
-    // ====== BOOT ======
-    async function boot(){
-      initNavHide();
-      initReveal();
-      renderCompanySizes();
-      renderModules();
-      updateSummary();
-      initButtons();
-
-      const { data: s } = await sb.auth.getSession();
-      const session = s?.session;
-
-      if (session){
-        setNavAuthed(true);
-        showDashboard();
-        await loadDashboard();
-      } else {
-        setNavAuthed(false);
-        showHome();
+      if (!company_name || !full_name || !email || !password){
+        setMsg($("suMsg"), "Please fill in company name, your full name, email and password.", "bad");
+        return;
+      }
+      if (password.length < 8){
+        setMsg($("suMsg"), "Password must be at least 8 characters.", "bad");
+        return;
       }
 
-      sb.auth.onAuthStateChange(async (_event, session2) => {
-        if (session2){
-          setNavAuthed(true);
-          showDashboard();
-          await loadDashboard();
+      // Save pending info (NO Supabase user creation here)
+      pendingSignup = {
+        company_name,
+        full_name,
+        email,
+        password,
+        company_size: selectedSizeId,
+        module_ids: Array.from(selectedModuleIds)
+      };
+
+      $("continueBtn").disabled = true;
+      $("continueBtn").style.opacity = ".6";
+
+      try{
+        await apiPost("/api/send-code", { email, purpose:"owner_signup" });
+        // Step 2
+        $("signupStep1").style.display = "none";
+        $("signupStep2").style.display = "block";
+        $("continueBtn").style.display = "none";
+        $("verifyBtn").style.display = "inline-flex";
+        $("suBackBtn").style.display = "inline-flex";
+        setMsg($("suMsg2"), "Code sent. Enter it below to create your account.", "good");
+      }catch(e){
+        setMsg($("suMsg"), e.message || "Failed to send code.", "bad");
+      }finally{
+        $("continueBtn").disabled = false;
+        $("continueBtn").style.opacity = "1";
+      }
+    }
+
+    async function verifyAndCreateOwner(){
+      setMsg($("suMsg2"), "", null);
+      if (!pendingSignup){
+        setMsg($("suMsg2"), "Press Continue first.", "bad");
+        return;
+      }
+      const code = $("suCode").value.trim();
+      if (!code || code.length !== 6){
+        setMsg($("suMsg2"), "Enter the 6-digit code.", "bad");
+        return;
+      }
+
+      $("verifyBtn").disabled = true;
+      $("verifyBtn").style.opacity = ".6";
+
+      try{
+        // This endpoint should:
+        // - verify code (hashed) in signup_codes
+        // - create auth user (email+password)
+        // - create company + purchases
+        // - return ok:true and (optionally) session/user/company
+        const data = await apiPost("/api/verify-code", {
+          purpose: "owner_signup",
+          email: pendingSignup.email,
+          code,
+          full_name: pendingSignup.full_name,
+          password: pendingSignup.password,
+          company_name: pendingSignup.company_name,
+          company_size: pendingSignup.company_size,
+          module_ids: pendingSignup.module_ids
+        });
+
+        setMsg($("suMsg2"), "Account created. Redirecting…", "good");
+        closeSignup();
+
+        // In testing, just take them to home; dashboard will be wired once verify-code returns session.
+        // If your verify-code returns a redirect or dashboard token, handle it here.
+        // For now:
+        window.location.hash = "#dashboard";
+        // If you already have a dashboard route in your current version, it can hook into the hash.
+      }catch(e){
+        setMsg($("suMsg2"), e.message || "Create failed.", "bad");
+      }finally{
+        $("verifyBtn").disabled = false;
+        $("verifyBtn").style.opacity = "1";
+      }
+    }
+
+    function signupBack(){
+      $("signupStep1").style.display = "block";
+      $("signupStep2").style.display = "none";
+      $("continueBtn").style.display = "inline-flex";
+      $("verifyBtn").style.display = "none";
+      $("suBackBtn").style.display = "none";
+      $("suCode").value = "";
+      setMsg($("suMsg"), "", null);
+      setMsg($("suMsg2"), "", null);
+    }
+
+    /* ================================
+       Login (placeholder)
+    ================================= */
+    function openLogin(){
+      setMsg($("liMsg"), "", null);
+      $("liEmail").value = "";
+      $("liPassword").value = "";
+      openModal("loginBackdrop");
+    }
+    async function doLogin(){
+      setMsg($("liMsg"), "", null);
+      const email = $("liEmail").value.trim().toLowerCase();
+      const password = $("liPassword").value;
+      if (!email || !password){
+        setMsg($("liMsg"), "Enter email and password.", "bad");
+        return;
+      }
+      $("loginBtn").disabled = true;
+      $("loginBtn").style.opacity = ".6";
+      try{
+        // If you already created an API endpoint for login, call it here.
+        // Otherwise, we’ll keep this as a placeholder so UI doesn’t break.
+        // Example:
+        // await apiPost("/api/login", { email, password });
+        setMsg($("liMsg"), "Login endpoint not wired yet.", "bad");
+      }catch(e){
+        setMsg($("liMsg"), e.message || "Login failed.", "bad");
+      }finally{
+        $("loginBtn").disabled = false;
+        $("loginBtn").style.opacity = "1";
+      }
+    }
+
+    /* ================================
+       Nav hide / show on scroll
+       - hide when you scroll past hero
+       - show when near top
+    ================================= */
+    function setupNavAutoHide(){
+      const navwrap = $("navwrap");
+      const hero = $("hero");
+      const heroH = () => hero.getBoundingClientRect().height;
+
+      const onScroll = () => {
+        const y = window.scrollY || document.documentElement.scrollTop;
+        const threshold = Math.max(260, heroH() * 0.78);
+        if (y > threshold) navwrap.classList.add("hidden");
+        else navwrap.classList.remove("hidden");
+      };
+
+      window.addEventListener("scroll", onScroll, {passive:true});
+      onScroll();
+    }
+
+    /* ================================
+       Floating icons (scattered across screen)
+       - Ensure none overlap central text area
+    ================================= */
+    function iconSvg(type){
+      // lightweight set (8)
+      const svgs = {
+        plus:`<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>`,
+        check:`<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>`,
+        lock:`<svg viewBox="0 0 24 24"><path d="M7 11V8a5 5 0 0 1 10 0v3"/><path d="M6 11h12v10H6z"/></svg>`,
+        list:`<svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>`,
+        target:`<svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/></svg>`,
+        badge:`<svg viewBox="0 0 24 24"><path d="M12 2 19 6v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/></svg>`,
+        brief:`<svg viewBox="0 0 24 24"><path d="M9 6V4h6v2"/><path d="M4 7h16v13H4z"/><path d="M4 12h16"/></svg>`,
+        hex:`<svg viewBox="0 0 24 24"><path d="M7 3h10l4 7-4 11H7L3 10z"/><path d="M12 8v8"/></svg>`
+      };
+      return svgs[type] || svgs.plus;
+    }
+
+    function buildIcons(){
+      const layer = $("iconsLayer");
+      layer.innerHTML = "";
+
+      // Place icons around the hero, scattered (not only edges)
+      // Avoid central "safe box" where text sits.
+      // Safe zone approx: x 18%..68% and y 12%..62% on desktop. We'll keep icons outside.
+      const icons = ["plus","check","lock","list","target","badge","brief","hex"];
+
+      const placements = [
+        {x: 8,  y: 18, s: 150, t:"plus"},
+        {x: 82, y: 18, s: 140, t:"lock"},
+        {x: 10, y: 58, s: 140, t:"check"},
+        {x: 86, y: 62, s: 150, t:"brief"},
+        {x: 72, y: 40, s: 150, t:"hex"},
+        {x: 42, y: 74, s: 160, t:"list"},
+        {x: 58, y: 20, s: 135, t:"target"},
+        {x: 24, y: 34, s: 135, t:"badge"},
+      ];
+
+      placements.forEach(p => {
+        const d = document.createElement("div");
+        d.className = "iconBubble";
+        d.style.left = p.x + "%";
+        d.style.top = p.y + "%";
+        d.style.width = p.s + "px";
+        d.style.height = p.s + "px";
+        d.style.transform = "translate(-50%,-50%)";
+        d.innerHTML = iconSvg(p.t);
+        layer.appendChild(d);
+      });
+
+      // On very small screens, reduce overlap by shrinking and nudging
+      const applyResponsive = () => {
+        const w = window.innerWidth;
+        const all = Array.from(layer.querySelectorAll(".iconBubble"));
+        if (w < 560){
+          all.forEach((b, i) => {
+            b.style.width = "118px";
+            b.style.height = "118px";
+            // keep them scattered but less intrusive
+            b.style.opacity = ".12";
+          });
         } else {
-          setNavAuthed(false);
-          showHome();
+          all.forEach((b) => b.style.opacity = ".18");
         }
+      };
+
+      window.addEventListener("resize", applyResponsive);
+      applyResponsive();
+    }
+
+    /* ================================
+       Password eye toggles
+    ================================= */
+    function setupPwToggle(inputId, btnId){
+      const inp = $(inputId);
+      const btn = $(btnId);
+      btn.addEventListener("click", () => {
+        const isPw = inp.type === "password";
+        inp.type = isPw ? "text" : "password";
+        btn.setAttribute("aria-label", isPw ? "Hide password" : "Show password");
       });
     }
 
-    boot();
+    /* ================================
+       Wire UI
+    ================================= */
+    function wireUI(){
+      // buttons
+      $("scrollDownBtn").addEventListener("click", () => scrollIntoPlanIfNeeded());
+      $("buildPlanBtn").addEventListener("click", () => scrollIntoPlanIfNeeded());
+      $("clearBtn").addEventListener("click", () => clearAll());
+
+      $("checkoutBtn").addEventListener("click", () => openSignup());
+
+      $("navLoginBtn").addEventListener("click", () => openLogin());
+
+      $("employeeSignupBtn").addEventListener("click", () => openModal("empBackdrop"));
+
+      // learn modal close
+      $("learnCloseBtn").addEventListener("click", () => closeModal("learnBackdrop"));
+      $("learnGotItBtn").addEventListener("click", () => closeModal("learnBackdrop"));
+      $("learnBackdrop").addEventListener("click", (e) => {
+        if (e.target === $("learnBackdrop")) closeModal("learnBackdrop");
+      });
+
+      // signup modal close
+      $("suCloseBtn").addEventListener("click", closeSignup);
+      $("signupBackdrop").addEventListener("click", (e) => {
+        if (e.target === $("signupBackdrop")) closeSignup();
+      });
+      $("continueBtn").addEventListener("click", sendCodeForOwner);
+      $("verifyBtn").addEventListener("click", verifyAndCreateOwner);
+      $("suBackBtn").addEventListener("click", signupBack);
+
+      $("loginInsteadBtn").addEventListener("click", () => {
+        closeSignup();
+        openLogin();
+      });
+
+      // login modal
+      $("loginCloseBtn").addEventListener("click", () => closeModal("loginBackdrop"));
+      $("loginBackdrop").addEventListener("click", (e) => {
+        if (e.target === $("loginBackdrop")) closeModal("loginBackdrop");
+      });
+      $("loginBtn").addEventListener("click", doLogin);
+
+      // employee modal
+      $("empCloseBtn").addEventListener("click", () => closeModal("empBackdrop"));
+      $("empOkBtn").addEventListener("click", () => closeModal("empBackdrop"));
+      $("empBackdrop").addEventListener("click", (e) => {
+        if (e.target === $("empBackdrop")) closeModal("empBackdrop");
+      });
+
+      // password toggles
+      setupPwToggle("suPassword", "suPwToggle");
+      setupPwToggle("liPassword", "liPwToggle");
+    }
+
+    /* ================================
+       Init
+    ================================= */
+    function init(){
+      renderSizes();
+      renderModules();
+      updateSelectionUI();
+      setupNavAutoHide();
+      buildIcons();
+      wireUI();
+
+      // Initially modules hidden until size selected
+      $("modulesWrap").style.display = "none";
+      $("totalBar").style.display = "none";
+
+      // If user lands with /api routes in browser, show hint (but won’t break site)
+      // No redirect logic here — Cloudflare handles /api via Functions.
+    }
+
+    init();
   </script>
 </body>
 </html>
-
-
-
-
