@@ -2,193 +2,209 @@ export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json().catch(() => ({}));
 
-    const purpose = String(body.purpose || "owner_signup").trim();
+    const purpose = String(body.purpose || "owner_signup");
     const email = String(body.email || "").trim().toLowerCase();
     const code = String(body.code || "").trim();
-    const full_name = String(body.full_name || "").trim();
+
     const password = String(body.password || "");
     const company_name = String(body.company_name || "").trim();
-    const company_size = String(body.company_size || "").trim();
+    const company_size = body.company_size ? String(body.company_size) : null;
     const module_ids = Array.isArray(body.module_ids) ? body.module_ids.map(String) : [];
 
-    if (!env.SUPABASE_URL) return jsonErr("Missing SUPABASE_URL env var", 500);
-    if (!env.SUPABASE_SERVICE_ROLE_KEY) return jsonErr("Missing SUPABASE_SERVICE_ROLE_KEY env var", 500);
-    if (!env.CODE_SALT) return jsonErr("Missing CODE_SALT env var", 500);
+    if (!env.SUPABASE_URL) return jsonErr("Missing SUPABASE_URL env var");
+    if (!env.SUPABASE_SERVICE_ROLE_KEY) return jsonErr("Missing SUPABASE_SERVICE_ROLE_KEY env var");
+    if (!env.CODE_SALT) return jsonErr("Missing CODE_SALT env var");
 
     if (!email) return jsonErr("Missing email", 400);
-    if (!code || code.length !== 6) return jsonErr("Missing/invalid code", 400);
+    if (!code || code.length !== 6) return jsonErr("Invalid code", 400);
 
-    if (purpose === "owner_signup") {
-      if (!full_name) return jsonErr("Missing full_name", 400);
-      if (!password || password.length < 8) return jsonErr("Password must be at least 8 characters", 400);
-      if (!company_name) return jsonErr("Missing company_name", 400);
-      if (!company_size) return jsonErr("Missing company_size", 400);
+    if (purpose !== "owner_signup") {
+      return jsonErr("Invalid purpose for this endpoint", 400);
     }
 
-    // ---- hash provided code ----
-    const enc = new TextEncoder();
-    const digest = await crypto.subtle.digest("SHA-256", enc.encode(code + env.CODE_SALT));
-    const code_hash = Array.from(new Uint8Array(digest))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
+    if (!password || password.length < 8) return jsonErr("Password must be at least 8 characters", 400);
+    if (!company_name) return jsonErr("Missing company_name", 400);
 
-    // ---- fetch latest valid code row from signup_codes ----
-    // NOTE: your table should be public.signup_codes with columns:
-    // email (text), code_hash (text), purpose (text), company_code (text nullable), expires_at (timestamptz)
-    const nowIso = new Date().toISOString();
-    const q = new URL(`${env.SUPABASE_URL}/rest/v1/signup_codes`);
-    q.searchParams.set("select", "id,email,code_hash,purpose,expires_at,company_code,created_at");
-    q.searchParams.set("email", `eq.${email}`);
-    q.searchParams.set("purpose", `eq.${purpose}`);
-    q.searchParams.set("expires_at", `gt.${nowIso}`);
-    q.searchParams.set("order", "created_at.desc");
-    q.searchParams.set("limit", "1");
+    // 1) Verify code against stored hash
+    const code_hash = await sha256Hex(code + env.CODE_SALT);
 
-    const codeRes = await fetch(q.toString(), {
+    const codesRes = await fetch(`${env.SUPABASE_URL}/rest/v1/signup_codes?select=*&email=eq.${encodeURIComponent(email)}&purpose=eq.owner_signup&order=created_at.desc&limit=1`, {
       headers: {
         apikey: env.SUPABASE_SERVICE_ROLE_KEY,
         authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-      },
+      }
     });
 
-    if (!codeRes.ok) {
-      const t = await codeRes.text();
-      return jsonErr(`Supabase lookup failed: ${t}`, 500);
+    if (!codesRes.ok) {
+      const t = await codesRes.text();
+      return jsonErr(`Failed reading signup_codes: ${t}`);
     }
 
-    const rows = await codeRes.json();
-    const row = rows && rows[0];
-    if (!row) return jsonErr("Code not found or expired. Please request a new one.", 400);
-    if (String(row.code_hash) !== code_hash) return jsonErr("Incorrect code. Please try again.", 400);
+    const codes = await codesRes.json();
+    const rec = codes?.[0];
+    if (!rec) return jsonErr("No code request found for this email. Please send a new code.", 400);
 
-    // ---- consume the code (delete row) so it can't be reused ----
-    // (Even if later steps fail, they can request a new code)
-    if (row.id) {
-      const del = await fetch(`${env.SUPABASE_URL}/rest/v1/signup_codes?id=eq.${encodeURIComponent(row.id)}`, {
-        method: "DELETE",
-        headers: {
-          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-          authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        },
-      });
-      // If delete fails, still continue but log it in response if needed
-      if (!del.ok) {
-        const dt = await del.text();
-        // Not fatal, but useful for debugging:
-        // return jsonErr(`Code verified but failed to delete code row: ${dt}`, 500);
+    const now = Date.now();
+    const exp = rec.expires_at ? Date.parse(rec.expires_at) : 0;
+    if (!exp || exp < now) return jsonErr("Code expired. Please request a new one.", 400);
+
+    if (String(rec.code_hash) !== String(code_hash)) return jsonErr("Incorrect code. Please try again.", 400);
+
+    // 2) Create user (auth admin API)
+    // First check if user already exists
+    const listRes = await fetch(`${env.SUPABASE_URL}/auth/v1/admin/users?email=${encodeURIComponent(email)}`, {
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      }
+    });
+
+    if (listRes.ok) {
+      const list = await listRes.json().catch(() => null);
+      const existing = Array.isArray(list?.users) ? list.users.find(u => String(u.email || "").toLowerCase() === email) : null;
+      if (existing?.id) {
+        return jsonOk({ ok: true, status: "EMAIL_EXISTS" });
       }
     }
 
-    // ---- owner signup: create auth user AFTER code verified ----
-    if (purpose !== "owner_signup") {
-      return jsonOk({ ok: true, message: "Code verified." });
-    }
-
-    // Create user via Supabase Admin API
-    // https://supabase.com/docs/reference/javascript/auth-admin-createuser (but here we call REST)
-    const createUserRes = await fetch(`${env.SUPABASE_URL}/auth/v1/admin/users`, {
+    const createRes = await fetch(`${env.SUPABASE_URL}/auth/v1/admin/users`, {
       method: "POST",
       headers: {
+        "content-type": "application/json",
         apikey: env.SUPABASE_SERVICE_ROLE_KEY,
         authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        "content-type": "application/json",
       },
       body: JSON.stringify({
         email,
         password,
-        email_confirm: true,
-        user_metadata: {
-          full_name,
-          role: "owner",
-        },
-      }),
+        email_confirm: true
+      })
     });
 
-    const createUserText = await createUserRes.text();
-    let createdUser = null;
-    try {
-      createdUser = JSON.parse(createUserText);
-    } catch {
-      // leave as null
+    if (!createRes.ok) {
+      const t = await createRes.text();
+      return jsonErr(`Create user failed: ${t}`);
     }
 
-    if (!createUserRes.ok) {
-      // Common causes:
-      // - "User already registered"
-      // - Password policy issues
-      // - Wrong service role key / wrong Supabase URL
-      return jsonErr(`Create user failed: ${createUserText}`, 500);
+    const created = await createRes.json().catch(() => null);
+    const user_id = created?.id;
+    if (!user_id) return jsonErr("Create user failed (no id)");
+
+    // 3) Create company (id should default gen_random_uuid())
+    // Generate company_code: first 3 letters of company + 6 digits
+    const prefix = company_name.replace(/[^A-Za-z]/g, "").slice(0,3).toUpperCase().padEnd(3, "X");
+    let company_code = `${prefix}${Math.floor(100000 + Math.random()*900000)}`;
+
+    // Ensure unique company_code (retry)
+    for (let i=0;i<10;i++){
+      const check = await fetch(`${env.SUPABASE_URL}/rest/v1/companies?select=id&company_code=eq.${company_code}&limit=1`, {
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        }
+      });
+      const rows = check.ok ? await check.json().catch(()=>[]) : [];
+      if (!rows?.length) break;
+      company_code = `${prefix}${Math.floor(100000 + Math.random()*900000)}`;
     }
-
-    const userId = createdUser?.id;
-    if (!userId) return jsonErr(`Create user failed (no id): ${createUserText}`, 500);
-
-    // ---- create a company id/code ----
-    const companyCode = makeCompanyCode(company_name);
-
-    // Your companies table MUST have:
-    // id uuid primary key default gen_random_uuid()
-    // owner_user_id uuid references auth.users(id)
-    // company_name text
-    // company_code text (unique)
-    // company_size text
-    // address text nullable
-    const companyPayload = {
-      owner_user_id: userId,
-      company_name,
-      company_code: companyCode,
-      company_size,
-      address: body.address ? String(body.address).trim() : null,
-    };
 
     const compIns = await fetch(`${env.SUPABASE_URL}/rest/v1/companies`, {
       method: "POST",
       headers: {
+        "content-type":"application/json",
         apikey: env.SUPABASE_SERVICE_ROLE_KEY,
         authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        "content-type": "application/json",
-        prefer: "return=representation",
+        prefer: "return=representation"
       },
-      body: JSON.stringify(companyPayload),
+      body: JSON.stringify([{
+        company_name,
+        owner_user_id: user_id,
+        company_code
+      }])
     });
-
-    const compText = await compIns.text();
-    let compRow = null;
-    try { compRow = JSON.parse(compText)?.[0] || JSON.parse(compText); } catch {}
 
     if (!compIns.ok) {
-      return jsonErr(`Create company failed: ${compText}`, 500);
+      const t = await compIns.text();
+      return jsonErr(`Create company failed: ${t}`);
     }
 
-    // ---- optional: store module purchases for the company ----
-    // If you have a purchases table, wire it here. For now we just return module_ids as owned.
-    return jsonOk({
-      ok: true,
-      user: { id: userId, email },
-      company: compRow || null,
-      owned_module_ids: module_ids,
+    const compRow = (await compIns.json().catch(()=>null))?.[0];
+    const company_id = compRow?.id;
+    if (!company_id) return jsonErr("Company created but no id returned.");
+
+    // 4) Create profile (owner)
+    const profIns = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles`, {
+      method: "POST",
+      headers: {
+        "content-type":"application/json",
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        prefer: "return=minimal"
+      },
+      body: JSON.stringify([{
+        user_id,
+        company_id,
+        full_name: null,
+        job_title: null,
+        job_category: null,
+        is_admin: true
+      }])
     });
+    // ignore if already exists
+    if (!profIns.ok) {
+      // don't hard-fail onboarding for profile insert conflicts
+    }
+
+    // 5) Subscriptions (testing mode)
+    const subIns = await fetch(`${env.SUPABASE_URL}/rest/v1/subscriptions`, {
+      method: "POST",
+      headers: {
+        "content-type":"application/json",
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        prefer: "return=minimal"
+      },
+      body: JSON.stringify([{
+        company_id,
+        company_size,
+        module_ids
+      }])
+    });
+    if (!subIns.ok) {
+      // allow continue if subs already exists etc
+    }
+
+    // 6) Consume code (delete it)
+    await fetch(`${env.SUPABASE_URL}/rest/v1/signup_codes?email=eq.${encodeURIComponent(email)}&purpose=eq.owner_signup`, {
+      method: "DELETE",
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      }
+    });
+
+    return jsonOk({ ok: true, user_id, company_id, company_code });
+
   } catch (e) {
-    return jsonErr(`Error: ${e?.message || e}`, 500);
+    return jsonErr(`Error: ${e?.message || e}`);
   }
 }
 
-/* ---------- helpers ---------- */
-function jsonOk(obj) {
+function jsonOk(obj, status=200){
   return new Response(JSON.stringify(obj), {
-    headers: { "content-type": "application/json" },
-  });
-}
-function jsonErr(message, status = 500) {
-  return new Response(JSON.stringify({ ok: false, error: message }), {
     status,
-    headers: { "content-type": "application/json" },
+    headers: { "content-type":"application/json" }
+  });
+}
+function jsonErr(msg, status=500){
+  return new Response(JSON.stringify({ ok:false, error: msg }), {
+    status,
+    headers: { "content-type":"application/json" }
   });
 }
 
-function makeCompanyCode(companyName) {
-  const letters = companyName.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 3).padEnd(3, "X");
-  const num = String(Math.floor(100000 + Math.random() * 900000)); // 6 digits
-  return `${letters}${num}`;
+async function sha256Hex(str){
+  const enc = new TextEncoder();
+  const digest = await crypto.subtle.digest("SHA-256", enc.encode(str));
+  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
-
