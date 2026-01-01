@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,43 +10,48 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CDN (OK for now/testing) -->
+  <!-- Tailwind CDN (testing/dev ok) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Supabase JS -->
+  <!-- Supabase JS v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
-      --bg0:#040814;
-      --bg1:#060c1f;
-      --panel: rgba(255,255,255,.06);
-      --panel2: rgba(255,255,255,.035);
+      --bg0:#020617; /* near-black */
+      --bg1:#050b1f; /* deep navy */
+      --bg2:#07122e; /* slightly brighter */
+      --panel: rgba(255,255,255,.055);
+      --panel2: rgba(255,255,255,.040);
       --stroke: rgba(255,255,255,.10);
-      --stroke2: rgba(255,255,255,.08);
+      --stroke2: rgba(255,255,255,.085);
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.70);
       --muted2: rgba(255,255,255,.55);
-      --accent: #5b86ff;          /* subtle blue */
-      --accent2:#7aa2ff;
-      --danger:#ff4d5f;
-      --ok:#21c36a;
-      --warn:#f5b84b;
+      --accent:#4d7cff;   /* subtle blue */
+      --accent2:#82a3ff;
       --r: 14px;
+      --shadow: 0 14px 40px rgba(0,0,0,.28);
     }
-    html,body{height:100%; background: radial-gradient(1200px 800px at 20% 0%, rgba(91,134,255,.15), transparent 60%),
-                              radial-gradient(900px 600px at 85% 20%, rgba(122,162,255,.10), transparent 55%),
-                              linear-gradient(180deg, var(--bg0), var(--bg1));
-              color:var(--text); font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;}
+    html,body{
+      height:100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 700px at 20% -10%, rgba(77,124,255,.16), transparent 60%),
+        radial-gradient(900px 600px at 85% 10%, rgba(130,163,255,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 45%, var(--bg0));
+      overflow-x:hidden;
+    }
     .glass{
       background: var(--panel);
       border: 1px solid var(--stroke);
       border-radius: var(--r);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      box-shadow: var(--shadow);
     }
-    .glass2{
+    .glass-soft{
       background: var(--panel2);
       border: 1px solid var(--stroke2);
       border-radius: var(--r);
@@ -59,163 +63,176 @@
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
       color: var(--text);
-      transition: transform .15s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease, opacity .14s ease;
+      user-select:none;
     }
-    .btn:hover{background: rgba(255,255,255,.085); border-color: rgba(255,255,255,.18);}
-    .btn:active{transform: translateY(1px);}
+    .btn:hover{ background: rgba(255,255,255,.085); border-color: rgba(255,255,255,.18); }
+    .btn:active{ transform: translateY(1px); }
     .btn-primary{
-      background: linear-gradient(180deg, rgba(91,134,255,.95), rgba(91,134,255,.78));
-      border: 1px solid rgba(91,134,255,.65);
-      color: #06112a;
-      font-weight: 700;
-    }
-    .btn-primary:hover{filter: brightness(1.03);}
-    .chip{
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(77,124,255,.95), rgba(77,124,255,.78));
+      border: 1px solid rgba(77,124,255,.65);
+      color: #07122e;
+      font-weight: 800;
     }
     .card{
       border-radius: var(--r);
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.045);
-      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+      transition: transform .14s ease, border-color .14s ease, background .14s ease;
     }
-    .card:hover{border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.06);}
-    .card.selected{
-      border-color: rgba(91,134,255,.85);
-      background: rgba(91,134,255,.10);
-      outline: 2px solid rgba(91,134,255,.25);
+    .card:hover{ border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.06); }
+    .selected{
+      border-color: rgba(77,124,255,.88) !important;
+      background: rgba(77,124,255,.11) !important;
+      outline: 2px solid rgba(77,124,255,.22);
     }
-    .fade-in{
-      opacity:0;
-      transform: translateY(10px);
-      animation: fadeIn .6s ease forwards;
+    .chip{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      border-radius: 999px;
     }
-    @keyframes fadeIn{to{opacity:1; transform: translateY(0);}}
-    .modal-overlay{
-      position: fixed; inset: 0; z-index: 50;
-      background: rgba(0,0,0,.55);
+
+    /* Subtle appear */
+    .reveal{ opacity:0; transform: translateY(10px); }
+    .reveal.show{ opacity:1; transform: translateY(0); transition: opacity .65s ease, transform .65s ease; }
+
+    /* Modal */
+    .overlay{
+      position:fixed; inset:0; z-index:60;
+      background: rgba(0,0,0,.58);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       display:none;
-      align-items:center;
-      justify-content:center;
+      align-items:center; justify-content:center;
       padding: 18px;
     }
-    .modal-overlay.show{display:flex;}
+    .overlay.show{ display:flex; }
     .modal{
-      width: min(980px, 96vw);
+      width: min(1040px, 96vw);
       max-height: 88vh;
       overflow:auto;
+      -webkit-overflow-scrolling: touch;
     }
-    /* stop iOS weirdness */
-    .modal{-webkit-overflow-scrolling: touch;}
-    /* hero icons */
-    .hero-icon{
+
+    /* HERO scattered icons (desktop only; never behind text) */
+    .hero-icons{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+    .hicon{
       position:absolute;
-      width: 38px; height: 38px;
-      opacity: .22;
-      filter: saturate(.9);
-      pointer-events:none;
+      width: 44px; height: 44px;
+      opacity:.14;
+      filter: saturate(.95);
+      transform: translate(0,0);
       transition: transform .08s ease;
+      z-index: 0;
     }
-    @media (min-width:768px){
-      .hero-icon{width:42px;height:42px;opacity:.20;}
+    .hero-content{ position:relative; z-index: 10; }
+
+    /* Stop icons overlapping text on mobile */
+    @media (max-width: 768px){
+      .hero-icons{ display:none; }
     }
-    @media (min-width:1024px){
-      .hero-icon{width:48px;height:48px;opacity:.18;}
+
+    /* Nav slide */
+    #navWrap{ transform: translateY(0); transition: transform .18s ease; }
+    .navHidden{ transform: translateY(-120%) !important; }
+
+    /* Input */
+    .inp{
+      border-radius: 12px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      outline:none;
+      color: var(--text);
     }
-    /* hide scrollbar (optional) */
-    .no-scrollbar::-webkit-scrollbar{width:0;height:0}
-    .no-scrollbar{scrollbar-width:none}
+    .inp:focus{ border-color: rgba(255,255,255,.18); }
+
+    /* Make the eye hover subtle (no jumping) */
+    .eyeBtn:hover{ transform: scale(.96); }
+
+    /* Keep summary bar from feeling cramped */
+    #summarySpacer{ height: 110px; }
   </style>
 
   <script>
-    // >>> Put your Supabase values here (you already have them)
-    // Make sure quotes are correct (you had a missing quote previously)
+    // Your Supabase details (must be valid strings)
     window.__SUPABASE_URL  = "https://hjdpcfhozhoyeqevnupm.supabase.co";
     window.__SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZHBjZmhvemhveWVxZXZudXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MTk3MzYsImV4cCI6MjA4MjQ5NTczNn0.BXosJO4NmEZOe73GXSGPa3z-i_4ZzF9zBAMBIf6Mkts";
-
-    // Your API routes (Cloudflare Pages Functions)
-    // Must exist in /functions/api/send-code.js and /functions/api/verify-code.js
-    window.__API_BASE = ""; // same origin
+    // Cloudflare Pages Functions live at /api/...
+    window.__API_BASE = "";
   </script>
 </head>
 
-<body class="min-h-screen">
+<body>
 
   <!-- NAV -->
-  <header id="topNav" class="fixed top-0 left-0 right-0 z-40">
-    <div class="mx-auto max-w-6xl px-4 py-3">
+  <header class="fixed top-0 left-0 right-0 z-50">
+    <div class="mx-auto max-w-6xl px-4 py-3" id="navWrap">
       <div class="glass flex items-center justify-between px-4 py-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
-            <img src="SmartCore Official Logos/SC Icon - Black Background.png" alt="SmartCore" class="w-full h-full object-contain translate-y-[-2px]" />
+          <div class="w-11 h-11 rounded-xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+            <img
+              src="SmartCore Official Logos/SC Icon - Black Background.png"
+              alt="SmartCore"
+              class="w-full h-full object-contain translate-y-[-3px]"
+            />
           </div>
           <div class="leading-tight">
-            <div class="text-sm font-semibold tracking-tight">SmartCore <span class="text-white/75">Technology</span></div>
+            <div class="text-sm font-semibold tracking-tight">
+              SmartCore <span class="text-white/75">Technology</span>
+            </div>
             <div class="text-xs text-white/55">Practical Technology. Built to Last.</div>
           </div>
         </div>
 
         <div class="flex items-center gap-2">
-          <button id="navLoginBtn" class="btn px-3 py-2 text-sm">Log In</button>
+          <button id="navLogin" class="btn px-3 py-2 text-sm">Log In</button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN -->
-  <main>
-
-    <!-- HERO -->
+  <!-- HOME -->
+  <main id="home">
+    <!-- HERO full screen (no box) -->
     <section id="hero" class="relative pt-24">
       <div class="mx-auto max-w-6xl px-4">
         <div class="relative min-h-[calc(100vh-96px)] flex items-center">
-          <!-- Scattered Icons -->
-          <div id="heroIcons" class="absolute inset-0 overflow-hidden"></div>
+          <div id="heroIcons" class="hero-icons"></div>
 
-          <div class="relative w-full">
+          <div class="hero-content w-full">
             <div class="max-w-3xl">
-              <div class="flex flex-wrap gap-2 mb-6">
+              <div class="flex flex-wrap gap-2 mb-6 reveal">
                 <span class="chip px-3 py-1 text-xs text-white/70">HR & Safety Systems</span>
                 <span class="chip px-3 py-1 text-xs text-white/70">Modular SaaS</span>
-                <span class="chip px-3 py-1 text-xs text-white/70">Built for UK businesses</span>
+                <span class="chip px-3 py-1 text-xs text-white/70">Built to be reliable</span>
               </div>
 
-              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05]">
+              <h1 class="reveal text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.02]">
                 SmartCore <span class="text-white/75">Technology</span>
               </h1>
-              <p class="mt-4 text-lg sm:text-xl text-white/70 max-w-2xl">
-                Practical, reliable systems for presence, safety, and people operations — designed to run quietly in the background and work when it matters.
+
+              <p class="reveal mt-5 text-lg sm:text-xl text-white/70 max-w-2xl">
+                Practical, dependable systems for presence, safety and people operations — built to run quietly in the background and work when it matters.
               </p>
 
-              <div class="mt-8 flex flex-wrap items-center gap-3">
-                <button id="viewPackagesBtn" class="btn btn-primary px-5 py-3">
+              <div class="reveal mt-9 flex flex-wrap items-center gap-3">
+                <button id="btnPackages" class="btn btn-primary px-6 py-3">
                   View Packages
                 </button>
-                <button id="scrollDownBtn" class="btn px-5 py-3">
+                <button id="btnArrow" class="btn px-6 py-3 inline-flex items-center gap-2">
                   Scroll Down
+                  <svg class="w-4 h-4 text-white/70" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
                 </button>
               </div>
 
-              <div class="mt-10 text-sm text-white/55">
+              <div class="reveal mt-10 text-sm text-white/55">
                 Calm, professional software — no hype. Just tools built to last.
               </div>
             </div>
-
-            <!-- Down Arrow -->
-            <div class="mt-14">
-              <button id="downArrowBtn" class="btn px-4 py-3 inline-flex items-center gap-2">
-                <span class="text-white/70">Explore</span>
-                <svg class="w-4 h-4 text-white/70" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-            </div>
-
           </div>
+
         </div>
       </div>
     </section>
@@ -223,90 +240,71 @@
     <!-- PACKAGES -->
     <section id="packages" class="py-16">
       <div class="mx-auto max-w-6xl px-4">
-        <div class="mb-10">
+        <div class="reveal mb-10">
           <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Build Your Plan</h2>
           <p class="mt-2 text-white/65 max-w-2xl">
-            Choose your company size, then select the modules you want. Pricing updates live.
+            Choose your company size first. Modules appear after selection.
           </p>
         </div>
 
-        <!-- Company Size -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button class="card p-5 text-left" data-size-id="s25" data-size-label="Up to 25 people" data-size-price="39">
+        <!-- Company size -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 reveal">
+          <button class="card p-5 text-left" data-size="s25">
             <div class="text-sm text-white/65">Up to 25 people</div>
             <div class="mt-2 text-2xl font-bold">£39<span class="text-sm font-medium text-white/60">/month</span></div>
           </button>
-          <button class="card p-5 text-left" data-size-id="s100" data-size-label="26–100 people" data-size-price="79">
+          <button class="card p-5 text-left" data-size="s100">
             <div class="text-sm text-white/65">26–100 people</div>
             <div class="mt-2 text-2xl font-bold">£79<span class="text-sm font-medium text-white/60">/month</span></div>
           </button>
-          <button class="card p-5 text-left" data-size-id="s250" data-size-label="101–250 people" data-size-price="149">
+          <button class="card p-5 text-left" data-size="s250">
             <div class="text-sm text-white/65">101–250 people</div>
             <div class="mt-2 text-2xl font-bold">£149<span class="text-sm font-medium text-white/60">/month</span></div>
           </button>
-          <button class="card p-5 text-left" data-size-id="s250p" data-size-label="250+ people" data-size-price="0">
+          <button class="card p-5 text-left" data-size="s250p">
             <div class="text-sm text-white/65">250+ people</div>
             <div class="mt-2 text-2xl font-bold">Contact<span class="text-sm font-medium text-white/60"> us</span></div>
           </button>
         </div>
 
-        <!-- 250+ extra input -->
-        <div id="bigCompanyBox" class="mt-6 hidden">
+        <!-- 250+ details -->
+        <div id="bigBox" class="mt-6 hidden reveal">
           <div class="glass p-5">
-            <div class="flex flex-col lg:flex-row gap-4 lg:items-end">
-              <div class="flex-1">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div class="lg:col-span-1">
                 <label class="text-sm text-white/70">Approximate company size</label>
-                <input id="bigCompanySize" type="number" min="1" placeholder="e.g. 420" class="mt-2 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/20 text-white placeholder:text-white/35"/>
-                <div id="bigCompanyWarn" class="mt-2 text-sm text-white/55"></div>
+                <input id="bigSize" type="number" min="1" placeholder="e.g. 420" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" />
+                <div id="bigWarn" class="mt-2 text-sm text-white/55"></div>
               </div>
-              <div class="flex-1">
+              <div class="lg:col-span-2">
                 <label class="text-sm text-white/70">Additional notes (optional)</label>
-                <textarea id="bigCompanyNotes" rows="2" placeholder="Any requirements or context…" class="mt-2 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/20 text-white placeholder:text-white/35"></textarea>
+                <textarea id="bigNotes" rows="2" placeholder="Anything we should know…" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35"></textarea>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Modules -->
-        <div id="modulesWrap" class="mt-10 hidden">
-          <div class="flex items-end justify-between gap-4 flex-wrap">
+        <!-- Modules (hidden until company size selected) -->
+        <div id="modulesWrap" class="mt-12 hidden">
+          <div class="reveal flex items-end justify-between gap-4 flex-wrap">
             <div>
               <h3 class="text-xl font-semibold">Modules</h3>
-              <p class="text-white/60 text-sm mt-1">Select only what you need. Add or remove later.</p>
+              <p class="text-white/60 text-sm mt-1">Select what you need. Add or remove later.</p>
             </div>
           </div>
 
-          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="modulesGrid">
-            <!-- JS renders -->
-          </div>
+          <div id="modulesGrid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
         </div>
 
-        <!-- Sticky Summary -->
-        <div id="summaryBar" class="fixed bottom-0 left-0 right-0 z-30 hidden">
-          <div class="mx-auto max-w-6xl px-4 pb-4">
-            <div class="glass flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-4">
-              <div>
-                <div class="text-sm text-white/60">Monthly Total</div>
-                <div class="text-2xl font-bold" id="totalText">£0 / month</div>
-                <div class="text-xs text-white/45 mt-1" id="summaryHint"></div>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <button id="checkoutBtn" class="btn btn-primary px-5 py-3">
-                  Continue
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        <!-- Spacer so sticky bar never smashes content -->
+        <div id="summarySpacer" class="hidden"></div>
       </div>
     </section>
 
     <!-- ABOUT -->
     <section id="about" class="py-16">
       <div class="mx-auto max-w-6xl px-4">
-        <div class="glass p-7">
+        <div class="glass p-7 reveal">
           <h2 class="text-2xl font-bold">About SmartCore Technology</h2>
           <div class="mt-3 text-white/70 leading-relaxed space-y-4">
             <p>
@@ -321,6 +319,7 @@
             <p>
               SmartCore Technology is not about flashy software. It’s about building tools that work properly, scale sensibly, and quietly do their job in the background.
             </p>
+
             <h3 class="text-xl font-semibold pt-2">The SmartCore Technology Approach</h3>
             <p>SmartCore Technology is built on a simple philosophy: technology should make work easier, not more complicated.</p>
             <ul class="list-disc pl-6 space-y-1">
@@ -344,156 +343,13 @@
     <!-- FOOTER -->
     <footer class="py-10">
       <div class="mx-auto max-w-6xl px-4">
-        <div class="glass2 px-5 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="glass-soft px-5 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 reveal">
           <div class="text-sm text-white/70">© <span id="year"></span> SmartCore Technology</div>
           <a class="text-sm text-white/70 hover:text-white" href="mailto:support@smartcoretechnology.co.uk">support@smartcoretechnology.co.uk</a>
         </div>
       </div>
     </footer>
-
   </main>
-
-  <!-- MODULE LEARN MORE MODAL -->
-  <div id="moduleModal" class="modal-overlay" aria-hidden="true">
-    <div class="modal glass p-6">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <div class="text-xs text-white/55" id="mmPrice">£0 / month</div>
-          <h3 class="text-2xl font-bold mt-1" id="mmTitle">Module</h3>
-          <p class="mt-2 text-white/70" id="mmSummary"></p>
-        </div>
-        <button id="mmClose" class="btn px-3 py-2 text-sm">Close</button>
-      </div>
-
-      <div class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="glass2 p-4">
-          <div class="text-sm text-white/70 mb-2">Preview</div>
-          <div class="rounded-xl overflow-hidden border border-white/10">
-            <iframe id="mmVideo" class="w-full aspect-video" src="https://www.youtube-nocookie.com/embed/S2kymv60ndQ" title="Preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>
-          </div>
-          <div class="mt-3 text-xs text-white/55">Open fullscreen from the player controls.</div>
-        </div>
-        <div class="glass2 p-4">
-          <div class="text-sm text-white/70 mb-2">Features</div>
-          <ul class="space-y-2 text-white/70 text-sm" id="mmFeatures"></ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- LOGIN MODAL -->
-  <div id="loginModal" class="modal-overlay" aria-hidden="true">
-    <div class="modal glass p-6" style="width:min(560px, 96vw)">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h3 class="text-2xl font-bold">Log In</h3>
-          <p class="mt-2 text-white/70 text-sm">Access your dashboard and systems.</p>
-        </div>
-        <button id="loginClose" class="btn px-3 py-2 text-sm">Close</button>
-      </div>
-
-      <div class="mt-5 space-y-3">
-        <div>
-          <label class="text-sm text-white/70">Email</label>
-          <input id="liEmail" type="email" class="mt-2 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/20 text-white placeholder:text-white/35" placeholder="name@company.co.uk">
-        </div>
-        <div>
-          <label class="text-sm text-white/70">Password</label>
-          <div class="mt-2 relative">
-            <input id="liPass" type="password" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 pr-12 outline-none focus:border-white/20 text-white placeholder:text-white/35" placeholder="••••••••">
-            <button id="liEye" type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn px-3 py-2 text-xs" title="Show/Hide">
-              👁
-            </button>
-          </div>
-          <button id="liBad" class="mt-2 text-sm text-white/55 hover:text-white hidden text-left">Incorrect credentials — forgot your password?</button>
-        </div>
-
-        <div class="flex items-center gap-2 pt-2">
-          <button id="loginBtn" class="btn btn-primary px-5 py-3 w-full">Continue</button>
-        </div>
-
-        <div class="pt-2 text-sm text-white/60">
-          <div class="mt-2">
-            <button id="noAccountBtn" class="text-white/70 hover:text-white underline underline-offset-4">Don’t have an account?</button>
-          </div>
-        </div>
-
-        <div id="liMsg" class="text-sm text-white/70"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SIGNUP MODAL -->
-  <div id="signupModal" class="modal-overlay" aria-hidden="true">
-    <div class="modal glass p-6" style="width:min(620px, 96vw)">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h3 class="text-2xl font-bold">Create Company Account</h3>
-          <p class="mt-2 text-white/70 text-sm">Create your company admin account. A 6-digit code will be emailed to confirm ownership.</p>
-        </div>
-        <button id="suClose" class="btn px-3 py-2 text-sm">Close</button>
-      </div>
-
-      <div class="mt-5 space-y-3">
-        <div>
-          <label class="text-sm text-white/70">Company name</label>
-          <input id="suCompany" class="mt-2 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/20 text-white placeholder:text-white/35" placeholder="Your company name">
-        </div>
-        <div>
-          <label class="text-sm text-white/70">Email</label>
-          <input id="suEmail" type="email" class="mt-2 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/20 text-white placeholder:text-white/35" placeholder="name@company.co.uk">
-        </div>
-        <div>
-          <label class="text-sm text-white/70">Password</label>
-          <div class="mt-2 relative">
-            <input id="suPass" type="password" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 pr-12 outline-none focus:border-white/20 text-white placeholder:text-white/35" placeholder="Minimum 8 characters">
-            <button id="suEye" type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn px-3 py-2 text-xs" title="Show/Hide">👁</button>
-          </div>
-        </div>
-
-        <div class="pt-2">
-          <button id="sendCodeBtn" class="btn btn-primary px-5 py-3 w-full">Continue</button>
-        </div>
-
-        <div id="codeBox" class="hidden pt-2">
-          <div class="glass2 p-4">
-            <div class="text-sm text-white/70">Enter verification code</div>
-            <input id="suCode" maxlength="6" class="mt-2 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/20 text-white placeholder:text-white/35" placeholder="6-digit code">
-            <button id="verifyCreateBtn" class="mt-3 btn btn-primary px-5 py-3 w-full">Continue</button>
-            <div class="mt-2 text-xs text-white/55">Codes expire after 10 minutes.</div>
-          </div>
-        </div>
-
-        <div id="suMsg" class="text-sm text-white/70"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAYMENT MODAL (TEST) -->
-  <div id="payModal" class="modal-overlay" aria-hidden="true">
-    <div class="modal glass p-6" style="width:min(620px, 96vw)">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h3 class="text-2xl font-bold">Payment</h3>
-          <p class="mt-2 text-white/70 text-sm">Testing mode — choose Accept or Decline. (Stripe will be added later.)</p>
-        </div>
-        <button id="payClose" class="btn px-3 py-2 text-sm">Close</button>
-      </div>
-
-      <div class="mt-6 glass2 p-5">
-        <div class="text-sm text-white/60">Total</div>
-        <div class="text-2xl font-bold mt-1" id="payTotal">£0 / month</div>
-        <div class="text-sm text-white/55 mt-2" id="paySummary"></div>
-      </div>
-
-      <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button id="payAccept" class="btn btn-primary px-5 py-3">Accept</button>
-        <button id="payDecline" class="btn px-5 py-3">Decline</button>
-      </div>
-
-      <div id="payMsg" class="mt-3 text-sm text-white/70"></div>
-    </div>
-  </div>
 
   <!-- DASHBOARD -->
   <section id="dashboard" class="hidden pt-24 pb-16">
@@ -507,22 +363,20 @@
           </div>
           <div class="flex items-center gap-2">
             <button id="dashSignOut" class="btn px-4 py-3">Sign Out</button>
-            <button id="dashBackHome" class="btn px-4 py-3">Back to site</button>
+            <button id="dashHome" class="btn px-4 py-3">Back to site</button>
           </div>
         </div>
 
         <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div class="glass2 p-5 lg:col-span-2">
+          <div class="glass-soft p-5 lg:col-span-2">
             <div class="flex items-center justify-between">
               <h3 class="font-semibold">Your Systems</h3>
               <button id="dashBuyMore" class="btn px-3 py-2 text-sm">Buy More</button>
             </div>
-            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3" id="dashSystems">
-              <!-- JS renders -->
-            </div>
+            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3" id="dashSystems"></div>
           </div>
 
-          <div class="glass2 p-5">
+          <div class="glass-soft p-5">
             <h3 class="font-semibold">Company Details</h3>
             <div class="mt-3 space-y-2 text-sm text-white/70">
               <div><span class="text-white/55">Company ID:</span> <span id="dashCompanyCode" class="font-semibold"></span></div>
@@ -537,49 +391,214 @@
     </div>
   </section>
 
+  <!-- STICKY SUMMARY (only after company size selected) -->
+  <div id="summaryBar" class="fixed bottom-0 left-0 right-0 z-40 hidden">
+    <div class="mx-auto max-w-6xl px-4 pb-4">
+      <div class="glass flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-4">
+        <div>
+          <div class="text-sm text-white/60">Monthly Total</div>
+          <div class="text-2xl font-bold" id="totalText">£0 / month</div>
+          <div class="text-xs text-white/45 mt-1" id="summaryHint"></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="checkoutBtn" class="btn btn-primary px-6 py-3">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE MODAL -->
+  <div id="moduleModal" class="overlay" aria-hidden="true">
+    <div class="modal glass p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-xs text-white/55" id="mmPrice">£0 / month</div>
+          <h3 class="text-2xl font-bold mt-1" id="mmTitle">Module</h3>
+          <p class="mt-2 text-white/70" id="mmSummary"></p>
+        </div>
+        <button id="mmClose" class="btn px-3 py-2 text-sm">Close</button>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="glass-soft p-4">
+          <div class="text-sm text-white/70 mb-2">Preview</div>
+          <div class="rounded-xl overflow-hidden border border-white/10">
+            <iframe
+              id="mmVideo"
+              class="w-full aspect-video"
+              src="https://www.youtube-nocookie.com/embed/S2kymv60ndQ"
+              title="Preview"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="mt-3 text-xs text-white/55">Use the player controls to go fullscreen.</div>
+        </div>
+
+        <div class="glass-soft p-4">
+          <div class="text-sm text-white/70 mb-2">Features</div>
+          <ul class="space-y-2 text-white/70 text-sm" id="mmFeatures"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div id="loginModal" class="overlay" aria-hidden="true">
+    <div class="modal glass p-6" style="width:min(560px, 96vw)">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h3 class="text-2xl font-bold">Log In</h3>
+          <p class="mt-2 text-white/70 text-sm">Access your dashboard and systems.</p>
+        </div>
+        <button id="loginClose" class="btn px-3 py-2 text-sm">Close</button>
+      </div>
+
+      <div class="mt-5 space-y-3">
+        <div>
+          <label class="text-sm text-white/70">Email</label>
+          <input id="liEmail" type="email" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" placeholder="name@company.co.uk">
+        </div>
+
+        <div>
+          <label class="text-sm text-white/70">Password</label>
+          <div class="mt-2 relative">
+            <input id="liPass" type="password" class="inp w-full px-4 py-3 pr-12 placeholder:text-white/35" placeholder="••••••••">
+            <button id="liEye" type="button" class="eyeBtn absolute right-2 top-1/2 -translate-y-1/2 btn px-3 py-2 text-xs" title="Show/Hide">👁</button>
+          </div>
+
+          <button id="liBad" class="mt-3 text-sm text-white/55 hover:text-white hidden text-left">
+            Incorrect credentials — forgot your password?
+          </button>
+
+          <div class="mt-3">
+            <button id="noAccountBtn" class="text-sm text-white/70 hover:text-white underline underline-offset-4">
+              Don’t have an account?
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button id="loginBtn" class="btn btn-primary px-5 py-3 w-full">Continue</button>
+        </div>
+
+        <div id="liMsg" class="text-sm text-white/70"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGNUP MODAL -->
+  <div id="signupModal" class="overlay" aria-hidden="true">
+    <div class="modal glass p-6" style="width:min(620px, 96vw)">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h3 class="text-2xl font-bold">Create Company Account</h3>
+          <p class="mt-2 text-white/70 text-sm">
+            Enter details, then confirm with a 6-digit email code. Your account is only created after code verification.
+          </p>
+        </div>
+        <button id="suClose" class="btn px-3 py-2 text-sm">Close</button>
+      </div>
+
+      <div class="mt-5 space-y-3">
+        <div>
+          <label class="text-sm text-white/70">Company name</label>
+          <input id="suCompany" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" placeholder="Your company name">
+        </div>
+        <div>
+          <label class="text-sm text-white/70">Email</label>
+          <input id="suEmail" type="email" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" placeholder="name@company.co.uk">
+        </div>
+        <div>
+          <label class="text-sm text-white/70">Password</label>
+          <div class="mt-2 relative">
+            <input id="suPass" type="password" class="inp w-full px-4 py-3 pr-12 placeholder:text-white/35" placeholder="Minimum 8 characters">
+            <button id="suEye" type="button" class="eyeBtn absolute right-2 top-1/2 -translate-y-1/2 btn px-3 py-2 text-xs" title="Show/Hide">👁</button>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button id="sendCodeBtn" class="btn btn-primary px-5 py-3 w-full">Continue</button>
+        </div>
+
+        <div id="codeBox" class="hidden pt-2">
+          <div class="glass-soft p-4">
+            <div class="text-sm text-white/70">Enter verification code</div>
+            <input id="suCode" maxlength="6" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" placeholder="6-digit code">
+            <button id="goPayBtn" class="mt-3 btn btn-primary px-5 py-3 w-full">Continue</button>
+            <div class="mt-2 text-xs text-white/55">Codes expire after 10 minutes.</div>
+          </div>
+        </div>
+
+        <div id="suMsg" class="text-sm text-white/70"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT MODAL -->
+  <div id="payModal" class="overlay" aria-hidden="true">
+    <div class="modal glass p-6" style="width:min(620px, 96vw)">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h3 class="text-2xl font-bold">Payment</h3>
+          <p class="mt-2 text-white/70 text-sm">Testing mode — choose Accept or Decline. (Stripe later.)</p>
+        </div>
+        <button id="payClose" class="btn px-3 py-2 text-sm">Close</button>
+      </div>
+
+      <div class="mt-6 glass-soft p-5">
+        <div class="text-sm text-white/60">Total</div>
+        <div class="text-2xl font-bold mt-1" id="payTotal">£0 / month</div>
+        <div class="text-sm text-white/55 mt-2" id="paySummary"></div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <button id="payAccept" class="btn btn-primary px-5 py-3">Accept</button>
+        <button id="payDecline" class="btn px-5 py-3">Decline</button>
+      </div>
+
+      <div id="payMsg" class="mt-3 text-sm text-white/70"></div>
+    </div>
+  </div>
+
   <script>
-    // ---------- Utilities ----------
+    // ---------- helpers ----------
     const $ = (id)=>document.getElementById(id);
 
-    function money(n){ return `£${Number(n||0).toFixed(0)}`; }
-
-    function scrollToEl(el){
-      el.scrollIntoView({ behavior:"smooth", block:"start" });
-    }
-
-    function showModal(el){
+    function showOverlay(el){
       el.classList.add("show");
       el.setAttribute("aria-hidden","false");
       document.body.style.overflow = "hidden";
     }
-    function hideModal(el){
+    function hideOverlay(el){
       el.classList.remove("show");
       el.setAttribute("aria-hidden","true");
       document.body.style.overflow = "";
     }
+    function money(n){ return `£${Number(n||0).toFixed(0)}`; }
+    function scrollToEl(el){ el.scrollIntoView({behavior:"smooth", block:"start"}); }
 
     async function apiPost(path, body){
       const res = await fetch((window.__API_BASE||"") + path, {
-        method:"POST",
-        headers:{ "content-type":"application/json" },
-        body: JSON.stringify(body||{})
+        method: "POST",
+        headers: { "content-type":"application/json" },
+        body: JSON.stringify(body || {})
       });
-      const txt = await res.text();
+      const text = await res.text();
       let data = null;
-      try{ data = JSON.parse(txt); }catch(e){ /* ignore */ }
+      try{ data = JSON.parse(text); }catch(_e){}
       if(!res.ok){
-        const msg = data?.error || txt || `Request failed (${res.status})`;
-        throw new Error(msg);
+        throw new Error(data?.error || text || `Request failed (${res.status})`);
       }
       return data ?? {};
     }
 
-    // ---------- Data ----------
+    // ---------- data ----------
     const COMPANY_SIZES = [
-      { id:"s25", label:"Up to 25 people", price:39, max:25 },
-      { id:"s100", label:"26–100 people", price:79, max:100 },
-      { id:"s250", label:"101–250 people", price:149, max:250 },
-      { id:"s250p", label:"250+ people", price:0, max:999999 }
+      { id:"s25",  label:"Up to 25 people",  price:39,  max:25 },
+      { id:"s100", label:"26–100 people",    price:79,  max:100 },
+      { id:"s250", label:"101–250 people",   price:149, max:250 },
+      { id:"s250p",label:"250+ people",      price:0,   max:999999 }
     ];
 
     const MODULES = [
@@ -587,186 +606,321 @@
         id:"presence_fire",
         name:"Presence & Fire Safety",
         price:10,
-        summary:"Real-time presence with a live evacuation list for drills and emergencies.",
+        summary:"A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.",
         features:[
           "Live on-site list for staff and visitors",
           "Instant evacuation roll call",
           "Digital sign-in / sign-out",
-          "Audit-ready logs for reviews",
-          "Designed for speed and reliability"
+          "Clear records for audits and reviews",
+          "Designed to be fast and reliable"
         ]
       },
       {
         id:"policies_handbook",
         name:"Policies & Staff Handbook",
         price:7,
-        summary:"Central policies with acknowledgement tracking and clear records.",
+        summary:"A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document.",
         features:[
           "Upload and organise policies",
           "Read & acknowledge tracking",
           "Re-acknowledgement on updates",
           "Manager visibility and reporting",
-          "Clean recordkeeping without paper"
+          "No paper or email chains"
         ]
       },
       {
         id:"holiday_booking",
         name:"Holiday Booking",
         price:8,
-        summary:"Simple requests and approvals, with team visibility of absences.",
+        summary:"A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place.",
         features:[
           "Quick holiday requests",
           "Approve / decline workflows",
-          "Team calendar visibility",
-          "No payroll complexity",
-          "Clear audit trail"
+          "Team visibility for absences",
+          "Simple and focused (no payroll)",
+          "Clear record of decisions"
         ]
       },
       {
         id:"accident_injury",
         name:"Accident & Injury Book",
         price:3,
-        summary:"Digital incident reporting with exports and secure records.",
+        summary:"A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details.",
         features:[
           "Fast incident logging",
-          "Attach photos and notes",
-          "Witness details where needed",
-          "Export records for compliance",
-          "Secure, organised storage"
+          "Photos, notes and details",
+          "Witness capture if needed",
+          "Export when required",
+          "Secure organised records"
         ]
       },
       {
         id:"training_compliance",
         name:"Training & Compliance",
         price:9,
-        summary:"Track expiry dates and reminders for training and compliance tasks.",
+        summary:"Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed.",
         features:[
           "Expiry tracking",
           "Automated reminders",
           "Compliance schedules",
-          "Inspection/task oversight",
-          "Consistent organisational view"
+          "Oversight across teams",
+          "Designed for consistency"
         ]
       },
       {
         id:"on_offboarding",
         name:"Onboarding & Offboarding",
         price:8,
-        summary:"Structured checklists to ensure consistent joins and leavers.",
+        summary:"Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments.",
         features:[
           "New starter checklists",
           "Leaver checklists",
-          "Department task coverage",
+          "Cross-department task coverage",
           "Completion records",
-          "Smoother transitions"
+          "Smoother staff transitions"
         ]
       },
       {
         id:"expenses_upload",
         name:"Expenses Upload",
         price:6,
-        summary:"Digital receipt uploads with categories and export options.",
+        summary:"Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported.",
         features:[
           "Receipt uploads",
           "Notes and categories",
-          "Review pipeline",
+          "Review workflow",
           "Export for accounts/payroll",
-          "Traceable, organised flow"
+          "Traceable and organised"
         ]
       },
       {
         id:"wellbeing_check",
         name:"Wellbeing Check",
         price:4,
-        summary:"A lightweight visual pulse check using three simple options.",
+        summary:"A lightweight wellbeing check-in that allows staff to quickly select one of three options. No medical data, no intrusive questions — just a clear visual pulse check.",
         features:[
           "🙂 Positive (green)",
           "😐 Neutral (amber)",
           "🙁 Concerned (red)",
-          "Trends over time",
-          "No medical data; privacy-respecting"
+          "Trend view over time",
+          "Privacy-respecting by design"
         ]
       }
     ];
 
-    // ---------- State ----------
-    const sb = supabase.createClient(window.__SUPABASE_URL, window.__SUPABASE_ANON);
+    // ---------- state ----------
+    // IMPORTANT: do NOT redeclare "supabase" (that causes your 'already declared' crash)
+    const sb = window.supabase.createClient(window.__SUPABASE_URL, window.__SUPABASE_ANON);
+
     const state = {
-      size: null,              // chosen company size object
-      modules: new Set(),      // selected module ids
-      bigCompanyCount: null,
-      pendingSignup: null,
+      size: null,
+      modules: new Set(),
+      pending: null,        // pending signup details (before verify/payment accept)
+      bigSize: null,
       session: null,
       profile: null,
       company: null,
       subscription: null,
-      employees: [],
-      __profilesKey: "user_id" // detected
+      __profilesKey: "user_id"
     };
 
-    // ---------- Render modules ----------
+    // ---------- reveal animations ----------
+    function setupReveal(){
+      const els = document.querySelectorAll(".reveal");
+      const io = new IntersectionObserver((entries)=>{
+        for(const e of entries){
+          if(e.isIntersecting){
+            e.target.classList.add("show");
+            io.unobserve(e.target);
+          }
+        }
+      }, { threshold: 0.12 });
+      els.forEach(el=>io.observe(el));
+    }
+
+    // ---------- hero icons (desktop only, scattered) ----------
+    const ICON_SVGS = [
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 12h10M12 7v10" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 8h10M7 12h10M7 16h7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v10l-8 4-8-4V7l8-4z" stroke="white" stroke-width="2"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 16 0" stroke="white" stroke-width="2"/><path d="M12 12l3-3" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 12l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M12 2v6m0 8v6M4 12h6m8 0h6" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`
+    ];
+    const hObjs = [];
+
+    function buildHeroIcons(){
+      const host = $("heroIcons");
+      host.innerHTML = "";
+      hObjs.length = 0;
+
+      const fine = window.matchMedia("(pointer:fine)").matches;
+      if(!fine) return;
+
+      const count = 10; // “a dozen-ish” feel but not cluttered
+      for(let i=0;i<count;i++){
+        const el = document.createElement("div");
+        el.className = "hicon";
+        el.innerHTML = ICON_SVGS[i % ICON_SVGS.length];
+
+        // scatter across screen, but keep a central “read zone” clear
+        let x = Math.random();
+        let y = Math.random();
+        const inReadZone = (x>0.18 && x<0.72 && y>0.18 && y<0.74);
+        if(inReadZone){
+          x = x < 0.45 ? x - 0.22 : x + 0.22;
+          y = y < 0.45 ? y - 0.18 : y + 0.18;
+        }
+        x = Math.min(0.96, Math.max(0.02, x));
+        y = Math.min(0.92, Math.max(0.02, y));
+
+        el.style.left = (x*100) + "%";
+        el.style.top  = (y*100) + "%";
+        host.appendChild(el);
+
+        hObjs.push({ el, bx:x, by:y, tx:0, ty:0, vx:0, vy:0 });
+      }
+    }
+
+    function heroMousePush(){
+      const fine = window.matchMedia("(pointer:fine)").matches;
+      if(!fine) return;
+
+      const hero = $("hero");
+      hero.addEventListener("mousemove", (e)=>{
+        const r = hero.getBoundingClientRect();
+        const mx = (e.clientX - r.left) / r.width;
+        const my = (e.clientY - r.top) / r.height;
+
+        for(const o of hObjs){
+          const dx = o.bx - mx;
+          const dy = o.by - my;
+          const dist = Math.sqrt(dx*dx + dy*dy) || 0.001;
+          const near = Math.max(0, 0.20 - dist) / 0.20; // 0..1
+          const push = 22 * near;
+          o.tx = (dx/dist) * push;
+          o.ty = (dy/dist) * push;
+        }
+      });
+      hero.addEventListener("mouseleave", ()=>{
+        for(const o of hObjs){ o.tx=0; o.ty=0; }
+      });
+
+      const tick = ()=>{
+        for(const o of hObjs){
+          o.vx += (o.tx - o.vx) * 0.12;
+          o.vy += (o.ty - o.vy) * 0.12;
+          o.el.style.transform = `translate(${o.vx}px, ${o.vy}px)`;
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    // ---------- packages/modules ----------
     function renderModules(){
       const grid = $("modulesGrid");
       grid.innerHTML = "";
 
       for(const m of MODULES){
-        const el = document.createElement("div");
-        el.className = "card p-5 relative";
-        el.dataset.mid = m.id;
+        const card = document.createElement("div");
+        card.className = "card p-5";
+        card.dataset.mid = m.id;
 
-        el.innerHTML = `
+        card.innerHTML = `
           <div class="flex items-start justify-between gap-3">
             <div>
-              <div class="text-sm text-white/80 font-semibold">${m.name}</div>
+              <div class="text-sm font-semibold text-white/85">${m.name}</div>
               <div class="mt-1 text-xs text-white/55">${money(m.price)} / month</div>
             </div>
-            <div class="w-8 h-8 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-white/70" title="Selectable">
+            <div class="w-9 h-9 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-white/70">
               ✓
             </div>
           </div>
           <div class="mt-4 flex items-center justify-between gap-2">
             <button class="btn px-3 py-2 text-sm learnMore">Learn more</button>
-            <button class="btn px-3 py-2 text-sm toggleSelect">Select</button>
+            <button class="btn px-3 py-2 text-sm selBtn">Select</button>
           </div>
         `;
 
-        // clicking card toggles selection
-        el.addEventListener("click", (e)=>{
-          const isButton = e.target.closest("button");
-          if(isButton) return; // handled below
+        card.addEventListener("click", (e)=>{
+          if(e.target.closest("button")) return;
           toggleModule(m.id);
         });
+        card.querySelector(".learnMore").addEventListener("click", ()=> openModule(m.id));
+        card.querySelector(".selBtn").addEventListener("click", ()=> toggleModule(m.id));
 
-        el.querySelector(".toggleSelect").addEventListener("click", ()=> toggleModule(m.id));
-        el.querySelector(".learnMore").addEventListener("click", ()=> openModuleModal(m.id));
-
-        grid.appendChild(el);
+        grid.appendChild(card);
       }
 
-      syncSelectedUI();
+      syncModuleUI();
     }
 
-    function toggleModule(id){
-      if(state.modules.has(id)) state.modules.delete(id);
-      else state.modules.add(id);
-      syncSelectedUI();
-      updateTotal();
+    function toggleModule(mid){
+      if(state.modules.has(mid)) state.modules.delete(mid);
+      else state.modules.add(mid);
+      syncModuleUI();
+      updateTotals();
     }
 
-    function syncSelectedUI(){
-      document.querySelectorAll("[data-mid]").forEach(card=>{
-        const id = card.dataset.mid;
-        const selected = state.modules.has(id);
-        card.classList.toggle("selected", selected);
-        const btn = card.querySelector(".toggleSelect");
-        btn.textContent = selected ? "Selected" : "Select";
-        btn.classList.toggle("btn-primary", selected);
-        btn.classList.toggle("btn", true);
+    function syncModuleUI(){
+      document.querySelectorAll("[data-mid]").forEach(el=>{
+        const mid = el.dataset.mid;
+        const on = state.modules.has(mid);
+        el.classList.toggle("selected", on);
+        const b = el.querySelector(".selBtn");
+        b.textContent = on ? "Selected" : "Select";
+        b.classList.toggle("btn-primary", on);
       });
     }
 
-    // ---------- Module modal ----------
-    function openModuleModal(mid){
+    function selectSize(id){
+      state.size = COMPANY_SIZES.find(s=>s.id===id) || null;
+
+      document.querySelectorAll("[data-size]").forEach(btn=>{
+        btn.classList.toggle("selected", btn.dataset.size === id);
+      });
+
+      // show modules + summary AFTER selection
+      const hasSize = !!state.size;
+      $("modulesWrap").classList.toggle("hidden", !hasSize);
+      $("summaryBar").classList.toggle("hidden", !hasSize);
+      $("summarySpacer").classList.toggle("hidden", !hasSize);
+
+      const isBig = state.size?.id === "s250p";
+      $("bigBox").classList.toggle("hidden", !isBig);
+
+      // set checkout label
+      $("checkoutBtn").textContent = isBig ? "Contact Us" : "Continue";
+
+      // modules render (first time)
+      renderModules();
+      updateTotals();
+    }
+
+    function calcTotals(){
+      const base = state.size ? state.size.price : 0;
+      let mods = 0;
+      for(const id of state.modules){
+        const m = MODULES.find(x=>x.id===id);
+        if(m) mods += m.price;
+      }
+      return { base, mods, total: base + mods };
+    }
+
+    function updateTotals(){
+      const t = calcTotals();
+      $("totalText").textContent = `${money(t.total)} / month`;
+      const sizeLabel = state.size ? state.size.label : "—";
+      $("summaryHint").textContent = `Package: ${sizeLabel} • Modules: ${state.modules.size}`;
+
+      $("payTotal").textContent = `${money(t.total)} / month`;
+      const modNames = [...state.modules].map(id=>MODULES.find(m=>m.id===id)?.name).filter(Boolean);
+      $("paySummary").textContent = modNames.length ? `Includes: ${modNames.join(", ")}` : "No modules selected.";
+    }
+
+    // ---------- module modal ----------
+    function openModule(mid){
       const m = MODULES.find(x=>x.id===mid);
       if(!m) return;
 
@@ -783,86 +937,20 @@
         ul.appendChild(li);
       }
 
-      // fixed embed
+      // keep a consistent embed
       $("mmVideo").src = "https://www.youtube-nocookie.com/embed/S2kymv60ndQ";
-      showModal($("moduleModal"));
+
+      showOverlay($("moduleModal"));
     }
 
-    // ---------- Company size selection ----------
-    function selectCompanySize(sizeId){
-      state.size = COMPANY_SIZES.find(s=>s.id===sizeId) || null;
-
-      document.querySelectorAll("[data-size-id]").forEach(btn=>{
-        btn.classList.toggle("selected", btn.dataset.sizeId===sizeId);
-      });
-
-      // reveal modules + summary once size selected
-      $("modulesWrap").classList.toggle("hidden", !state.size);
-      $("summaryBar").classList.toggle("hidden", !state.size);
-      $("bigCompanyBox").classList.toggle("hidden", !(state.size && state.size.id==="s250p"));
-
-      // reset big company input
-      if(!(state.size && state.size.id==="s250p")){
-        $("bigCompanySize").value = "";
-        $("bigCompanyNotes").value = "";
-        $("bigCompanyWarn").textContent = "";
-        state.bigCompanyCount = null;
-      }
-
-      // ensure modules rendered
-      renderModules();
-      updateTotal();
-      updateCheckoutButton();
-    }
-
-    function updateCheckoutButton(){
-      const isBig = state.size?.id==="s250p";
-      const btn = $("checkoutBtn");
-      if(isBig){
-        btn.textContent = "Contact Us";
-        btn.classList.remove("btn-primary");
-        btn.classList.add("btn-primary"); // keep primary look
-      } else {
-        btn.textContent = "Continue";
-        btn.classList.remove("btn-primary");
-        btn.classList.add("btn-primary");
-      }
-    }
-
-    // ---------- Totals ----------
-    function calcTotal(){
-      let base = state.size ? state.size.price : 0;
-      let mods = 0;
-      for(const id of state.modules){
-        const m = MODULES.find(x=>x.id===id);
-        if(m) mods += m.price;
-      }
-      return { base, mods, total: base + mods };
-    }
-
-    function updateTotal(){
-      const t = calcTotal();
-      $("totalText").textContent = `${money(t.total)} / month`;
-      const modsCount = state.modules.size;
-      const sizeLabel = state.size ? state.size.label : "—";
-      $("summaryHint").textContent = `Package: ${sizeLabel} • Modules: ${modsCount}`;
-      $("payTotal").textContent = `${money(t.total)} / month`;
-
-      // Pay summary
+    // ---------- big company mailto ----------
+    function buildMailto(){
+      const sizeNum = Number($("bigSize").value || 0);
+      const notes = $("bigNotes").value || "";
       const modNames = [...state.modules].map(id=>MODULES.find(m=>m.id===id)?.name).filter(Boolean);
-      $("paySummary").textContent = modNames.length ? `Includes: ${modNames.join(", ")}` : `No modules selected yet.`;
-
-      updateCheckoutButton();
-    }
-
-    // ---------- Contact email for 250+ ----------
-    function buildContactMailto(){
-      const sizeNum = Number($("bigCompanySize").value || 0);
-      const notes = $("bigCompanyNotes").value || "";
-      const moduleNames = [...state.modules].map(id=>MODULES.find(m=>m.id===id)?.name).filter(Boolean);
 
       const subject = "250+ Person Company - Wanting to Sign Up";
-      const bodyLines = [
+      const body = [
         "Hello SmartCore Technology,",
         "",
         "We would like to enquire about onboarding a 250+ person organisation.",
@@ -870,148 +958,136 @@
         `Approximate company size: ${sizeNum || "Not provided"}`,
         "",
         "Requested modules:",
-        moduleNames.length ? moduleNames.map(n=>`- ${n}`).join("\n") : "- (None selected yet)",
+        modNames.length ? modNames.map(n=>`- ${n}`).join("\n") : "- (None selected yet)",
         "",
         notes ? "Additional notes:\n" + notes : "Additional notes: (none)",
         "",
         "Regards,",
         "(Your name)"
-      ];
+      ].join("\n");
 
-      const body = bodyLines.join("\n");
       return `mailto:support@smartcoretechnology.co.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
 
-    // ---------- Auth / Signup flow (email code first) ----------
-    // Important: we do NOT create Supabase auth user until code is verified via /api/verify-code
-    async function startOwnerSignup(){
-      $("suMsg").textContent = "";
+    // ---------- auth: schema-safe profile lookup (fixes your profiles.id error) ----------
+    async function getProfileByAuthUserId(uid){
+      // Try profiles.user_id first
+      {
+        const { data, error } = await sb.from("profiles").select("*").eq("user_id", uid).maybeSingle();
+        if(!error) return { profile: data || null, key: "user_id" };
+        // if it's not a missing column error, throw
+        if(!String(error.message||"").toLowerCase().includes("column")) throw error;
+      }
+      // Try profiles.id fallback
+      {
+        const { data, error } = await sb.from("profiles").select("*").eq("id", uid).maybeSingle();
+        if(!error) return { profile: data || null, key: "id" };
+        throw error;
+      }
+    }
 
-      if(!state.size){ $("suMsg").textContent = "Select a company size first."; return; }
+    async function loadAccount(){
+      const { data: { session } } = await sb.auth.getSession();
+      state.session = session || null;
 
-      const company_name = $("suCompany").value.trim();
-      const email = $("suEmail").value.trim().toLowerCase();
-      const password = $("suPass").value;
+      if(!state.session?.user){
+        state.profile = null;
+        state.company = null;
+        state.subscription = null;
+        return;
+      }
 
-      if(!company_name){ $("suMsg").textContent = "Enter your company name."; return; }
-      if(!email){ $("suMsg").textContent = "Enter your email."; return; }
-      if(!password || password.length < 8){ $("suMsg").textContent = "Password must be at least 8 characters."; return; }
+      const uid = state.session.user.id;
 
-      // store pending (used after verification)
-      state.pendingSignup = {
-        company_name,
-        email,
-        password,
-        company_size_id: state.size.id,
-        company_size_label: state.size.label,
-        company_size_price: state.size.price,
-        big_company_size: state.size.id==="s250p" ? Number($("bigCompanySize").value || 0) : null,
-        module_ids: [...state.modules]
-      };
+      // Profile (auto-detect key)
+      const r = await getProfileByAuthUserId(uid);
+      state.profile = r.profile;
+      state.__profilesKey = r.key;
 
-      // For 250+, we don't signup here. We contact instead.
-      if(state.size.id==="s250p"){
-        const sizeNum = Number($("bigCompanySize").value || 0);
-        if(!sizeNum){
-          $("suMsg").textContent = "Please enter an approximate company size first.";
-          return;
+      // Company (prefer profile.company_id)
+      let company = null;
+      if(state.profile?.company_id){
+        const { data, error } = await sb.from("companies").select("*").eq("id", state.profile.company_id).maybeSingle();
+        if(error) throw new Error("Company load failed: " + error.message);
+        company = data;
+      }else{
+        const { data, error } = await sb.from("companies").select("*").eq("owner_user_id", uid).maybeSingle();
+        if(error) throw new Error("Company load failed: " + error.message);
+        company = data;
+      }
+      state.company = company || null;
+
+      // Subscription latest
+      if(state.company?.id){
+        const { data: sub, error: sErr } = await sb
+          .from("subscriptions")
+          .select("*")
+          .eq("company_id", state.company.id)
+          .order("created_at", { ascending:false })
+          .limit(1)
+          .maybeSingle();
+        state.subscription = sErr ? null : (sub || null);
+      }else{
+        state.subscription = null;
+      }
+    }
+
+    function showDashboard(){
+      $("home").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+      location.hash = "#dashboard";
+
+      const c = state.company;
+      $("dashCompany").textContent = c?.company_name || "Your Company";
+
+      const meta = [];
+      if(state.session?.user?.email) meta.push(state.session.user.email);
+      if(c?.company_address) meta.push(c.company_address);
+      $("dashMeta").textContent = meta.join(" • ");
+
+      $("dashCompanyCode").textContent = c?.company_code || "—";
+      $("dashSize").textContent = c?.company_size_label || c?.company_size || "—";
+
+      const total = state.subscription?.monthly_total ?? null;
+      $("dashTotal").textContent = total !== null ? `${money(total)} / month` : "—";
+
+      const ownedRaw = state.subscription?.module_ids || state.subscription?.selected_modules || [];
+      const owned = new Set(Array.isArray(ownedRaw) ? ownedRaw : []);
+      const wrap = $("dashSystems");
+      wrap.innerHTML = "";
+
+      const ownedMods = MODULES.filter(m=>owned.has(m.id));
+      if(!ownedMods.length){
+        wrap.innerHTML = `<div class="text-sm text-white/60">No modules purchased yet.</div>`;
+      }else{
+        for(const m of ownedMods){
+          const a = document.createElement("a");
+          a.href = "https://smartcoretechnology.co.uk";
+          a.target = "_blank";
+          a.className = "card p-4 block";
+          a.innerHTML = `
+            <div class="text-sm font-semibold">${m.name}</div>
+            <div class="text-xs text-white/60 mt-1">Open system</div>
+          `;
+          wrap.appendChild(a);
         }
-        if(sizeNum < 250){
-          $("suMsg").textContent = "That looks below 250. If you meant 250+, adjust the number or choose the 101–250 package.";
-          return;
-        }
-      }
-
-      // send code
-      $("sendCodeBtn").disabled = true;
-      $("sendCodeBtn").classList.add("opacity-50");
-
-      try{
-        await apiPost("/api/send-code", {
-          email,
-          purpose: "owner_signup"
-        });
-
-        $("codeBox").classList.remove("hidden");
-        $("suMsg").textContent = "Code sent. Check your inbox (and junk).";
-      }catch(e){
-        $("suMsg").textContent = e.message || "Failed to send code.";
-      }finally{
-        $("sendCodeBtn").disabled = false;
-        $("sendCodeBtn").classList.remove("opacity-50");
       }
     }
 
-    async function verifyAndCreateOwner(){
-      $("suMsg").textContent = "";
-      if(!state.pendingSignup){ $("suMsg").textContent = "Press Continue first."; return; }
-
-      const code = $("suCode").value.trim();
-      if(!code || code.length !== 6){ $("suMsg").textContent = "Enter the 6-digit code."; return; }
-
-      // Payment screen first (testing)
-      hideModal($("signupModal"));
-      openPaymentModal();
+    function showHome(){
+      $("dashboard").classList.add("hidden");
+      $("home").classList.remove("hidden");
+      location.hash = "#";
     }
 
-    function openPaymentModal(){
-      updateTotal();
-      $("payMsg").textContent = "";
-      showModal($("payModal"));
+    async function signOut(){
+      await sb.auth.signOut();
+      state.session = null; state.profile=null; state.company=null; state.subscription=null;
+      showHome();
+      scrollToEl($("hero"));
     }
 
-    async function acceptPaymentAndFinalize(){
-      $("payMsg").textContent = "";
-      const p = state.pendingSignup;
-      if(!p){ $("payMsg").textContent = "No pending signup found."; return; }
-
-      const code = $("suCode").value.trim();
-      if(!code || code.length !== 6){ $("payMsg").textContent = "Verification code missing."; return; }
-
-      // create via backend verify-code (which should create auth user + company + subscription)
-      $("payAccept").disabled = true;
-      $("payAccept").classList.add("opacity-50");
-
-      try{
-        const res = await apiPost("/api/verify-code", {
-          purpose: "owner_signup",
-          email: p.email,
-          code,
-          password: p.password,
-          company_name: p.company_name,
-          company_size_id: p.company_size_id,
-          company_size_label: p.company_size_label,
-          company_size_price: p.company_size_price,
-          module_ids: p.module_ids,
-          big_company_size: p.big_company_size
-        });
-
-        // expect backend to create user + then sign them in (returns session?) OR we sign in here
-        // We'll sign in here with email/password (safe for testing)
-        const { data, error } = await sb.auth.signInWithPassword({ email: p.email, password: p.password });
-        if(error) throw new Error("Account created but login failed: " + error.message);
-
-        state.pendingSignup = null;
-        hideModal($("payModal"));
-
-        await loadAccount();
-        showDashboard();
-        location.hash = "#dashboard";
-
-      }catch(e){
-        $("payMsg").textContent = e.message || "Payment accept failed.";
-      }finally{
-        $("payAccept").disabled = false;
-        $("payAccept").classList.remove("opacity-50");
-      }
-    }
-
-    function declinePayment(){
-      $("payMsg").textContent = "Payment declined (testing). Nothing has been created.";
-      // keep them on the payment modal
-    }
-
-    // ---------- Login ----------
+    // ---------- login ----------
     async function login(){
       $("liMsg").textContent = "";
       $("liBad").classList.add("hidden");
@@ -1028,15 +1104,13 @@
       $("loginBtn").classList.add("opacity-50");
 
       try{
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        const { error } = await sb.auth.signInWithPassword({ email, password });
         if(error) throw error;
 
-        hideModal($("loginModal"));
+        hideOverlay($("loginModal"));
         await loadAccount();
         showDashboard();
-        location.hash = "#dashboard";
       }catch(e){
-        $("liMsg").textContent = "";
         $("liBad").classList.remove("hidden");
       }finally{
         $("loginBtn").disabled = false;
@@ -1047,421 +1121,259 @@
     async function resetPassword(){
       const email = $("liEmail").value.trim().toLowerCase();
       if(!email){ $("liMsg").textContent = "Enter your email first."; return; }
-
-      // redirect back to site hash
       const redirectTo = location.origin + "/#reset";
       const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
-      if(error) $("liMsg").textContent = error.message;
-      else $("liMsg").textContent = "Password reset email sent.";
+      $("liMsg").textContent = error ? error.message : "Password reset email sent.";
     }
 
-    // ---------- Dashboard / Data loading with schema auto-detect ----------
-    async function getProfileByAuthUserId(uid){
-      // Try profiles.user_id first (most common)
-      {
-        const { data, error } = await sb.from("profiles").select("*").eq("user_id", uid).maybeSingle();
-        if(!error) return { profile: data || null, key: "user_id" };
-        if(!String(error.message||"").toLowerCase().includes("column")) throw error;
-      }
-      // Try profiles.id second
-      {
-        const { data, error } = await sb.from("profiles").select("*").eq("id", uid).maybeSingle();
-        if(!error) return { profile: data || null, key: "id" };
-        throw error;
-      }
-    }
+    // ---------- signup: IMPORTANT behaviour ----------
+    // We ONLY create account AFTER email code is verified AND payment Accept is clicked.
+    async function startSignup(){
+      $("suMsg").textContent = "";
 
-    async function loadAccount(){
-      const { data: { session } } = await sb.auth.getSession();
-      state.session = session || null;
-
-      if(!state.session?.user){
-        state.profile = null;
-        state.company = null;
-        state.subscription = null;
-        state.employees = [];
+      if(!state.size){
+        $("suMsg").textContent = "Select a company size first.";
         return;
       }
 
-      const uid = state.session.user.id;
+      // 250+ is contact flow, not signup
+      if(state.size.id === "s250p"){
+        $("suMsg").textContent = "For 250+ people, use Contact Us from the checkout bar.";
+        return;
+      }
 
-      // profile auto-detect (fix for "profiles.id does not exist")
-      let profKey = "user_id";
+      const company_name = $("suCompany").value.trim();
+      const email = $("suEmail").value.trim().toLowerCase();
+      const password = $("suPass").value;
+
+      if(!company_name){ $("suMsg").textContent = "Enter your company name."; return; }
+      if(!email){ $("suMsg").textContent = "Enter your email."; return; }
+      if(!password || password.length < 8){ $("suMsg").textContent = "Password must be at least 8 characters."; return; }
+
+      // store pending (NOT creating account yet)
+      state.pending = {
+        company_name, email, password,
+        company_size_id: state.size.id,
+        company_size_label: state.size.label,
+        company_size_price: state.size.price,
+        module_ids: [...state.modules]
+      };
+
+      $("sendCodeBtn").disabled = true;
+      $("sendCodeBtn").classList.add("opacity-50");
+
       try{
-        const r = await getProfileByAuthUserId(uid);
-        state.profile = r.profile;
-        profKey = r.key;
+        await apiPost("/api/send-code", { email, purpose:"owner_signup" });
+        $("codeBox").classList.remove("hidden");
+        $("suMsg").textContent = "Code sent. Check your inbox (and junk).";
       }catch(e){
-        throw new Error("Profile load failed: " + (e.message || e));
-      }
-      state.__profilesKey = profKey;
-
-      // company
-      let comp = null;
-      if(state.profile?.company_id){
-        const { data, error } = await sb.from("companies").select("*").eq("id", state.profile.company_id).maybeSingle();
-        if(error) throw new Error("Company load failed: " + error.message);
-        comp = data;
-      } else {
-        const { data, error } = await sb.from("companies").select("*").eq("owner_user_id", uid).maybeSingle();
-        if(error) throw new Error("Company load failed: " + error.message);
-        comp = data;
-      }
-      state.company = comp || null;
-
-      // subscription latest
-      if(state.company?.id){
-        const { data: sub, error: sErr } = await sb
-          .from("subscriptions")
-          .select("*")
-          .eq("company_id", state.company.id)
-          .order("created_at", { ascending:false })
-          .limit(1)
-          .maybeSingle();
-
-        state.subscription = sErr ? null : (sub || null);
-
-        // employees
-        const { data: emps, error: eErr } = await sb
-          .from("employees")
-          .select("*")
-          .eq("company_id", state.company.id)
-          .order("created_at", { ascending:true });
-
-        state.employees = eErr ? [] : (emps || []);
-      }else{
-        state.subscription = null;
-        state.employees = [];
+        $("suMsg").textContent = e.message || "Failed to send code.";
+      }finally{
+        $("sendCodeBtn").disabled = false;
+        $("sendCodeBtn").classList.remove("opacity-50");
       }
     }
 
-    function showDashboard(){
-      // hide homepage sections
-      document.querySelector("main").classList.add("hidden");
-      $("dashboard").classList.remove("hidden");
+    function goToPayment(){
+      $("suMsg").textContent = "";
+      if(!state.pending){ $("suMsg").textContent = "Press Continue first."; return; }
 
-      // render
-      const c = state.company;
-      $("dashCompany").textContent = c?.company_name || "Your Company";
-      $("dashCompanyCode").textContent = c?.company_code || "—";
-      $("dashSize").textContent = c?.company_size_label || c?.company_size || "—";
+      const code = $("suCode").value.trim();
+      if(!code || code.length !== 6){
+        $("suMsg").textContent = "Enter the 6-digit code.";
+        return;
+      }
 
-      // totals from subscription if exists
-      const total = (state.subscription?.monthly_total ?? null);
-      $("dashTotal").textContent = total !== null ? `${money(total)} / month` : "—";
+      // Payment modal (testing)
+      hideOverlay($("signupModal"));
+      $("payMsg").textContent = "";
+      updateTotals();
+      showOverlay($("payModal"));
+    }
 
-      const meta = [];
-      if(state.session?.user?.email) meta.push(state.session.user.email);
-      if(c?.company_address) meta.push(c.company_address);
-      $("dashMeta").textContent = meta.join(" • ");
+    async function acceptPayment(){
+      $("payMsg").textContent = "";
+      const p = state.pending;
+      const code = $("suCode").value.trim();
 
-      // systems quick links based on subscription module_ids
-      const owned = (state.subscription?.module_ids || state.subscription?.selected_modules || []);
-      const ownedSet = new Set(Array.isArray(owned) ? owned : []);
-      const wrap = $("dashSystems");
-      wrap.innerHTML = "";
+      if(!p){ $("payMsg").textContent = "No pending signup found."; return; }
+      if(!code || code.length !== 6){ $("payMsg").textContent = "Verification code missing."; return; }
 
-      const ownedModules = MODULES.filter(m=> ownedSet.has(m.id));
-      if(!ownedModules.length){
-        wrap.innerHTML = `<div class="text-sm text-white/60">No modules purchased yet.</div>`;
-      }else{
-        for(const m of ownedModules){
-          const tile = document.createElement("a");
-          tile.href = "https://smartcoretechnology.co.uk";
-          tile.target = "_blank";
-          tile.className = "card p-4 block";
-          tile.innerHTML = `
-            <div class="text-sm font-semibold">${m.name}</div>
-            <div class="text-xs text-white/60 mt-1">Open system</div>
-          `;
-          wrap.appendChild(tile);
-        }
+      $("payAccept").disabled = true;
+      $("payAccept").classList.add("opacity-50");
+
+      try{
+        // Verify code + create user/company/subscription (server must do creation)
+        await apiPost("/api/verify-code", {
+          purpose: "owner_signup",
+          email: p.email,
+          code,
+          password: p.password,
+          company_name: p.company_name,
+          company_size_id: p.company_size_id,
+          company_size_label: p.company_size_label,
+          company_size_price: p.company_size_price,
+          module_ids: p.module_ids
+        });
+
+        // Now sign in (client)
+        const { error } = await sb.auth.signInWithPassword({ email: p.email, password: p.password });
+        if(error) throw new Error("Created, but login failed: " + error.message);
+
+        state.pending = null;
+        hideOverlay($("payModal"));
+        await loadAccount();
+        showDashboard();
+      }catch(e){
+        $("payMsg").textContent = e.message || "Create user failed.";
+      }finally{
+        $("payAccept").disabled = false;
+        $("payAccept").classList.remove("opacity-50");
       }
     }
 
-    function showHomepage(){
-      $("dashboard").classList.add("hidden");
-      document.querySelector("main").classList.remove("hidden");
-      location.hash = "#";
+    function declinePayment(){
+      $("payMsg").textContent = "Payment declined (testing). Nothing has been created.";
     }
 
-    async function signOut(){
-      await sb.auth.signOut();
-      state.session = null;
-      state.profile = null;
-      state.company = null;
-      state.subscription = null;
-      state.employees = [];
-      showHomepage();
-      scrollToEl($("hero"));
-    }
-
-    // ---------- Checkout click ----------
-    function onCheckout(){
+    // ---------- checkout button ----------
+    function checkout(){
       if(!state.size){
         scrollToEl($("packages"));
         return;
       }
 
-      // 250+ -> contact email (require size)
-      if(state.size.id==="s250p"){
-        const sizeNum = Number($("bigCompanySize").value || 0);
-        if(!sizeNum){
+      // 250+ contact flow
+      if(state.size.id === "s250p"){
+        const n = Number($("bigSize").value || 0);
+        if(!n){
           alert("Please enter an approximate company size first.");
           return;
         }
-        if(sizeNum < 250){
+        if(n < 250){
           const ok = confirm("That number looks below 250. Are you sure you want the 250+ package?");
           if(!ok) return;
         }
-        const mailto = buildContactMailto();
-        window.location.href = mailto;
+        window.location.href = buildMailto();
         return;
       }
 
-      // Normal signup
+      // open signup modal
       $("codeBox").classList.add("hidden");
       $("suCode").value = "";
       $("suMsg").textContent = "";
-      $("sendCodeBtn").disabled = false;
-      $("sendCodeBtn").classList.remove("opacity-50");
-
-      showModal($("signupModal"));
+      showOverlay($("signupModal"));
     }
 
-    // ---------- Hero icon scatter + mouse push (desktop only) ----------
-    const HERO_ICON_COUNT = 8;
-    const ICON_SVGS = [
-      // small inline svg icons
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 12h10M12 7v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 8h10M7 12h10M7 16h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v10l-8 4-8-4V7l8-4z" stroke="currentColor" stroke-width="2"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="2"/><path d="M12 12l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 12l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M12 2v6m0 8v6M4 12h6m8 0h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-4.5 7-11a7 7 0 0 0-14 0c0 6.5 7 11 7 11z" stroke="currentColor" stroke-width="2"/></svg>`
-    ];
-
-    const heroIconObjs = [];
-
-    function buildHeroIcons(){
-      const host = $("heroIcons");
-      host.innerHTML = "";
-      heroIconObjs.length = 0;
-
-      const isFinePointer = window.matchMedia("(pointer:fine)").matches;
-      const isLarge = window.innerWidth >= 1024;
-
-      if(!isFinePointer) return; // no icons on touch devices
-
-      for(let i=0;i<HERO_ICON_COUNT;i++){
-        const d = document.createElement("div");
-        d.className = "hero-icon text-white";
-        d.innerHTML = ICON_SVGS[i % ICON_SVGS.length];
-
-        // scatter: random across whole hero, but keep center region clearer
-        const x = Math.random();
-        const y = Math.random();
-
-        // avoid middle band where text sits
-        const safe = (x>0.20 && x<0.75 && y>0.20 && y<0.70);
-        const finalX = safe ? (x<0.5 ? x-0.22 : x+0.22) : x;
-        const finalY = safe ? (y<0.5 ? y-0.20 : y+0.20) : y;
-
-        d.style.left = `${finalX*100}%`;
-        d.style.top  = `${finalY*100}%`;
-
-        host.appendChild(d);
-
-        heroIconObjs.push({
-          el: d,
-          baseX: finalX,
-          baseY: finalY,
-          vx: 0, vy: 0,
-          tx: 0, ty: 0
-        });
-      }
-    }
-
-    function animateHeroIcons(){
-      const isFinePointer = window.matchMedia("(pointer:fine)").matches;
-      if(!isFinePointer) return;
-
-      const maxPush = 18;
-      for(const o of heroIconObjs){
-        // ease toward target
-        o.vx += (o.tx - o.vx) * 0.12;
-        o.vy += (o.ty - o.vy) * 0.12;
-        o.el.style.transform = `translate(${o.vx}px, ${o.vy}px)`;
-      }
-      requestAnimationFrame(animateHeroIcons);
-    }
-
-    function setupMousePush(){
-      const isFinePointer = window.matchMedia("(pointer:fine)").matches;
-      if(!isFinePointer) return;
-
-      const hero = $("hero");
-      hero.addEventListener("mousemove", (e)=>{
-        const rect = hero.getBoundingClientRect();
-        const mx = (e.clientX - rect.left) / rect.width;
-        const my = (e.clientY - rect.top) / rect.height;
-
-        for(const o of heroIconObjs){
-          const dx = (o.baseX - mx);
-          const dy = (o.baseY - my);
-          const dist = Math.sqrt(dx*dx + dy*dy) || 0.001;
-          const force = Math.max(0, 0.20 - dist) / 0.20; // 0..1 near cursor
-          const push = 22 * force;
-
-          o.tx = (dx/dist) * push;
-          o.ty = (dy/dist) * push;
-        }
-      });
-
-      hero.addEventListener("mouseleave", ()=>{
-        for(const o of heroIconObjs){
-          o.tx = 0; o.ty = 0;
-        }
-      });
-    }
-
-    // ---------- Nav hide on scroll down past hero ----------
+    // ---------- nav hide on scroll past hero ----------
     let lastY = 0;
     function navAutoHide(){
-      const nav = $("topNav");
+      const nav = $("navWrap");
       const y = window.scrollY || 0;
       const heroH = $("hero").offsetHeight || 600;
+      const past = y > heroH * 0.65;
 
-      // only hide once user is past hero
-      const pastHero = y > (heroH * 0.65);
-
-      if(!pastHero){
-        nav.style.transform = "translateY(0)";
-        nav.style.transition = "transform .18s ease";
+      if(!past){
+        nav.classList.remove("navHidden");
         lastY = y;
         return;
       }
-
-      const goingDown = y > lastY + 6;
-      const goingUp = y < lastY - 6;
-
-      if(goingDown) nav.style.transform = "translateY(-110%)";
-      if(goingUp) nav.style.transform = "translateY(0)";
-      nav.style.transition = "transform .18s ease";
+      if(y > lastY + 8) nav.classList.add("navHidden");
+      if(y < lastY - 8) nav.classList.remove("navHidden");
       lastY = y;
     }
 
-    // ---------- Password eye (subtle hover) ----------
-    function setupEye(btnId, inputId){
-      const btn = $(btnId);
-      const input = $(inputId);
+    // ---------- eye buttons ----------
+    function setupEye(btn, input){
       btn.addEventListener("click", ()=>{
         input.type = (input.type === "password") ? "text" : "password";
       });
-      btn.addEventListener("mouseenter", ()=>{
-        btn.style.transform = "scale(.97)";
-      });
-      btn.addEventListener("mouseleave", ()=>{
-        btn.style.transform = "scale(1)";
-      });
     }
 
-    // ---------- Init / Events ----------
+    // ---------- init ----------
     document.addEventListener("DOMContentLoaded", async ()=>{
       $("year").textContent = new Date().getFullYear();
 
-      // Hero icon setup
+      // reveal
+      setupReveal();
+
+      // hero icons (desktop)
       buildHeroIcons();
-      setupMousePush();
-      requestAnimationFrame(animateHeroIcons);
+      heroMousePush();
+      window.addEventListener("resize", buildHeroIcons);
 
-      window.addEventListener("resize", ()=>{
-        buildHeroIcons();
+      // scroll buttons
+      $("btnPackages").addEventListener("click", ()=> scrollToEl($("packages")));
+      $("btnArrow").addEventListener("click", ()=> scrollToEl($("packages")));
+
+      // size selection
+      document.querySelectorAll("[data-size]").forEach(btn=>{
+        btn.addEventListener("click", ()=> selectSize(btn.dataset.size));
       });
 
-      // Company size cards
-      document.querySelectorAll("[data-size-id]").forEach(btn=>{
-        btn.addEventListener("click", ()=> selectCompanySize(btn.dataset.sizeId));
+      // big size warning
+      $("bigSize").addEventListener("input", ()=>{
+        const v = Number($("bigSize").value || 0);
+        state.bigSize = v || null;
+        $("bigWarn").textContent = (v && v < 250)
+          ? "That number looks below 250. If you meant 250+, adjust it or choose the 101–250 package."
+          : "";
       });
 
-      // buttons
-      $("viewPackagesBtn").addEventListener("click", ()=> scrollToEl($("packages")));
-      $("scrollDownBtn").addEventListener("click", ()=> scrollToEl($("packages")));
-      $("downArrowBtn").addEventListener("click", ()=> scrollToEl($("packages")));
-      $("checkoutBtn").addEventListener("click", onCheckout);
+      // render modules once (hidden until size)
+      renderModules();
+      updateTotals();
 
-      // big company size validation
-      $("bigCompanySize").addEventListener("input", ()=>{
-        const v = Number($("bigCompanySize").value || 0);
-        state.bigCompanyCount = v || null;
-        if(v && v < 250){
-          $("bigCompanyWarn").textContent = "That number looks below 250. If you meant 250+, adjust it or choose the 101–250 package.";
-        }else{
-          $("bigCompanyWarn").textContent = "";
-        }
-      });
+      // summary / checkout
+      $("checkoutBtn").addEventListener("click", checkout);
 
       // module modal close
-      $("mmClose").addEventListener("click", ()=> hideModal($("moduleModal")));
-      $("moduleModal").addEventListener("click", (e)=>{ if(e.target === $("moduleModal")) hideModal($("moduleModal")); });
+      $("mmClose").addEventListener("click", ()=> hideOverlay($("moduleModal")));
+      $("moduleModal").addEventListener("click", (e)=>{ if(e.target === $("moduleModal")) hideOverlay($("moduleModal")); });
 
-      // login modal open/close
-      $("navLoginBtn").addEventListener("click", ()=> showModal($("loginModal")));
-      $("loginClose").addEventListener("click", ()=> hideModal($("loginModal")));
-      $("loginModal").addEventListener("click", (e)=>{ if(e.target === $("loginModal")) hideModal($("loginModal")); });
+      // login modal
+      $("navLogin").addEventListener("click", ()=> showOverlay($("loginModal")));
+      $("loginClose").addEventListener("click", ()=> hideOverlay($("loginModal")));
+      $("loginModal").addEventListener("click", (e)=>{ if(e.target === $("loginModal")) hideOverlay($("loginModal")); });
 
-      // signup modal close
-      $("suClose").addEventListener("click", ()=> hideModal($("signupModal")));
-      $("signupModal").addEventListener("click", (e)=>{ if(e.target === $("signupModal")) hideModal($("signupModal")); });
-
-      // pay modal close
-      $("payClose").addEventListener("click", ()=> hideModal($("payModal")));
-      $("payModal").addEventListener("click", (e)=>{ if(e.target === $("payModal")) hideModal($("payModal")); });
-
-      // signup flow
-      $("sendCodeBtn").addEventListener("click", startOwnerSignup);
-      $("verifyCreateBtn").addEventListener("click", verifyAndCreateOwner);
-
-      // payment
-      $("payAccept").addEventListener("click", acceptPaymentAndFinalize);
-      $("payDecline").addEventListener("click", declinePayment);
-
-      // login flow
       $("loginBtn").addEventListener("click", login);
       $("liBad").addEventListener("click", resetPassword);
 
-      // no account info popup
       $("noAccountBtn").addEventListener("click", ()=>{
         alert("If your company is already set up on SmartCore, ask your admin for the company code and sign up as an employee.\n\nIf you're new, build your plan, select modules, and create a company account to get started.");
       });
 
-      // eyes
-      setupEye("liEye", "liPass");
-      setupEye("suEye", "suPass");
+      // signup modal
+      $("suClose").addEventListener("click", ()=> hideOverlay($("signupModal")));
+      $("signupModal").addEventListener("click", (e)=>{ if(e.target === $("signupModal")) hideOverlay($("signupModal")); });
+      $("sendCodeBtn").addEventListener("click", startSignup);
+      $("goPayBtn").addEventListener("click", goToPayment);
+
+      // pay modal
+      $("payClose").addEventListener("click", ()=> hideOverlay($("payModal")));
+      $("payModal").addEventListener("click", (e)=>{ if(e.target === $("payModal")) hideOverlay($("payModal")); });
+      $("payAccept").addEventListener("click", acceptPayment);
+      $("payDecline").addEventListener("click", declinePayment);
 
       // dashboard buttons
       $("dashSignOut").addEventListener("click", signOut);
-      $("dashBackHome").addEventListener("click", showHomepage);
+      $("dashHome").addEventListener("click", showHome);
+      $("dashBuyMore").addEventListener("click", ()=>{ showHome(); scrollToEl($("packages")); });
 
-      // render initial modules (hidden until size selected)
-      renderModules();
-      updateTotal();
-      updateCheckoutButton();
+      // eye setup
+      setupEye($("liEye"), $("liPass"));
+      setupEye($("suEye"), $("suPass"));
 
-      // nav hide on scroll
+      // nav hide
       window.addEventListener("scroll", navAutoHide, { passive:true });
 
-      // if already logged in, go dashboard
+      // Restore session -> dashboard
       try{
         await loadAccount();
         if(state.session?.user){
           showDashboard();
-          location.hash = "#dashboard";
         }
       }catch(e){
-        // keep on homepage if fails
         console.warn(e);
       }
     });
@@ -1469,4 +1381,3 @@
 
 </body>
 </html>
-```
