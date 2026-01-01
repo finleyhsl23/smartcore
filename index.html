@@ -2,1787 +2,1219 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SmartCore Technology</title>
 
-  <!-- Tailwind CDN (fine for now while building) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Supabase JS -->
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
-      --bg0:#050913; --bg1:#070c1a;
-      --blueGlow: rgba(76, 138, 255, .18);
-      --blueGlow2: rgba(76, 138, 255, .10);
-      --glass: rgba(255,255,255,.06);
-      --stroke: rgba(255,255,255,.10);
-      --stroke2: rgba(255,255,255,.14);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.72);
-      --muted2: rgba(255,255,255,.55);
-      --shadow: 0 18px 60px rgba(0,0,0,.55);
-      --radius: 18px;
-      --radius2: 24px;
-      --accent: rgba(120, 170, 255, .95);
-      --maxw: 1120px;
+      --bg0:#050816;
+      --bg1:#06102a;
+      --panel:rgba(10,16,34,.62);
+      --panel2:rgba(10,16,34,.42);
+      --stroke:rgba(255,255,255,.12);
+      --stroke2:rgba(255,255,255,.08);
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.70);
+      --muted2:rgba(234,240,255,.55);
+      --shadow: 0 30px 80px rgba(0,0,0,.55);
+      --blur: 18px;
+      --radius: 22px;
+      --radius2: 16px;
+      --accent: rgba(120,170,255,.85);
+      --good: rgba(60, 220, 140, .95);
     }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial;
       color:var(--text);
       background:
-        radial-gradient(900px 520px at 50% 18%, var(--blueGlow), transparent 62%),
-        radial-gradient(600px 420px at 15% 75%, var(--blueGlow2), transparent 62%),
+        radial-gradient(900px 700px at 50% 14%, rgba(60,110,255,.22), transparent 60%),
+        radial-gradient(900px 800px at 50% 60%, rgba(30,70,200,.16), transparent 60%),
+        radial-gradient(800px 700px at 50% 100%, rgba(0,0,0,.35), transparent 55%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       overflow-x:hidden;
     }
-    .wrap{ width:min(var(--maxw), calc(100% - 40px)); margin:0 auto; }
+
+    /* Liquid glass panels */
     .glass{
-      background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.045));
-      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--stroke);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-radius: var(--radius2);
-    }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.070), rgba(255,255,255,.040));
-      border: 1px solid var(--stroke);
-      box-shadow: 0 10px 40px rgba(0,0,0,.35);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
       border-radius: var(--radius);
     }
-    .btn{
-      appearance:none;
-      border: 1px solid var(--stroke2);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-weight: 650;
-      cursor:pointer;
-      transition: transform .12s ease, background .2s ease, border-color .2s ease;
-      display:inline-flex; align-items:center; gap:8px;
-      user-select:none;
-      text-decoration:none;
-      white-space:nowrap;
+    .glass2{
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--stroke2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--radius2);
     }
-    .btn:hover{ background: rgba(255,255,255,.09); transform: translateY(-1px); border-color: rgba(255,255,255,.18); }
-    .btn.primary{
-      background: rgba(120, 170, 255, .14);
-      border-color: rgba(120, 170, 255, .28);
-    }
-    .btn.primary:hover{ background: rgba(120, 170, 255, .20); }
-    .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
-    .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 7px 10px; border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      color: var(--muted);
-      font-size: 12px;
-      width: fit-content;
-    }
-    .fadeUp{ opacity:0; transform:translateY(10px); animation: fadeUp .75s ease forwards; }
-    .d1{ animation-delay:.08s; } .d2{ animation-delay:.16s; } .d3{ animation-delay:.24s; } .d4{ animation-delay:.32s; }
-    @keyframes fadeUp{ to{ opacity:1; transform:translateY(0); } }
 
-    /* NAV */
-    .navWrap{
-      position: fixed; top: 18px; left:0; right:0;
+    /* Navbar */
+    .nav{
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(1080px, calc(100% - 24px));
+      padding: 12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
       z-index: 50;
       transition: transform .28s ease, opacity .28s ease;
+    }
+    .nav.hidden{
+      transform: translateX(-50%) translateY(-18px);
+      opacity: 0;
       pointer-events: none;
     }
-    .navWrap .nav{ pointer-events:auto; display:flex; align-items:center; justify-content:space-between; gap:14px; padding:10px 12px; }
-    .navHidden{ transform: translateY(-24px); opacity:0; pointer-events:none; }
-    .brand{ display:flex; align-items:center; gap:10px; padding: 6px 8px; border-radius:14px; min-width:0; }
-    .brand img{ width: 42px; height: 42px; border-radius: 14px; object-fit: cover; display:block; }
-    .brandText{ display:flex; flex-direction:column; line-height:1.05; padding-top: 3px; min-width:0; }
-    .brandText strong{ font-size: 13px; white-space:nowrap; }
-    .brandText span{ font-size: 11px; color: var(--muted2); white-space:nowrap; }
-    .navRight{ display:flex; gap:10px; align-items:center; }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width: 260px;
+    }
+    .brand img{
+      width: 44px; height: 44px; border-radius: 14px;
+      display:block;
+      object-fit: cover;
+    }
+    .brand .t1{font-weight:800; letter-spacing:.2px; font-size:13px; line-height:1.1}
+    .brand .t2{font-size:11px; color:var(--muted2); margin-top:2px}
+    .btn{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding: 9px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08) }
+    .btn:active{ transform: translateY(0px) scale(.99) }
+    .btn.primary{
+      background: rgba(120,170,255,.16);
+      border-color: rgba(120,170,255,.28);
+    }
+    .btn.primary:hover{
+      background: rgba(120,170,255,.22);
+      border-color: rgba(120,170,255,.38);
+    }
+    .btn.danger{
+      background: rgba(255,80,110,.10);
+      border-color: rgba(255,80,110,.22);
+    }
 
-    /* HERO */
+    /* Hero */
     .hero{
       min-height: 100vh;
-      display:flex; align-items:center;
-      padding-top: 92px; padding-bottom: 26px;
-      position: relative; overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 120px 16px 70px;
+      position: relative;
     }
-    .h1{
-      font-size: clamp(56px, 7vw, 92px);
-      line-height: .95;
-      margin: 16px 0 10px;
-      letter-spacing: -1.3px;
+    .heroInner{
+      width:min(1080px, 100%);
+      position: relative;
+      padding: 38px 34px;
     }
-    .h1 .tech{ opacity:.72; display:block; }
-    .lead{
-      font-size: 16px;
-      color: var(--muted);
-      line-height: 1.55;
-      max-width: 62ch;
-      margin: 0 0 18px;
-    }
-    .heroCTA{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
-    .scrollBtn{
-      margin-top: 16px;
-      display:inline-flex; align-items:center; gap:10px;
-      color: var(--muted2);
-      background: transparent; border:none; cursor:pointer;
-      padding: 8px 2px;
-    }
-    .arrow{
-      width: 34px; height: 34px;
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      padding: 8px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      display:flex; align-items:center; justify-content:center;
-      transition: transform .2s ease, background .2s ease;
+      border:1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 12px;
     }
-    .scrollBtn:hover .arrow{ transform: translateY(1px); background: rgba(255,255,255,.08); }
+    h1{
+      margin: 14px 0 10px;
+      font-size: clamp(44px, 6vw, 68px);
+      line-height: 1.02;
+      letter-spacing: -1px;
+    }
+    h1 .dim{ opacity: .72; }
+    .sub{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 560px;
+      line-height: 1.55;
+    }
+    .heroActions{ display:flex; gap:10px; flex-wrap: wrap; margin-top: 14px; }
+    .downBtn{
+      margin-top: 14px;
+      width: fit-content;
+      opacity: .95;
+    }
 
-    /* ICON BUBBLES */
-    .iconLayer{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+    /* Floating icons */
+    .iconField{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
     .bubble{
       position:absolute;
-      width: 128px; height: 128px; border-radius:999px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.08);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      display:flex; align-items:center; justify-content:center;
-      opacity:.14;
-      filter: drop-shadow(0 18px 30px rgba(0,0,0,.35));
-      animation: floaty 8s ease-in-out infinite;
+      width: 150px; height: 150px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.09);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity: .22;
+      transform: translate3d(var(--x,0px), var(--y,0px), 0);
+      transition: opacity .25s ease;
       will-change: transform;
     }
-    .bubble svg{ width: 54px; height: 54px; opacity:.85; }
-    @keyframes floaty{
-      0%,100%{ transform: translate3d(0,0,0); }
-      50%{ transform: translate3d(0, -10px, 0); }
+    .bubble svg{ width: 52px; height: 52px; opacity: .85; }
+    .bubble.small{ width: 120px; height: 120px; opacity: .18 }
+    .bubble.tiny{ width: 92px; height: 92px; opacity: .14 }
+
+    /* Main sections */
+    .wrap{ width:min(1080px, calc(100% - 24px)); margin: 0 auto 90px; }
+    .section{ padding: 0 0 18px; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
     }
-    .safeMask{ position:absolute; inset:0; z-index:3; pointer-events:none; }
-    .safeBox{
-      position:absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%,-50%);
-      width: min(860px, calc(100% - 34px));
-      height: min(540px, calc(100% - 160px));
-      border-radius: 34px;
-      background: radial-gradient(closest-side, rgba(0,0,0,.46), transparent 70%);
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+      .heroInner{ padding: 28px 18px; }
+      .brand{ min-width: 0; }
     }
 
-    /* SECTION */
-    .section{ padding: 74px 0; }
-    .sectionTitle{ font-size: 18px; margin: 0 0 8px; letter-spacing:-.2px; }
-    .sectionSub{ color: var(--muted2); font-size: 13px; margin: 0 0 18px; }
+    /* Plan card */
+    .plan{
+      padding: 18px;
+      position: relative;
+      overflow:hidden;
+    }
+    .plan h2{ margin: 0 0 6px; font-size: 18px; }
+    .plan p{ margin: 0 0 16px; color: var(--muted2); font-size: 13px; }
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 980px){ .cards{ grid-template-columns: repeat(2, 1fr);} }
+    @media (max-width: 520px){ .cards{ grid-template-columns: 1fr;} }
 
-    .planGrid{ display:grid; gap:14px; grid-template-columns: repeat(4, 1fr); }
-    .modGrid{ display:grid; gap:14px; grid-template-columns: repeat(3, 1fr); margin-top:12px; }
-
-    .sizeCard,.modCard{
-      padding: 14px;
+    .choice{
+      padding: 12px;
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
+      background: rgba(255,255,255,.04);
       cursor:pointer;
-      transition: transform .12s ease, border-color .2s ease, background .2s ease;
-      display:flex; justify-content:space-between; gap:10px; min-height: 84px;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      position:relative;
+      min-height: 76px;
     }
-    .sizeCard:hover,.modCard:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.07); }
+    .choice:hover{ transform: translateY(-1px); background: rgba(255,255,255,.06) }
+    .choice .t{ font-weight: 700; font-size: 12px; margin-bottom: 2px; }
+    .choice .s{ color: var(--muted2); font-size: 12px; }
+    .choice .p{ color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .choice.sel{
+      border-color: rgba(120,170,255,.55);
+      background: rgba(120,170,255,.10);
+    }
+    .choice.sel::after{
+      content:"✓";
+      position:absolute;
+      right:10px;
+      top:10px;
+      width: 26px; height: 26px;
+      border-radius: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(120,170,255,.18);
+      border: 1px solid rgba(120,170,255,.32);
+      color: rgba(220,235,255,.95);
+      font-weight: 900;
+      font-size: 14px;
+    }
 
-    .selected{
-      border-color: rgba(120,170,255,.55) !important;
-      box-shadow: 0 0 0 2px rgba(120,170,255,.22) inset;
+    .modules{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
     }
-    .tick{
-      width: 28px; height: 28px; border-radius:999px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.06);
-      display:flex; align-items:center; justify-content:center;
-      flex:0 0 auto; margin-top:4px;
-    }
-    .tick.on{
-      background: rgba(120,170,255,.22);
-      border-color: rgba(120,170,255,.45);
-    }
-    .tick.on:before{ content:"✓"; font-weight:900; font-size:14px; }
+    @media (max-width: 980px){ .modules{ grid-template-columns: repeat(2, 1fr);} }
+    @media (max-width: 520px){ .modules{ grid-template-columns: 1fr;} }
 
-    .modMeta{ display:flex; flex-direction:column; gap:4px; min-width:0; }
-    .modName{ font-weight: 800; font-size: 13px; }
-    .modPrice{ color: var(--muted2); font-size: 12px; }
-    .modActions{ display:flex; gap: 8px; align-items:center; margin-top:8px; }
-    .learnBtn{ font-size: 12px; padding: 7px 10px; white-space: nowrap; }
-
-    .totalBar{
-      margin-top: 26px; /* pushed down a bit */
-      padding: 14px;
-      display:flex; justify-content:space-between; align-items:center; gap:12px;
-      border-radius: 18px;
+    .mod{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      position:relative;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
     }
-    .totalLeft{ display:flex; flex-direction:column; gap:4px; }
-    .totalLeft strong{ font-size: 14px; }
-    .totalLeft span{ font-size: 12px; color: var(--muted2); }
-    .totalRight{ display:flex; gap:10px; align-items:center; }
-
-    /* MODALS + SCROLL LOCK */
-    .backdrop{
-      position: fixed; inset:0;
-      background: rgba(0,0,0,.58);
-      display:none; align-items:center; justify-content:center;
-      padding: 20px;
-      z-index: 80;
-    }
-    .backdrop.show{ display:flex; }
-    .modal{
-      width: min(820px, 100%);
-      max-height: min(84vh, 820px);
-      overflow:auto;
-      padding: 16px;
-      border-radius: 20px;
-    }
-    .modalHeader{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 10px;
-      position: sticky; top:0;
-      background: linear-gradient(180deg, rgba(9,14,28,.96), rgba(9,14,28,.80));
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      padding: 10px 10px 12px;
-      border-radius: 14px;
-      z-index: 2;
-    }
-    .modalHeader strong{ font-size: 13px; }
-
-    .field{ display:flex; flex-direction:column; gap:6px; margin-top: 10px; }
-    .label{ font-size: 12px; color: var(--muted2); }
-    .input{
-      width: 100%;
-      border-radius: 14px;
+    .mod:hover{ transform: translateY(-1px); background: rgba(255,255,255,.06) }
+    .mod .name{ font-weight: 800; font-size: 12px; margin-bottom: 4px; }
+    .mod .price{ color: var(--muted2); font-size: 12px; margin-bottom: 10px; }
+    .modActions{ display:flex; gap:10px; align-items:center; justify-content:space-between; }
+    .chip{
+      padding: 7px 10px;
+      border-radius: 999px;
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.05);
-      color: var(--text);
-      padding: 12px 12px;
-      outline:none;
-      transition: border-color .2s ease, background .2s ease;
-    }
-    .input:focus{ border-color: rgba(120,170,255,.40); background: rgba(255,255,255,.07); }
-    .msg{ margin-top: 10px; color: var(--muted); font-size: 13px; }
-    .msg.err{ color: rgba(255,140,140,.95); }
-    .row2{ display:grid; gap: 10px; grid-template-columns: 1fr 1fr; }
-
-    /* custom checkbox + file */
-    .check{
-      display:flex; align-items:center; gap:10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
+      font-size: 12px;
       cursor:pointer;
       user-select:none;
     }
-    .checkDot{
-      width: 18px; height: 18px; border-radius: 6px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.04);
-      display:flex; align-items:center; justify-content:center;
+    .chip:hover{ background: rgba(255,255,255,.07) }
+    .chip.sel{
+      border-color: rgba(120,170,255,.55);
+      background: rgba(120,170,255,.14);
     }
-    .check.on .checkDot{
-      background: rgba(120,170,255,.22);
-      border-color: rgba(120,170,255,.42);
-    }
-    .check.on .checkDot:before{ content:"✓"; font-weight:900; font-size:12px; }
 
-    .fileBtn{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 10px 12px;
+    /* Total bar */
+    .totalBar{
+      margin-top: 16px;
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .totalLeft .big{ font-size: 18px; font-weight: 900; }
+    .totalLeft .small{ color: var(--muted2); font-size: 12px; margin-top:2px }
+    .totalActions{ display:flex; gap:10px; align-items:center; }
+
+    /* 250+ box */
+    .contactBox{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      display:none;
+    }
+    .contactBox.show{ display:block; }
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .field label{ font-size: 12px; color: var(--muted2); }
+    input, textarea{
+      width:100%;
+      padding: 11px 12px;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+    }
+    textarea{ min-height: 92px; resize: vertical; }
+    input:focus, textarea:focus{ border-color: rgba(120,170,255,.55) }
+
+    /* About */
+    .about{ padding: 18px; }
+    .about h3{ margin:0 0 10px; font-size: 16px; }
+    .about p{ margin:0 0 10px; color: var(--muted2); font-size: 13px; line-height: 1.6; }
+    .about ul{ margin:8px 0 0 18px; color: var(--muted2); font-size: 13px; line-height: 1.6; }
+
+    /* Modals */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 80;
+    }
+    .overlay.show{ display:flex; }
+    .modal{
+      width: min(520px, 100%);
+      padding: 16px;
+      position: relative;
+      max-height: min(88vh, 740px);
+      overflow:auto;
+    }
+    .modalHeader{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px; }
+    .modalTitle{ font-weight: 900; font-size: 14px; }
+    .modalClose{ padding: 8px 10px; border-radius: 12px; }
+    .modal .row{ display:grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+    .muted{ color: var(--muted2); font-size: 12px; }
+    .msg{ margin-top: 8px; font-size: 12px; color: rgba(255,190,190,.95); }
+
+    .pwWrap{ position:relative; }
+    .eyeBtn{
+      position:absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
       cursor:pointer;
-      transition: background .2s ease, border-color .2s ease, transform .12s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition: transform .12s ease, background .12s ease;
     }
-    .fileBtn:hover{ background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.18); transform: translateY(-1px); }
+    /* Subtle hover only (no jumping) */
+    .eyeBtn:hover{
+      background: rgba(255,255,255,.07);
+      transform: translateY(-50%) scale(.96);
+    }
+    .eyeBtn svg{ width: 18px; height: 18px; opacity:.9 }
 
-    @media (max-width: 900px){
-      .planGrid{ grid-template-columns: 1fr 1fr; }
-      .modGrid{ grid-template-columns: 1fr; }
-      .row2{ grid-template-columns: 1fr; }
-      .brandText span{ display:none; }
+    /* small footer */
+    .foot{
+      width:min(1080px, calc(100% - 24px));
+      margin: 0 auto 26px;
+      color: rgba(234,240,255,.45);
+      font-size: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap: 14px;
+      flex-wrap: wrap;
     }
 
-    footer{ padding: 26px 0 40px; color: var(--muted2); font-size: 12px; }
-    a.link{ color: rgba(160,200,255,.95); text-decoration: none; }
-    a.link:hover{ text-decoration: underline; }
   </style>
 </head>
 
 <body>
+
   <!-- NAV -->
-  <div class="navWrap" id="navWrap">
-    <div class="wrap">
-      <div class="nav glass">
-        <div class="brand">
-          <img alt="SmartCore" src="SmartCore%20Official%20Logos/SC%20Icon%20-%20Black%20Background.png" />
-          <div class="brandText">
-            <strong>SmartCore Technology</strong>
-            <span>Practical Technology. Built to Last.</span>
-          </div>
-        </div>
-        <div class="navRight">
-          <button class="btn ghost" id="loginTopBtn" type="button">Log In</button>
-        </div>
+  <div id="nav" class="nav glass">
+    <div class="brand">
+      <img id="navLogo" src="SmartCore%20Official%20Logos/SC%20Icon%20-%20Black%20Background.png" alt="SmartCore" />
+      <div>
+        <div class="t1">SmartCore Technology</div>
+        <div class="t2">Practical Technology. Built to Last.</div>
       </div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center">
+      <button class="btn" id="loginOpen">Log in</button>
     </div>
   </div>
 
   <!-- HERO -->
-  <section class="hero" id="home">
-    <div class="iconLayer" id="iconLayer"></div>
-    <div class="safeMask"><div class="safeBox"></div></div>
+  <section class="hero">
+    <div class="iconField" id="iconField"></div>
 
-    <div class="wrap relative z-[4]">
-      <div>
-        <div class="pill fadeUp d1">
-          <span style="display:inline-block;width:7px;height:7px;border-radius:999px;background:rgba(120,170,255,.8)"></span>
-          Calm systems for real workplaces
-        </div>
+    <div class="heroInner glass">
+      <span class="pill">Calm systems for real workplaces</span>
 
-        <h1 class="h1 fadeUp d2">
-          SmartCore <span class="tech">Technology</span>
-        </h1>
+      <h1>
+        SmartCore<br/>
+        <span class="dim">Technology</span>
+      </h1>
 
-        <p class="lead fadeUp d3">
-          Reliable software systems for workspace management — practical tools that stay clean, consistent, and easy to run.
-        </p>
+      <p class="sub">Practical, reliable systems that businesses can depend on every day.</p>
 
-        <div class="heroCTA fadeUp d4">
-          <button class="btn primary" id="buildPlanBtn" type="button">Build Your Plan →</button>
-          <button class="btn" id="employeeBtn" type="button">Sign Up As An Employee</button>
-        </div>
-
-        <button class="scrollBtn" id="scrollDownBtn" type="button">
-          <span class="arrow">↓</span>
-          <span>Scroll Down</span>
-        </button>
+      <div class="heroActions">
+        <button class="btn primary" id="goPlan">Build Your Plan</button>
+        <button class="btn" id="empOpen">Sign Up As An Employee</button>
       </div>
+
+      <button class="btn downBtn" id="scrollDown">Scroll Down ↓</button>
     </div>
   </section>
 
-  <!-- BUILD PLAN -->
-  <section class="section" id="plan">
-    <div class="wrap">
-      <div class="card p-5">
-        <div class="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 class="sectionTitle">Build your plan</h2>
-            <p class="sectionSub">Choose your company size, then select modules. Totals update live.</p>
-          </div>
-          <div class="text-right text-[12px]" style="color:var(--muted2);">
-            Monthly subscription (GBP)
-            <div class="mt-1 font-black text-white" id="planSummary">Select a company size</div>
-          </div>
-        </div>
+  <!-- MAIN -->
+  <div class="wrap">
+    <div class="grid">
+      <div class="plan glass section" id="plan">
+        <h2>Build your plan</h2>
+        <p>Choose a company size, then select modules. Totals update live.</p>
 
-        <div class="mt-4 text-[13px] font-semibold">Select your company size</div>
+        <div class="cards" id="sizeCards"></div>
 
-        <div class="planGrid mt-3" id="sizeGrid">
-          <div class="sizeCard" data-size="up_to_25"><div><div class="font-black text-[13px]">Up to 25 people</div><div class="text-[12px] mt-1" style="color:var(--muted2)">£39 / month</div></div><div class="tick"></div></div>
-          <div class="sizeCard" data-size="26_100"><div><div class="font-black text-[13px]">26–100 people</div><div class="text-[12px] mt-1" style="color:var(--muted2)">£79 / month</div></div><div class="tick"></div></div>
-          <div class="sizeCard" data-size="101_250"><div><div class="font-black text-[13px]">101–250 people</div><div class="text-[12px] mt-1" style="color:var(--muted2)">£149 / month</div></div><div class="tick"></div></div>
-          <div class="sizeCard" data-size="250_plus"><div><div class="font-black text-[13px]">250+ people</div><div class="text-[12px] mt-1" style="color:var(--muted2)">Contact us</div></div><div class="tick"></div></div>
-        </div>
-
-        <div id="size250Box" class="mt-4 hidden">
-          <div class="row2">
+        <div class="contactBox" id="bigContact">
+          <div class="row" style="display:grid; gap:10px;">
             <div class="field">
-              <div class="label">Approx company size (required to contact)</div>
-              <input class="input" id="approxSize" type="number" min="1" placeholder="e.g. 520" />
-              <div class="label hidden" id="approxWarn" style="color:rgba(255,200,110,.95)">
-                You entered under 250. You’ll be asked to confirm.
-              </div>
+              <label>Approx company size (required)</label>
+              <input id="bigSize" type="number" min="1" placeholder="e.g. 350" />
             </div>
             <div class="field">
-              <div class="label">&nbsp;</div>
-              <button class="btn primary" id="contact250Btn" type="button" disabled>Contact Us →</button>
-              <div class="label mt-2">We’ll open a pre-filled email to support.</div>
+              <label>Additional notes (optional)</label>
+              <textarea id="bigNotes" placeholder="Anything useful for us to know..."></textarea>
             </div>
           </div>
         </div>
 
-        <div id="modulesWrap" class="hidden">
-          <div class="mt-5 text-[13px] font-semibold">Select your modules</div>
-
-          <div class="modGrid" id="modGrid">
-            <div class="modCard" data-mod="presence_fire"><div class="modMeta"><div class="modName">Presence & Fire Safety</div><div class="modPrice">£10 / month</div><div class="modActions"><button class="btn learnBtn" type="button" data-learn="presence_fire">Learn more</button></div></div><div class="tick"></div></div>
-            <div class="modCard" data-mod="policies_handbook"><div class="modMeta"><div class="modName">Policies & Staff Handbook</div><div class="modPrice">£7 / month</div><div class="modActions"><button class="btn learnBtn" type="button" data-learn="policies_handbook">Learn more</button></div></div><div class="tick"></div></div>
-            <div class="modCard" data-mod="holiday_booking"><div class="modMeta"><div class="modName">Holiday Booking</div><div class="modPrice">£8 / month</div><div class="modActions"><button class="btn learnBtn" type="button" data-learn="holiday_booking">Learn more</button></div></div><div class="tick"></div></div>
-            <div class="modCard" data-mod="accident_book"><div class="modMeta"><div class="modName">Accident & Injury Book</div><div class="modPrice">£3 / month</div><div class="modActions"><button class="btn learnBtn" type="button" data-learn="accident_book">Learn more</button></div></div><div class="tick"></div></div>
-            <div class="modCard" data-mod="training_compliance"><div class="modMeta"><div class="modName">Training & Compliance</div><div class="modPrice">£9 / month</div><div class="modActions"><button class="btn learnBtn" type="button" data-learn="training_compliance">Learn more</button></div></div><div class="tick"></div></div>
-            <div class="modCard" data-mod="onboarding_offboarding"><div class="modMeta"><div class="modName">Onboarding & Offboarding</div><div class="modPrice">£8 / month</div><div class="modActions"><button class="btn learnBtn" type="button" data-learn="onboarding_offboarding">Learn more</button></div></div><div class="tick"></div></div>
-            <div class="modCard" data-mod="expenses_upload"><div class="modMeta"><div class="modName">Expenses Upload</div><div class="modPrice">£6 / month</div><div class="modActions"><button class="btn learnBtn" type="button" data-learn="expenses_upload">Learn more</button></div></div><div class="tick"></div></div>
-            <div class="modCard" data-mod="wellbeing_check"><div class="modMeta"><div class="modName">Wellbeing Check</div><div class="modPrice">£4 / month</div><div class="modActions"><button class="btn learnBtn" type="button" data-learn="wellbeing_check">Learn more</button></div></div><div class="tick"></div></div>
+        <div id="modulesWrap" style="display:none">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px; margin-bottom: 6px;">
+            <div style="font-weight:800; font-size: 13px;">Select your modules</div>
+            <div class="muted">Select any</div>
           </div>
+          <div class="modules" id="moduleCards"></div>
+        </div>
 
-          <div class="totalBar card">
-            <div class="totalLeft">
-              <strong id="totalLine">£0 / month</strong>
-              <span id="totalHint">Select modules to begin</span>
-            </div>
-            <div class="totalRight">
-              <button class="btn" id="clearPlanBtn" type="button">Clear</button>
-              <button class="btn primary" id="checkoutBtn" type="button" disabled>Continue →</button>
-            </div>
+        <div class="totalBar" style="margin-top:18px">
+          <div class="totalLeft">
+            <div class="big" id="totalText">£0 / month</div>
+            <div class="small" id="totalSub">Select a company size</div>
+          </div>
+          <div class="totalActions">
+            <button class="btn" id="clearBtn">Clear</button>
+            <button class="btn primary" id="checkoutBtn" disabled>Checkout →</button>
           </div>
         </div>
+
       </div>
 
-      <div class="card p-5 mt-5">
-        <h2 class="sectionTitle">About SmartCore Technology</h2>
-        <div class="text-[13px] leading-[1.75]" style="color:var(--muted);">
-          <p class="mb-3">SmartCore Technology was built by Finley Hassall, a young founder with a long-standing passion for technology and a strong business mindset. Interested in IT from the age of six, Finley always knew he wanted to build a career creating systems that solve real-world problems.</p>
-          <p class="mb-3">Rather than focusing on trends or hype, SmartCore Technology was created with a clear goal: to build practical, reliable systems that businesses can depend on every day.</p>
-          <p class="mb-3">The company was developed with guidance and support from Finley’s mother, a business owner herself, but every system within SmartCore has been hand-crafted from the ground up by Finley. Each feature, workflow, and decision has been designed with real workplaces in mind — prioritising clarity, usability, and long-term reliability over unnecessary complexity.</p>
-          <p class="mb-3">SmartCore Technology is not about flashy software. It’s about building tools that work properly, scale sensibly, and quietly do their job in the background.</p>
-          <p class="font-semibold mt-4">The SmartCore Technology Approach</p>
-          <p class="mb-3">SmartCore Technology is built on a simple philosophy: technology should make work easier, not more complicated.</p>
-          <ul class="list-disc pl-5">
-            <li>solve a specific, real business problem</li>
-            <li>be easy to understand and use</li>
-            <li>create clear, auditable records</li>
-            <li>scale as organisations grow</li>
-            <li>remain reliable over time</li>
-          </ul>
-          <p class="mt-3">Instead of offering one large, bloated platform, SmartCore provides modular systems that companies can choose and combine based on their actual needs. This keeps costs fair, reduces complexity, and allows businesses to stay in control of how they operate.</p>
-          <p class="mt-3">SmartCore Technology focuses on the areas that matter most — people, safety, and operational clarity — delivering tools that support organisations without getting in the way.</p>
-        </div>
-      </div>
+      <div class="about glass section">
+        <h3>About SmartCore Technology</h3>
+        <p>SmartCore Technology was built by Finley Hassall, a young founder with a long-standing passion for technology and a strong business mindset. Interested in IT from the age of six, Finley always knew he wanted to build a career creating systems that solve real-world problems.</p>
+        <p>Rather than focusing on trends or hype, SmartCore Technology was created with a clear goal: to build practical, reliable systems that businesses can depend on every day.</p>
+        <p>The company was developed with guidance and support from Finley’s mother, a business owner herself, but every system within SmartCore has been hand-crafted from the ground up by Finley. Each feature, workflow, and decision has been designed with real workplaces in mind — prioritising clarity, usability, and long-term reliability over unnecessary complexity.</p>
+        <p>SmartCore Technology is not about flashy software. It’s about building tools that work properly, scale sensibly, and quietly do their job in the background.</p>
 
-      <footer class="wrap">
-        SmartCore Technology — Practical Technology. Built to Last. · Support:
-        <a class="link" href="mailto:support@smartcoretechnology.co.uk">support@smartcoretechnology.co.uk</a>
-      </footer>
-    </div>
-  </section>
-
-  <!-- LEARN MORE MODAL -->
-  <div class="backdrop" id="learnModal">
-    <div class="modal glass" role="dialog" aria-modal="true">
-      <div class="modalHeader">
-        <strong id="learnTitle">Module</strong>
-        <button class="btn" id="learnClose" type="button">Close</button>
-      </div>
-      <div class="px-2 pb-3">
-        <div class="text-[13px] leading-[1.7] whitespace-pre-wrap" style="color:var(--muted)" id="learnBody"></div>
-
-        <div class="mt-4">
-          <div class="card p-3">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <div class="font-black">Preview</div>
-              <a class="link" href="https://youtu.be/S2kymv60ndQ?si=7AGk-tN09k0g5qf3" target="_blank" rel="noreferrer">Open in YouTube</a>
-            </div>
-            <div class="mt-3 overflow-hidden rounded-[14px] border" style="border-color:rgba(255,255,255,.08);">
-              <iframe
-                title="Preview"
-                width="100%"
-                height="315"
-                src="https://www.youtube.com/embed/S2kymv60ndQ"
-                allowfullscreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                style="display:block;border:0;background:#000;">
-              </iframe>
-            </div>
-          </div>
-        </div>
+        <h3 style="margin-top:16px">The SmartCore Technology Approach</h3>
+        <p>SmartCore Technology is built on a simple philosophy: technology should make work easier, not more complicated.</p>
+        <ul>
+          <li>solve a specific, real business problem</li>
+          <li>be easy to understand and use</li>
+          <li>create clear, auditable records</li>
+          <li>scale as organisations grow</li>
+          <li>remain reliable over time</li>
+        </ul>
+        <p style="margin-top:12px">Instead of offering one large, bloated platform, SmartCore provides modular systems that companies can choose and combine based on their actual needs. This keeps costs fair, reduces complexity, and allows businesses to stay in control of how they operate.</p>
       </div>
     </div>
   </div>
 
-  <!-- CONFIRM MODAL -->
-  <div class="backdrop" id="confirmModal">
-    <div class="modal glass" role="dialog" aria-modal="true" style="width:min(520px,100%);">
+  <div class="foot">
+    <div>SmartCore Technology — Practical Technology. Built to Last.</div>
+    <div>Support: support@smartcoretechnology.co.uk</div>
+  </div>
+
+  <!-- MODULE LEARN MORE MODAL -->
+  <div class="overlay" id="learnOverlay">
+    <div class="modal glass" style="width:min(760px,100%)">
       <div class="modalHeader">
-        <strong id="confirmTitle">Confirm</strong>
-        <button class="btn" id="confirmClose" type="button">Close</button>
+        <div class="modalTitle" id="learnTitle">Module</div>
+        <button class="btn modalClose" id="learnClose">Close</button>
       </div>
-      <div class="px-2 pb-3">
-        <div class="text-[13px] leading-[1.6]" style="color:var(--muted)" id="confirmText"></div>
-        <div class="flex justify-end gap-2 mt-4">
-          <button class="btn" id="confirmNo" type="button">No</button>
-          <button class="btn primary" id="confirmYes" type="button">Yes</button>
-        </div>
+      <div class="muted" id="learnPrice"></div>
+      <div style="height:10px"></div>
+      <div id="learnBody" class="muted" style="font-size:13px; line-height:1.65"></div>
+      <div style="height:12px"></div>
+      <div style="border:1px solid rgba(255,255,255,.10); border-radius:16px; overflow:hidden; background: rgba(0,0,0,.2)">
+        <iframe
+          id="learnVideo"
+          width="100%"
+          height="360"
+          src=""
+          title="Module preview"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+          allowfullscreen
+        ></iframe>
       </div>
     </div>
   </div>
 
-  <!-- CHECKOUT MODAL (Owner signup w/ code) -->
-  <div class="backdrop" id="checkoutModal">
-    <div class="modal glass" role="dialog" aria-modal="true">
+  <!-- CHECKOUT MODAL (Owner signup + verify + mock pay) -->
+  <div class="overlay" id="checkoutOverlay">
+    <div class="modal glass">
       <div class="modalHeader">
-        <strong>Company Sign Up</strong>
-        <button class="btn" id="coClose" type="button">Close</button>
+        <div class="modalTitle" id="checkoutTitle">Create account</div>
+        <button class="btn modalClose" id="checkoutClose">Close</button>
       </div>
 
-      <div class="px-2 pb-3">
-        <div id="coStep1">
-          <div class="row2">
-            <div class="field">
-              <div class="label">Company name</div>
-              <input class="input" id="coCompany" placeholder="e.g. SmartFits Installations Ltd" />
-            </div>
-            <div class="field">
-              <div class="label">Your full name</div>
-              <input class="input" id="coName" placeholder="e.g. Finley Hassall" />
-            </div>
-          </div>
-
-          <div class="row2">
-            <div class="field">
-              <div class="label">Email</div>
-              <input class="input" id="coEmail" type="email" placeholder="you@company.co.uk" />
-            </div>
-            <div class="field">
-              <div class="label">Password</div>
-              <div class="relative">
-                <input class="input pr-10" id="coPass" type="password" placeholder="Minimum 8 characters" />
-                <button class="absolute right-2 top-1/2 -translate-y-1/2 btn px-3 py-2" id="coEye" type="button">👁</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="msg" id="coMsg1"></div>
-          <div class="mt-3 flex justify-end">
-            <button class="btn primary" id="coContinue" type="button">Continue →</button>
-          </div>
-        </div>
-
-        <div id="coStep2" class="hidden">
+      <div id="checkoutStep1">
+        <div class="row">
           <div class="field">
-            <div class="label">Enter the 6-digit code sent to your email</div>
-            <input class="input" id="coCode" maxlength="6" inputmode="numeric" placeholder="000000" />
+            <label>Company name</label>
+            <input id="suCompany" placeholder="e.g. SmartFits Installations Ltd" />
           </div>
-          <div class="msg" id="coMsg2"></div>
-          <div class="mt-3 flex justify-end gap-2">
-            <button class="btn" id="coBack" type="button">Back</button>
-            <button class="btn primary" id="coVerify" type="button">Continue →</button>
+          <div class="field">
+            <label>Email</label>
+            <input id="suEmail" type="email" placeholder="name@company.com" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="pwWrap">
+              <input id="suPass" type="password" placeholder="Minimum 8 characters" />
+              <button class="eyeBtn" id="suEye" type="button" aria-label="Show password">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" stroke="rgba(234,240,255,.9)" stroke-width="1.7"/>
+                  <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="rgba(234,240,255,.9)" stroke-width="1.7"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
+
+        <div class="muted" style="margin-top:10px">
+          We’ll email you a 6-digit code. Your account is only created after verification and payment acceptance.
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end">
+          <button class="btn primary" id="sendCodeBtn">Continue →</button>
+        </div>
+        <div id="suMsg" class="msg"></div>
+      </div>
+
+      <div id="checkoutStep2" style="display:none">
+        <div class="row">
+          <div class="field">
+            <label>6-digit code</label>
+            <input id="suCode" inputmode="numeric" placeholder="123456" maxlength="6" />
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end">
+          <button class="btn" id="backToDetails">Back</button>
+          <button class="btn primary" id="verifyOnlyBtn">Verify →</button>
+        </div>
+        <div id="suMsg2" class="msg"></div>
+      </div>
+
+      <div id="checkoutStep3" style="display:none">
+        <div class="muted" style="margin-top:6px">
+          Payment (testing mode). This is where Stripe will go later.
+        </div>
+
+        <div class="glass2" style="margin-top:12px; padding:12px;">
+          <div style="font-weight:900; font-size:13px; margin-bottom:6px">Your plan</div>
+          <div class="muted" id="paySummary" style="font-size:12px; line-height:1.5"></div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end">
+          <button class="btn danger" id="payDecline">Decline</button>
+          <button class="btn primary" id="payAccept">Pay (Accept)</button>
+        </div>
+        <div id="payMsg" class="msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE SIGNUP MODAL (placeholder - wired later) -->
+  <div class="overlay" id="empOverlay">
+    <div class="modal glass">
+      <div class="modalHeader">
+        <div class="modalTitle">Sign up as an employee</div>
+        <button class="btn modalClose" id="empClose">Close</button>
+      </div>
+      <div class="muted" style="line-height:1.6">
+        Employee signup will validate your company code and your name against the employee list before sending a code.
+        We’ll wire this after the owner signup + dashboard is fully stable.
       </div>
     </div>
   </div>
 
   <!-- LOGIN MODAL -->
-  <div class="backdrop" id="loginModal">
-    <div class="modal glass" role="dialog" aria-modal="true" style="width:min(520px,100%);">
+  <div class="overlay" id="loginOverlay">
+    <div class="modal glass">
       <div class="modalHeader">
-        <strong>Log In</strong>
-        <button class="btn" id="liClose" type="button">Close</button>
+        <div class="modalTitle">Log in</div>
+        <button class="btn modalClose" id="loginClose">Close</button>
       </div>
-      <div class="px-2 pb-3">
+
+      <div class="row">
         <div class="field">
-          <div class="label">Email</div>
-          <input class="input" id="liEmail" type="email" placeholder="you@company.co.uk" />
+          <label>Email</label>
+          <input id="liEmail" type="email" placeholder="name@company.com" />
         </div>
         <div class="field">
-          <div class="label">Password</div>
-          <div class="relative">
-            <input class="input pr-10" id="liPass" type="password" placeholder="Your password" />
-            <button class="absolute right-2 top-1/2 -translate-y-1/2 btn px-3 py-2" id="liEye" type="button">👁</button>
+          <label>Password</label>
+          <div class="pwWrap">
+            <input id="liPass" type="password" placeholder="Your password" />
+            <button class="eyeBtn" id="liEye" type="button" aria-label="Show password">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" stroke="rgba(234,240,255,.9)" stroke-width="1.7"/>
+                <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="rgba(234,240,255,.9)" stroke-width="1.7"/>
+              </svg>
+            </button>
           </div>
         </div>
-
-        <div class="msg err hidden cursor-pointer" id="liBad">Incorrect credentials — Forgot your password?</div>
-
-        <div class="msg" id="liMsg"></div>
-        <div class="mt-3 flex justify-end">
-          <button class="btn primary" id="liGo" type="button">Log In →</button>
-        </div>
-
-        <div class="mt-4 text-[12px]" style="color:var(--muted2);">
-          Don’t have an account?
-        </div>
-        <button class="btn mt-2 w-full justify-center" id="liHelp" type="button">Sign up options</button>
       </div>
+
+      <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end">
+        <button class="btn primary" id="loginBtn">Log in →</button>
+      </div>
+      <div id="liMsg" class="msg"></div>
+
+      <div class="muted" style="margin-top:12px">
+        Don’t have an account?
+      </div>
+      <button class="btn" style="margin-top:8px; width:100%" id="noAccountBtn">What should I do?</button>
     </div>
   </div>
 
-  <!-- SIGNUP OPTIONS MODAL -->
-  <div class="backdrop" id="signupHelpModal">
-    <div class="modal glass" role="dialog" aria-modal="true" style="width:min(560px,100%);">
+  <!-- SIMPLE DASH PLACEHOLDER (we’ll improve after) -->
+  <div class="overlay" id="dashOverlay">
+    <div class="modal glass" style="width:min(860px,100%)">
       <div class="modalHeader">
-        <strong>Sign Up Options</strong>
-        <button class="btn" id="shClose" type="button">Close</button>
+        <div class="modalTitle">Dashboard</div>
+        <button class="btn danger" id="signOutBtn">Sign out</button>
       </div>
-      <div class="px-2 pb-3 text-[13px] leading-[1.6]" style="color:var(--muted);">
-        <p class="mb-3">
-          If your organisation is already set up in SmartCore, choose <b>Sign Up As An Employee</b> and use your company code.
-        </p>
-        <p class="mb-3">
-          If you’re new to SmartCore, scroll to <b>Build Your Plan</b>, select your company size and modules, then continue to create the company account.
-        </p>
-        <p class="font-semibold mt-4" style="color:rgba(255,255,255,.86)">Practical systems. Clean setup. Built for real teams.</p>
-      </div>
+      <div class="muted">You’re signed in. Next we’ll build company onboarding + employee management properly.</div>
     </div>
   </div>
-
-  <!-- EMPLOYEE SIGNUP MODAL -->
-  <div class="backdrop" id="employeeModal">
-    <div class="modal glass" role="dialog" aria-modal="true">
-      <div class="modalHeader">
-        <strong>Employee Sign Up</strong>
-        <button class="btn" id="emClose" type="button">Close</button>
-      </div>
-      <div class="px-2 pb-3">
-        <div id="emStep1">
-          <div class="row2">
-            <div class="field">
-              <div class="label">Company code</div>
-              <input class="input" id="emCompanyCode" placeholder="e.g. SMA123456" />
-            </div>
-            <div class="field">
-              <div class="label">Your full name (must match admin record)</div>
-              <input class="input" id="emName" placeholder="e.g. Finley Hassall" />
-            </div>
-          </div>
-          <div class="row2">
-            <div class="field">
-              <div class="label">Email</div>
-              <input class="input" id="emEmail" type="email" placeholder="you@company.co.uk" />
-            </div>
-            <div class="field">
-              <div class="label">Password</div>
-              <div class="relative">
-                <input class="input pr-10" id="emPass" type="password" placeholder="Minimum 8 characters" />
-                <button class="absolute right-2 top-1/2 -translate-y-1/2 btn px-3 py-2" id="emEye" type="button">👁</button>
-              </div>
-            </div>
-          </div>
-          <div class="msg" id="emMsg1"></div>
-          <div class="mt-3 flex justify-end">
-            <button class="btn primary" id="emContinue" type="button">Continue →</button>
-          </div>
-        </div>
-
-        <div id="emStep2" class="hidden">
-          <div class="field">
-            <div class="label">Enter the 6-digit code sent to your email</div>
-            <input class="input" id="emCode" maxlength="6" inputmode="numeric" placeholder="000000" />
-          </div>
-          <div class="msg" id="emMsg2"></div>
-          <div class="mt-3 flex justify-end gap-2">
-            <button class="btn" id="emBack" type="button">Back</button>
-            <button class="btn primary" id="emVerify" type="button">Continue →</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DASHBOARD -->
-  <section class="section hidden" id="dashboard">
-    <div class="wrap">
-      <div class="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <div class="pill"><span style="display:inline-block;width:7px;height:7px;border-radius:999px;background:rgba(120,170,255,.8)"></span> Dashboard</div>
-          <h2 class="sectionTitle mt-2" id="dashCompanyName">Your Company</h2>
-          <div class="text-[12px]" style="color:var(--muted2)" id="dashCompanyMeta"></div>
-        </div>
-        <div class="flex gap-2">
-          <button class="btn" id="dashRefresh">Refresh</button>
-          <button class="btn" id="dashSignOut">Sign Out</button>
-        </div>
-      </div>
-
-      <!-- Onboarding wizard -->
-      <div class="card p-5 mt-5 hidden" id="onboardBox">
-        <div class="sectionTitle">Company onboarding</div>
-        <div class="sectionSub">Complete these steps to finish setup. (One step at a time.)</div>
-
-        <div id="obStep1">
-          <div class="field">
-            <div class="label">Full company name</div>
-            <input class="input" id="obCompanyName" />
-          </div>
-          <div class="mt-3 flex justify-end">
-            <button class="btn primary" id="obNext1">Continue →</button>
-          </div>
-          <div class="msg" id="obMsg1"></div>
-        </div>
-
-        <div id="obStep2" class="hidden">
-          <div class="field">
-            <div class="label">Full company address</div>
-            <input class="input" id="obCompanyAddress" placeholder="Full address" />
-          </div>
-          <div class="mt-3 flex justify-end gap-2">
-            <button class="btn" id="obBack2">Back</button>
-            <button class="btn primary" id="obNext2">Continue →</button>
-          </div>
-          <div class="msg" id="obMsg2"></div>
-        </div>
-
-        <div id="obStep3" class="hidden">
-          <div class="field">
-            <div class="label">Upload company logo (best with no background)</div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <label class="fileBtn">
-                Choose file
-                <input id="obLogo" type="file" accept="image/*" class="hidden" />
-              </label>
-              <div class="text-[12px]" style="color:var(--muted2)" id="obLogoName">No file chosen</div>
-            </div>
-          </div>
-          <div class="mt-3 flex justify-end gap-2">
-            <button class="btn" id="obBack3">Back</button>
-            <button class="btn primary" id="obFinish">Finish setup →</button>
-          </div>
-          <div class="msg" id="obMsg3"></div>
-        </div>
-      </div>
-
-      <!-- Tell us about you + employees -->
-      <div class="card p-5 mt-5">
-        <div class="sectionTitle">Team</div>
-        <div class="sectionSub" id="teamLimitLine">Loading…</div>
-
-        <div class="row2">
-          <div class="field">
-            <div class="label">Add employee full name</div>
-            <input class="input" id="empName" placeholder="e.g. Finley Hassall" />
-          </div>
-          <div class="field">
-            <div class="label">Job title</div>
-            <input class="input" id="empTitle" placeholder="e.g. Founder" />
-          </div>
-        </div>
-
-        <div class="row2">
-          <div class="field">
-            <div class="label">Job category</div>
-            <input class="input" id="empCategory" placeholder="e.g. Senior Management Team" />
-          </div>
-          <div class="field">
-            <div class="label">Admin access</div>
-            <div class="check" id="empAdminCheck">
-              <div class="checkDot"></div>
-              <div>
-                <div class="font-semibold text-[13px]">Grant admin</div>
-                <div class="text-[12px]" style="color:var(--muted2)">Allows employee to manage users and settings</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3 flex justify-end">
-          <button class="btn primary" id="empAddBtn">Add employee →</button>
-        </div>
-
-        <div class="msg" id="empMsg"></div>
-
-        <div class="mt-4 border-t pt-4" style="border-color:rgba(255,255,255,.08)">
-          <div class="sectionTitle" style="font-size:14px">Employees</div>
-          <div class="text-[12px]" style="color:var(--muted2)">Click the pencil to edit. The employee ID stays the same.</div>
-
-          <div class="mt-3 space-y-2" id="empList"></div>
-        </div>
-      </div>
-
-      <!-- Systems + buy more -->
-      <div class="card p-5 mt-5">
-        <div class="sectionTitle">Your systems</div>
-        <div class="sectionSub">Quick links appear only for modules your company owns.</div>
-
-        <div class="grid md:grid-cols-2 gap-3" id="ownedMods"></div>
-
-        <div class="mt-5 border-t pt-5" style="border-color:rgba(255,255,255,.08)">
-          <div class="sectionTitle">Buy more systems</div>
-          <div class="sectionSub">Select additional modules and save. (Stripe later — test mode is free.)</div>
-          <div class="modGrid" id="buyMods"></div>
-          <div class="mt-4 flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <div class="font-black" id="dashTotal">£0 / month</div>
-              <div class="text-[12px]" style="color:var(--muted2)" id="dashTotalHint">Saved to your account</div>
-            </div>
-            <button class="btn primary" id="saveModulesBtn">Save modules →</button>
-          </div>
-          <div class="msg" id="modsMsg"></div>
-        </div>
-      </div>
-
-      <!-- Company settings -->
-      <div class="card p-5 mt-5">
-        <div class="sectionTitle">Company settings</div>
-        <div class="sectionSub">Update company name, address, and brand colours used across your systems.</div>
-
-        <div class="row2">
-          <div class="field">
-            <div class="label">Company name</div>
-            <input class="input" id="setName" />
-          </div>
-          <div class="field">
-            <div class="label">Company address</div>
-            <input class="input" id="setAddress" />
-          </div>
-        </div>
-
-        <div class="row2">
-          <div class="field">
-            <div class="label">Primary colour</div>
-            <input class="input" id="setPrimary" placeholder="#ff0000" />
-          </div>
-          <div class="field">
-            <div class="label">Secondary colour</div>
-            <input class="input" id="setSecondary" placeholder="#000000" />
-          </div>
-        </div>
-
-        <div class="row2">
-          <div class="field">
-            <div class="label">Text colour</div>
-            <input class="input" id="setText" placeholder="#ffffff" />
-          </div>
-          <div class="field">
-            <div class="label">&nbsp;</div>
-            <button class="btn primary" id="saveSettingsBtn">Save settings →</button>
-          </div>
-        </div>
-
-        <div class="msg" id="setMsg"></div>
-      </div>
-    </div>
-  </section>
 
   <script>
-    // ---------- Utilities ----------
-    const $ = (id)=>document.getElementById(id);
-    const qs = (sel)=>document.querySelector(sel);
-    const qsa = (sel)=>Array.from(document.querySelectorAll(sel));
-    const money = (n)=> `£${Number(n||0).toFixed(0)}`;
-    const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+    // --------- CONFIG (you told me these for future reference) ----------
+    // NOTE: fix your SUPABASE_URL string in your codebase (missing closing quote in what you pasted earlier)
+    window.__SUPABASE_URL = window.__SUPABASE_URL || "https://hjdpcfhozhoyeqevnupm.supabase.co";
+    window.__SUPABASE_ANON = window.__SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZHBjZmhvemhveWVxZXZudXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MTk3MzYsImV4cCI6MjA4MjQ5NTczNn0.BXosJO4NmEZOe73GXSGPa3z-i_4ZzF9zBAMBIf6Mkts";
 
-    function lockScroll(on){
-      document.body.style.overflow = on ? "hidden" : "";
-      document.documentElement.style.overflow = on ? "hidden" : "";
-    }
-    function showModal(el){ el.classList.add("show"); lockScroll(true); }
-    function hideModal(el){ el.classList.remove("show"); lockScroll(false); }
+    const supabase = window.supabase.createClient(window.__SUPABASE_URL, window.__SUPABASE_ANON);
+
+    const $ = (id) => document.getElementById(id);
+
+    function openOverlay(id){ $(id).classList.add("show"); }
+    function closeOverlay(id){ $(id).classList.remove("show"); }
+    function money(n){ return "£" + Number(n||0).toFixed(0); }
 
     async function apiPost(path, payload){
       const res = await fetch(path, {
-        method: "POST",
-        headers: { "content-type":"application/json" },
+        method:"POST",
+        headers:{ "content-type":"application/json" },
         body: JSON.stringify(payload || {})
       });
       const text = await res.text();
-      let json = null;
-      try{ json = JSON.parse(text); }catch{}
-      if(!res.ok){
-        throw new Error(json?.error || text || `Request failed: ${res.status}`);
-      }
-      return json ?? { ok:true };
+      let data;
+      try { data = JSON.parse(text); } catch { data = { ok:false, error:text }; }
+      if (!res.ok) throw new Error(data?.error || text || ("Request failed: " + res.status));
+      return data;
     }
 
-    // ---------- Config (set from Cloudflare env via /api/me usage; Supabase client used for login/session only) ----------
-    let supabase = null;
-    function getSupabase(){
-      if(supabase) return supabase;
-      // IMPORTANT: these are public (anon) values; you can hardcode them OR keep empty and only use server endpoints
-      // If you hardcode, replace the values below.
-      const SUPABASE_URL = window.__SUPABASE_URL || "";
-      const SUPABASE_ANON = window.__SUPABASE_ANON || "";
-      if(!SUPABASE_URL || !SUPABASE_ANON) return null;
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession:true }});
-      return supabase;
-    }
+    // --------- NAV hide after hero ----------
+    const nav = $("nav");
+    const hero = document.querySelector(".hero");
+    const obs = new IntersectionObserver(([e])=>{
+      // if hero not visible -> hide nav
+      nav.classList.toggle("hidden", !e.isIntersecting);
+    }, { threshold: 0.1 });
+    obs.observe(hero);
 
-    // ---------- Content ----------
-    const SIZE_PRICE = { up_to_25:39, "26_100":79, "101_250":149, "250_plus":null };
-    const SIZE_LIMIT = { up_to_25:25, "26_100":100, "101_250":250, "250_plus":null };
-    const SIZE_LABEL = { up_to_25:"Up to 25 people", "26_100":"26–100 people", "101_250":"101–250 people", "250_plus":"250+ people" };
+    // --------- Scroll down ----------
+    $("scrollDown").onclick = () => $("plan").scrollIntoView({ behavior:"smooth", block:"start" });
+    $("goPlan").onclick = () => $("plan").scrollIntoView({ behavior:"smooth", block:"start" });
 
-    const MODS = [
-      { id:"presence_fire", name:"Presence & Fire Safety", price:10, link:"https://smartfits.co.uk" },
-      { id:"policies_handbook", name:"Policies & Staff Handbook", price:7, link:"https://smartfits.co.uk" },
-      { id:"holiday_booking", name:"Holiday Booking", price:8, link:"https://smartfits.co.uk" },
-      { id:"accident_book", name:"Accident & Injury Book", price:3, link:"https://smartfits.co.uk" },
-      { id:"training_compliance", name:"Training & Compliance", price:9, link:"https://smartfits.co.uk" },
-      { id:"onboarding_offboarding", name:"Onboarding & Offboarding", price:8, link:"https://smartfits.co.uk" },
-      { id:"expenses_upload", name:"Expenses Upload", price:6, link:"https://smartfits.co.uk" },
-      { id:"wellbeing_check", name:"Wellbeing Check", price:4, link:"https://smartfits.co.uk" },
-    ];
+    // --------- Popups ----------
+    $("learnClose").onclick = () => closeOverlay("learnOverlay");
+    $("checkoutClose").onclick = () => closeOverlay("checkoutOverlay");
+    $("empClose").onclick = () => closeOverlay("empOverlay");
+    $("loginClose").onclick = () => closeOverlay("loginOverlay");
 
-    const LEARN = {
-      presence_fire: `A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.\n\nDesigned to be simple, fast, and reliable when it matters most, with clear records for audits and incident reviews.`,
-      policies_handbook: `A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document. Managers can update policies, request re-acknowledgement, and view clear records at any time.\n\nHelps organisations demonstrate that information has been issued and acknowledged without relying on paper or email chains.`,
-      holiday_booking: `A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place.\n\nIntentionally simple and focused, with no payroll or salary management.`,
-      accident_book: `A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required.\n\nKeeps incident records organised, secure, and easy to access if they are ever needed.`,
-      training_compliance: `Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance.\n\nDesigned to support consistency and oversight without adding unnecessary complexity.`,
-      onboarding_offboarding: `Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments. From access setup to equipment returns, nothing is forgotten.\n\nProvides a clear record of what was completed and when, supporting smoother staff transitions.`,
-      expenses_upload: `Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported for accounting or payroll systems.\n\nKeeps expense handling simple, organised, and traceable.`,
-      wellbeing_check: `A lightweight wellbeing check-in that allows staff to quickly select one of three options:\n\n🙂 Positive (green)\n😐 Neutral (amber)\n🙁 Concerned (red)\n\nOver time, this provides managers with a simple, high-level view of wellbeing trends across teams, helping highlight when additional attention may be needed.\n\nNo medical data, no intrusive questions — just a clear, visual pulse check designed to support awareness while respecting privacy.`,
+    $("empOpen").onclick = () => openOverlay("empOverlay");
+    $("loginOpen").onclick = () => openOverlay("loginOverlay");
+
+    // “What should I do?” helper
+    $("noAccountBtn").onclick = () => {
+      alert("If your company is already using SmartCore, choose 'Sign Up As An Employee' on the homepage.\n\nIf you’re setting up your company for the first time, build your plan, select your modules, then check out to create your account.\n\nJoin the best. Join SmartCore.");
     };
 
-    // ---------- State ----------
+    // --------- Eye toggles (subtle hover already) ----------
+    function wireEye(btnId, inputId){
+      const btn = $(btnId), inp = $(inputId);
+      btn.onclick = () => {
+        inp.type = (inp.type === "password") ? "text" : "password";
+      };
+    }
+    wireEye("suEye", "suPass");
+    wireEye("liEye", "liPass");
+
+    // --------- Data ----------
+    const COMPANY_SIZES = [
+      { id:"up_to_25", label:"Up to 25 people", price:39, note:"£39 / month", max:25 },
+      { id:"26_100", label:"26–100 people", price:79, note:"£79 / month", max:100 },
+      { id:"101_250", label:"101–250 people", price:149, note:"£149 / month", max:250 },
+      { id:"250_plus", label:"250+ people", price:null, note:"Contact us", max:null },
+    ];
+
+    const MODULES = [
+      { id:"presence_fire", name:"Presence & Fire Safety", price:10, summary:"A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies. Designed to be simple, fast, and reliable when it matters most, with clear records for audits and incident reviews." },
+      { id:"policies_handbook", name:"Policies & Staff Handbook", price:7, summary:"A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document. Managers can update policies, request re-acknowledgement, and view clear records at any time. Helps organisations demonstrate that information has been issued and acknowledged without relying on paper or email chains." },
+      { id:"holiday_booking", name:"Holiday Booking", price:8, summary:"A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place. Intentionally simple and focused, with no payroll or salary management." },
+      { id:"accident_injury", name:"Accident & Injury Book", price:3, summary:"A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required. Keeps incident records organised, secure, and easy to access if they are ever needed." },
+      { id:"training_compliance", name:"Training & Compliance", price:9, summary:"Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance. Designed to support consistency and oversight without adding unnecessary complexity." },
+      { id:"on_offboarding", name:"Onboarding & Offboarding", price:8, summary:"Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments. From access setup to equipment returns, nothing is forgotten. Provides a clear record of what was completed and when, supporting smoother staff transitions." },
+      { id:"expenses_upload", name:"Expenses Upload", price:6, summary:"Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported for accounting or payroll systems. Keeps expense handling simple, organised, and traceable." },
+      { id:"wellbeing_check", name:"Wellbeing Check", price:4, summary:"A lightweight wellbeing check-in with three options: 🙂 Positive (green), 😐 Neutral (amber), 🙁 Concerned (red). Over time, this provides a simple, high-level view of wellbeing trends. No medical data, no intrusive questions — just a clear, visual pulse check designed to support awareness while respecting privacy." },
+    ];
+
+    // State
     let selectedSize = null;
-    const selectedMods = new Set();
-    let pendingOwner = null;
-    let pendingEmployee = null;
+    let selectedModules = new Set();
+    let verifyToken = null;
+    let pendingSignup = null;
 
-    let confirmYesCb = null;
-
-    // Dashboard data
-    let me = null;            // { profile, company, employees }
-    let buySelected = new Set();
-
-    // ---------- UI helpers ----------
-    function setCardSelected(el, on){
-      el.classList.toggle("selected", !!on);
-      const t = el.querySelector(".tick");
-      if (t) t.classList.toggle("on", !!on);
+    // --------- Render size cards ----------
+    const sizeCards = $("sizeCards");
+    function renderSizes(){
+      sizeCards.innerHTML = "";
+      COMPANY_SIZES.forEach(s => {
+        const d = document.createElement("div");
+        d.className = "choice" + (selectedSize?.id === s.id ? " sel" : "");
+        d.innerHTML = `
+          <div class="t">${s.label}</div>
+          <div class="s">${s.note}</div>
+          <div class="p">${s.id === "250_plus" ? "We’ll quote based on requirements." : "Checkout online in minutes."}</div>
+        `;
+        d.onclick = () => {
+          selectedSize = s;
+          // reset module selection if switching size
+          selectedModules = new Set();
+          renderSizes();
+          renderModules();
+          updateTotal();
+        };
+        sizeCards.appendChild(d);
+      });
     }
 
-    function updateTotals(){
-      if(!selectedSize){
-        $("planSummary").textContent = "Select a company size";
-        $("modulesWrap").classList.add("hidden");
-        $("size250Box").classList.add("hidden");
-        $("totalLine").textContent = "£0 / month";
-        $("totalHint").textContent = "Select modules to begin";
-        $("checkoutBtn").disabled = true;
+    // --------- Render modules ----------
+    const modulesWrap = $("modulesWrap");
+    const moduleCards = $("moduleCards");
+    const bigContact = $("bigContact");
+
+    function renderModules(){
+      const is250 = selectedSize?.id === "250_plus";
+      bigContact.classList.toggle("show", !!is250);
+
+      modulesWrap.style.display = selectedSize ? "block" : "none";
+      if (!selectedSize) { moduleCards.innerHTML=""; return; }
+
+      moduleCards.innerHTML = "";
+      MODULES.forEach(m => {
+        const d = document.createElement("div");
+        d.className = "mod";
+        const isSel = selectedModules.has(m.id);
+        d.innerHTML = `
+          <div class="name">${m.name}</div>
+          <div class="price">£${m.price} / month</div>
+          <div class="modActions">
+            <div class="chip" data-learn="1">Learn more</div>
+            <div class="chip ${isSel ? "sel" : ""}" data-toggle="1">${isSel ? "Selected" : "Select"}</div>
+          </div>
+        `;
+
+        d.querySelector('[data-learn="1"]').onclick = () => openLearn(m);
+        d.querySelector('[data-toggle="1"]').onclick = () => {
+          if (selectedModules.has(m.id)) selectedModules.delete(m.id);
+          else selectedModules.add(m.id);
+          renderModules();
+          updateTotal();
+        };
+        moduleCards.appendChild(d);
+      });
+    }
+
+    function openLearn(m){
+      $("learnTitle").textContent = m.name;
+      $("learnPrice").textContent = `£${m.price} / month`;
+      $("learnBody").textContent = m.summary;
+      // YouTube embed for fullscreen
+      $("learnVideo").src = "https://www.youtube.com/embed/S2kymv60ndQ?rel=0&modestbranding=1";
+      openOverlay("learnOverlay");
+    }
+
+    // --------- Total + checkout ----------
+    const checkoutBtn = $("checkoutBtn");
+    function updateTotal(){
+      if (!selectedSize){
+        $("totalText").textContent = "£0 / month";
+        $("totalSub").textContent = "Select a company size";
+        checkoutBtn.disabled = true;
+        checkoutBtn.textContent = "Checkout →";
         return;
       }
 
-      $("modulesWrap").classList.remove("hidden");
-      $("planSummary").textContent = SIZE_LABEL[selectedSize];
+      const modsTotal = Array.from(selectedModules).reduce((sum, id) => {
+        const m = MODULES.find(x=>x.id===id);
+        return sum + (m?.price || 0);
+      }, 0);
 
-      const is250 = selectedSize === "250_plus";
-      $("size250Box").classList.toggle("hidden", !is250);
-
-      let modTotal = 0;
-      selectedMods.forEach(id => { modTotal += (MODS.find(m=>m.id===id)?.price || 0); });
-
-      if(is250){
-        $("totalLine").textContent = "Contact us";
-        $("totalHint").textContent = `${SIZE_LABEL[selectedSize]} · ${selectedMods.size} module${selectedMods.size===1?"":"s"}`;
-        $("checkoutBtn").disabled = true;
-
-        const approx = Number($("approxSize").value || 0);
-        $("contact250Btn").disabled = !(approx >= 1 && selectedMods.size > 0);
-      } else {
-        const total = (SIZE_PRICE[selectedSize] || 0) + modTotal;
-        $("totalLine").textContent = `${money(total)} / month`;
-        $("totalHint").textContent = `${SIZE_LABEL[selectedSize]} · ${selectedMods.size} module${selectedMods.size===1?"":"s"}`;
-        $("checkoutBtn").disabled = !(selectedMods.size > 0);
-      }
-    }
-
-    function confirmDialog(title, text, yesCb){
-      confirmYesCb = yesCb;
-      $("confirmTitle").textContent = title;
-      $("confirmText").textContent = text;
-      showModal($("confirmModal"));
-    }
-
-    // ---------- Icons (8 scattered) ----------
-    function makeBubbles(){
-      const layer = $("iconLayer");
-      layer.innerHTML = "";
-      const icons = [
-        `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><path d="M12 2l7 4v12l-7 4-7-4V6l7-4z"/></svg>`,
-        `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><path d="M8 11V7a4 4 0 118 0v4"/><rect x="6" y="11" width="12" height="10" rx="2"/></svg>`,
-        `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><circle cx="12" cy="12" r="7"/><path d="M12 8v4l3 2"/></svg>`,
-        `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><path d="M6 7h12v10H6z"/><path d="M9 7V4h6v3"/></svg>`,
-        `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><path d="M7 12l3 3 7-7"/></svg>`,
-        `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>`,
-        `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`,
-        `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><path d="M12 5v14M5 12h14"/></svg>`,
-      ];
-      // safe zone (avoid text)
-      const safe = { x:50, y:50, w:56, h:52 };
-
-      for(let i=0;i<8;i++){
-        const div = document.createElement("div");
-        div.className = "bubble";
-        div.innerHTML = icons[i];
-
-        // find a spot not in safe area
-        let x=0,y=0,tries=0;
-        while(true){
-          tries++;
-          x = Math.random()*100;
-          y = Math.random()*100;
-          const inSafe =
-            x > (safe.x - safe.w/2) && x < (safe.x + safe.w/2) &&
-            y > (safe.y - safe.h/2) && y < (safe.y + safe.h/2);
-          if(!inSafe) break;
-          if(tries>60) break;
-        }
-        div.style.left = `calc(${x}% - 64px)`;
-        div.style.top  = `calc(${y}% - 64px)`;
-        div.style.animationDelay = `${Math.random()*1.2}s`;
-        layer.appendChild(div);
-      }
-    }
-
-    // ---------- Routing (show dashboard / plan) ----------
-    function showDashboard(on){
-      $("dashboard").classList.toggle("hidden", !on);
-      $("plan").classList.toggle("hidden", on);
-      window.scrollTo({ top: 0, behavior: "instant" });
-    }
-
-    // ---------- Auth + Dashboard ----------
-    async function loadMe(){
-      // uses server endpoint (service role) but validates the access token
-      const sb = getSupabase();
-      if(!sb) throw new Error("Supabase anon config not set in index.html (window.__SUPABASE_URL / __SUPABASE_ANON).");
-      const { data } = await sb.auth.getSession();
-      const token = data?.session?.access_token;
-      if(!token) throw new Error("No session.");
-
-      const res = await apiPost("/api/me", { access_token: token });
-      me = res;
-      return me;
-    }
-
-    function renderDashboard(){
-      if(!me?.company) return;
-
-      $("dashCompanyName").textContent = me.company.company_name || "Your Company";
-      $("dashCompanyMeta").textContent = `Company code: ${me.company.company_code || "—"} · Size: ${me.company.company_size_label || "—"}`;
-
-      // onboarding steps if missing name/address/logo
-      const needsName = !me.company.company_name;
-      const needsAddr = !me.company.company_address;
-      const needsLogo = !me.company.logo_data_url;
-
-      $("onboardBox").classList.toggle("hidden", !(needsName || needsAddr || needsLogo));
-
-      // prefill
-      $("obCompanyName").value = me.company.company_name || "";
-      $("obCompanyAddress").value = me.company.company_address || "";
-
-      // Step gating
-      $("obStep1").classList.toggle("hidden", !needsName);
-      $("obStep2").classList.toggle("hidden", needsName || !needsAddr);
-      $("obStep3").classList.toggle("hidden", needsName || needsAddr || !needsLogo);
-
-      // team limits
-      const count = me.employees?.length || 0;
-      const limit = me.company.employee_limit;
-      $("teamLimitLine").textContent = limit ? `Employees: ${count} / ${limit}` : `Employees: ${count}`;
-
-      // Employees list
-      const list = $("empList");
-      list.innerHTML = "";
-      (me.employees || []).forEach(emp => {
-        const row = document.createElement("div");
-        row.className = "card p-3 flex items-start justify-between gap-2";
-        row.innerHTML = `
-          <div class="min-w-0">
-            <div class="font-black text-[13px]">${escapeHtml(emp.full_name || "")} <span class="text-[12px]" style="color:rgba(255,255,255,.55)">(${escapeHtml(emp.employee_id || "")})</span></div>
-            <div class="text-[12px]" style="color:rgba(255,255,255,.60)">
-              ${escapeHtml(emp.job_title || "—")} · ${escapeHtml(emp.job_category || "—")} ${emp.is_admin ? "· Admin" : ""}
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <button class="btn px-3 py-2" data-edit="${emp.id}">✏️</button>
-            <button class="btn px-3 py-2" data-del="${emp.id}">✖</button>
-          </div>
-        `;
-        list.appendChild(row);
-      });
-
-      // Systems
-      const owned = new Set(me.company.module_ids || []);
-      $("ownedMods").innerHTML = "";
-      MODS.filter(m=>owned.has(m.id)).forEach(m=>{
-        const card = document.createElement("a");
-        card.className = "card p-4 block hover:opacity-95 transition";
-        card.href = m.link;
-        card.target = "_blank";
-        card.rel = "noreferrer";
-        card.innerHTML = `
-          <div class="font-black">${escapeHtml(m.name)}</div>
-          <div class="text-[12px] mt-1" style="color:rgba(255,255,255,.60)">Open module</div>
-        `;
-        $("ownedMods").appendChild(card);
-      });
-      if(owned.size === 0){
-        $("ownedMods").innerHTML = `<div class="text-[13px]" style="color:rgba(255,255,255,.65)">No modules saved yet.</div>`;
+      if (selectedSize.id === "250_plus"){
+        $("totalText").textContent = "Custom quote";
+        $("totalSub").textContent = "Enter approx company size to contact us";
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = "Contact Us →";
+        return;
       }
 
-      // Buy more systems
-      buySelected = new Set(me.company.module_ids || []);
-      const buyWrap = $("buyMods");
-      buyWrap.innerHTML = "";
-      MODS.forEach(m=>{
-        const el = document.createElement("div");
-        el.className = "modCard";
-        el.setAttribute("data-buy", m.id);
-        el.innerHTML = `
-          <div class="modMeta">
-            <div class="modName">${escapeHtml(m.name)}</div>
-            <div class="modPrice">£${m.price} / month</div>
-          </div>
-          <div class="tick"></div>
-        `;
-        buyWrap.appendChild(el);
-        setCardSelected(el, buySelected.has(m.id));
-        el.addEventListener("click", ()=>{
-          if(buySelected.has(m.id)) buySelected.delete(m.id);
-          else buySelected.add(m.id);
-          setCardSelected(el, buySelected.has(m.id));
-          updateDashTotal();
-        });
-      });
-
-      // Company settings
-      $("setName").value = me.company.company_name || "";
-      $("setAddress").value = me.company.company_address || "";
-      $("setPrimary").value = me.company.brand_primary || "";
-      $("setSecondary").value = me.company.brand_secondary || "";
-      $("setText").value = me.company.brand_text || "";
-
-      updateDashTotal();
+      const total = selectedSize.price + modsTotal;
+      $("totalText").textContent = `${money(total)} / month`;
+      $("totalSub").textContent = `${selectedSize.label} • ${selectedModules.size} module${selectedModules.size===1?"":"s"}`;
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = "Checkout →";
     }
 
-    function updateDashTotal(){
-      const sizePrice = me?.company?.company_size_price || 0;
-      let modTotal = 0;
-      buySelected.forEach(id=>{
-        modTotal += (MODS.find(m=>m.id===id)?.price || 0);
-      });
-      const total = sizePrice + modTotal;
-      $("dashTotal").textContent = `${money(total)} / month`;
+    $("clearBtn").onclick = () => {
+      selectedSize = null;
+      selectedModules = new Set();
+      renderSizes(); renderModules(); updateTotal();
+    };
+
+    checkoutBtn.onclick = () => {
+      if (!selectedSize) return;
+
+      if (selectedSize.id === "250_plus"){
+        const n = Number($("bigSize").value || 0);
+        if (!n) { alert("Please enter an approximate company size first."); return; }
+        if (n < 250){
+          const ok = confirm("That size is under 250. Are you sure you want the 250+ package?");
+          if (!ok) return;
+        }
+        const subject = encodeURIComponent("250+ Person Company - Wanting to Sign Up");
+        const mods = Array.from(selectedModules).map(id => MODULES.find(m=>m.id===id)?.name).filter(Boolean);
+        const body = encodeURIComponent(
+`Hello SmartCore Team,
+
+We are interested in signing up on the 250+ person package.
+
+Approx company size: ${n}
+
+Systems requested:
+${mods.length ? ("- " + mods.join("\n- ")) : "- (Not selected yet)"}
+
+Additional notes:
+${$("bigNotes").value || "(none)"}
+
+Thank you,
+`
+        );
+        window.location.href = `mailto:support@smartcoretechnology.co.uk?subject=${subject}&body=${body}`;
+        return;
+      }
+
+      // open checkout modal
+      openOverlay("checkoutOverlay");
+      setCheckoutStep(1);
+      $("suMsg").textContent = "";
+      $("suMsg2").textContent = "";
+      $("payMsg").textContent = "";
+    };
+
+    function setCheckoutStep(n){
+      $("checkoutStep1").style.display = (n===1) ? "block" : "none";
+      $("checkoutStep2").style.display = (n===2) ? "block" : "none";
+      $("checkoutStep3").style.display = (n===3) ? "block" : "none";
     }
 
-    function escapeHtml(s){
-      return String(s||"").replace(/[&<>"']/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-    }
+    // --------- Checkout flow ----------
+    $("backToDetails").onclick = () => setCheckoutStep(1);
+
+    $("sendCodeBtn").onclick = async () => {
+      $("suMsg").textContent = "";
+
+      if (!selectedSize || selectedSize.id === "250_plus"){
+        $("suMsg").textContent = "Please select a company size under 250+ first.";
+        return;
+      }
+
+      const company_name = $("suCompany").value.trim();
+      const email = $("suEmail").value.trim().toLowerCase();
+      const password = $("suPass").value;
+
+      if (!company_name) { $("suMsg").textContent = "Enter your company name."; return; }
+      if (!email) { $("suMsg").textContent = "Enter your email."; return; }
+      if (!password || password.length < 8) { $("suMsg").textContent = "Password must be at least 8 characters."; return; }
+
+      // Store pending locally only (NOT in Supabase)
+      pendingSignup = {
+        company_name,
+        email,
+        password,
+        company_size: selectedSize.id,
+        company_size_label: selectedSize.label,
+        company_size_price: selectedSize.price,
+        module_ids: Array.from(selectedModules),
+      };
 
-    // ---------- Main init ----------
-    document.addEventListener("DOMContentLoaded", async () => {
-      // nav hide on scroll
-      let lastY = window.scrollY;
-      window.addEventListener("scroll", ()=>{
-        const y = window.scrollY;
-        const nav = $("navWrap");
-        const down = y > lastY + 6;
-        const up = y < lastY - 6;
-        if (down && y > 120) nav.classList.add("navHidden");
-        if (up) nav.classList.remove("navHidden");
-        lastY = y;
-      });
-
-      makeBubbles();
-
-      $("buildPlanBtn").addEventListener("click", ()=> $("plan").scrollIntoView({behavior:"smooth", block:"start"}) );
-      $("scrollDownBtn").addEventListener("click", ()=> $("plan").scrollIntoView({behavior:"smooth", block:"start"}) );
-
-      // modal close wiring
-      $("learnClose").addEventListener("click", ()=>hideModal($("learnModal")));
-      $("learnModal").addEventListener("click", (e)=>{ if(e.target === $("learnModal")) hideModal($("learnModal")); });
-
-      $("confirmClose").addEventListener("click", ()=>hideModal($("confirmModal")));
-      $("confirmNo").addEventListener("click", ()=>hideModal($("confirmModal")));
-      $("confirmYes").addEventListener("click", ()=>{
-        hideModal($("confirmModal"));
-        if(typeof confirmYesCb === "function") confirmYesCb();
-        confirmYesCb = null;
-      });
-
-      $("coClose").addEventListener("click", ()=>hideModal($("checkoutModal")));
-      $("liClose").addEventListener("click", ()=>hideModal($("loginModal")));
-      $("shClose").addEventListener("click", ()=>hideModal($("signupHelpModal")));
-      $("emClose").addEventListener("click", ()=>hideModal($("employeeModal")));
-
-      // learn buttons
-      qsa("[data-learn]").forEach(btn=>{
-        btn.addEventListener("click", (e)=>{
-          e.preventDefault(); e.stopPropagation();
-          const id = btn.getAttribute("data-learn");
-          const name = btn.closest(".modCard")?.querySelector(".modName")?.textContent?.trim() || "Module";
-          $("learnTitle").textContent = name;
-          $("learnBody").textContent = LEARN[id] || "Details coming soon.";
-          showModal($("learnModal"));
-        });
-      });
-
-      // size selection
-      qsa(".sizeCard").forEach(card=>{
-        card.addEventListener("click", ()=>{
-          selectedSize = card.getAttribute("data-size");
-
-          // clear modules on size change
-          selectedMods.clear();
-          qsa(".modCard[data-mod]").forEach(m=>setCardSelected(m,false));
-
-          qsa(".sizeCard").forEach(c=>setCardSelected(c, c===card));
-          updateTotals();
-        });
-      });
-
-      // module selection
-      qsa(".modCard[data-mod]").forEach(card=>{
-        card.addEventListener("click", (e)=>{
-          if (e.target.closest?.("[data-learn]")) return;
-          if(!selectedSize) return;
-
-          const id = card.getAttribute("data-mod");
-          if(selectedMods.has(id)) selectedMods.delete(id);
-          else selectedMods.add(id);
-
-          setCardSelected(card, selectedMods.has(id));
-          updateTotals();
-        });
-      });
-
-      // 250+ box
-      $("approxSize").addEventListener("input", ()=>{
-        const v = Number($("approxSize").value || 0);
-        $("approxWarn").classList.toggle("hidden", !(v>0 && v<250));
-        updateTotals();
-      });
-
-      $("contact250Btn").addEventListener("click", ()=>{
-        const approx = Number($("approxSize").value || 0);
-        if(!approx) return;
-
-        const mods = Array.from(selectedMods).map(id => MODS.find(m=>m.id===id)?.name).filter(Boolean);
-        const openEmail = ()=>{
-          const subject = `250+ Person Company - Wanting to Sign Up`;
-          const body =
-`Hello SmartCore Technology,
-
-We would like to enquire about signing up for SmartCore Technology.
-
-Approx company size: ${approx}
-
-Modules of interest:
-${mods.map(m=>"• "+m).join("\n")}
-
-Please let us know next steps, pricing, and onboarding.
-
-Kind regards,
-(Your name)
-(Company name)`;
-
-          window.location.href =
-            `mailto:support@smartcoretechnology.co.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        };
-
-        if(approx < 250){
-          confirmDialog(
-            "Check company size",
-            "You entered a company size under 250, but selected the 250+ plan. Are you sure you want to continue with this package?",
-            openEmail
-          );
-          return;
-        }
-        openEmail();
-      });
-
-      // clear plan
-      $("clearPlanBtn").addEventListener("click", ()=>{
-        selectedSize = null;
-        selectedMods.clear();
-        qsa(".sizeCard").forEach(c=>setCardSelected(c,false));
-        qsa(".modCard[data-mod]").forEach(m=>setCardSelected(m,false));
-        updateTotals();
-      });
-
-      // checkout -> opens owner signup modal
-      $("checkoutBtn").addEventListener("click", ()=>{
-        // reset
-        pendingOwner = {
-          size: selectedSize,
-          module_ids: Array.from(selectedMods),
-        };
-        $("coMsg1").textContent = "";
-        $("coMsg2").textContent = "";
-        $("coStep1").classList.remove("hidden");
-        $("coStep2").classList.add("hidden");
-        $("coCode").value = "";
-        showModal($("checkoutModal"));
-      });
-
-      // password eye toggles
-      $("coEye").addEventListener("click", ()=>{ $("coPass").type = $("coPass").type === "password" ? "text" : "password"; });
-      $("liEye").addEventListener("click", ()=>{ $("liPass").type = $("liPass").type === "password" ? "text" : "password"; });
-      $("emEye").addEventListener("click", ()=>{ $("emPass").type = $("emPass").type === "password" ? "text" : "password"; });
-
-      // owner signup: continue -> send code
-      $("coContinue").addEventListener("click", async ()=>{
-        $("coMsg1").classList.remove("err");
-        $("coMsg1").textContent = "";
-
-        const company_name = $("coCompany").value.trim();
-        const full_name = $("coName").value.trim();
-        const email = $("coEmail").value.trim().toLowerCase();
-        const password = $("coPass").value;
-
-        if(!company_name || !full_name || !email || !password){
-          $("coMsg1").classList.add("err");
-          $("coMsg1").textContent = "Please complete all fields.";
-          return;
-        }
-        if(password.length < 8){
-          $("coMsg1").classList.add("err");
-          $("coMsg1").textContent = "Password must be at least 8 characters.";
-          return;
-        }
-
-        // email already registered? (check via supabase auth sign-in attempt is messy)
-        // We rely on verify-code function to reject if already exists.
-
-        pendingOwner.company_name = company_name;
-        pendingOwner.full_name = full_name;
-        pendingOwner.email = email;
-        pendingOwner.password = password;
-
-        try{
-          $("coContinue").disabled = true;
-
-          await apiPost("/api/send-code", {
-            purpose: "owner_signup",
-            email
-          });
-
-          $("coStep1").classList.add("hidden");
-          $("coStep2").classList.remove("hidden");
-          $("coMsg2").textContent = "Code sent. Please check your inbox (and junk).";
-        }catch(e){
-          $("coMsg1").classList.add("err");
-          $("coMsg1").textContent = e.message || String(e);
-        }finally{
-          $("coContinue").disabled = false;
-        }
-      });
-
-      $("coBack").addEventListener("click", ()=>{
-        $("coStep2").classList.add("hidden");
-        $("coStep1").classList.remove("hidden");
-      });
-
-      // owner verify -> create user + company (SERVER) -> then sign in (client) -> dashboard
-      $("coVerify").addEventListener("click", async ()=>{
-        $("coMsg2").classList.remove("err");
-        $("coMsg2").textContent = "";
-        const code = $("coCode").value.trim();
-        if(!code || code.length !== 6){
-          $("coMsg2").classList.add("err");
-          $("coMsg2").textContent = "Enter the 6-digit code.";
-          return;
-        }
-
-        try{
-          $("coVerify").disabled = true;
-
-          const res = await apiPost("/api/verify-code", {
-            purpose: "owner_signup",
-            email: pendingOwner.email,
-            code,
-            password: pendingOwner.password,
-            full_name: pendingOwner.full_name,
-            company_name: pendingOwner.company_name,
-            company_size_id: pendingOwner.size,
-            module_ids: pendingOwner.module_ids
-          });
-
-          // now sign in using supabase client (needs anon config)
-          const sb = getSupabase();
-          if(!sb){
-            $("coMsg2").classList.add("err");
-            $("coMsg2").textContent = "Supabase anon config missing in index.html. Add window.__SUPABASE_URL and window.__SUPABASE_ANON (public).";
-            return;
-          }
-          const { error } = await sb.auth.signInWithPassword({ email: pendingOwner.email, password: pendingOwner.password });
-          if(error){
-            $("coMsg2").classList.add("err");
-            $("coMsg2").textContent = "Account created, but login failed. Try logging in manually.";
-            return;
-          }
-
-          hideModal($("checkoutModal"));
-          await sleep(250);
-          await loadMe();
-          renderDashboard();
-          showDashboard(true);
-        }catch(e){
-          $("coMsg2").classList.add("err");
-          $("coMsg2").textContent = e.message || String(e);
-        }finally{
-          $("coVerify").disabled = false;
-        }
-      });
-
-      // employee signup modal open
-      $("employeeBtn").addEventListener("click", ()=>{
-        pendingEmployee = null;
-        $("emMsg1").textContent = "";
-        $("emMsg2").textContent = "";
-        $("emStep1").classList.remove("hidden");
-        $("emStep2").classList.add("hidden");
-        $("emCode").value = "";
-        showModal($("employeeModal"));
-      });
-
-      // employee signup: continue -> send code (server checks employee exists by name)
-      $("emContinue").addEventListener("click", async ()=>{
-        $("emMsg1").classList.remove("err");
-        $("emMsg1").textContent = "";
-
-        const company_code = $("emCompanyCode").value.trim().toUpperCase();
-        const full_name = $("emName").value.trim();
-        const email = $("emEmail").value.trim().toLowerCase();
-        const password = $("emPass").value;
-
-        if(!company_code || !full_name || !email || !password){
-          $("emMsg1").classList.add("err");
-          $("emMsg1").textContent = "Please complete all fields.";
-          return;
-        }
-        if(password.length < 8){
-          $("emMsg1").classList.add("err");
-          $("emMsg1").textContent = "Password must be at least 8 characters.";
-          return;
-        }
-
-        pendingEmployee = { company_code, full_name, email, password };
-
-        try{
-          $("emContinue").disabled = true;
-
-          await apiPost("/api/send-code", {
-            purpose: "employee_signup",
-            email,
-            company_code,
-            full_name
-          });
-
-          $("emStep1").classList.add("hidden");
-          $("emStep2").classList.remove("hidden");
-          $("emMsg2").textContent = "Code sent. Please check your inbox (and junk).";
-        }catch(e){
-          $("emMsg1").classList.add("err");
-          $("emMsg1").textContent = e.message || String(e);
-        }finally{
-          $("emContinue").disabled = false;
-        }
-      });
-
-      $("emBack").addEventListener("click", ()=>{
-        $("emStep2").classList.add("hidden");
-        $("emStep1").classList.remove("hidden");
-      });
-
-      $("emVerify").addEventListener("click", async ()=>{
-        $("emMsg2").classList.remove("err");
-        $("emMsg2").textContent = "";
-        const code = $("emCode").value.trim();
-        if(!code || code.length !== 6){
-          $("emMsg2").classList.add("err");
-          $("emMsg2").textContent = "Enter the 6-digit code.";
-          return;
-        }
-
-        try{
-          $("emVerify").disabled = true;
-
-          await apiPost("/api/verify-code", {
-            purpose: "employee_signup",
-            email: pendingEmployee.email,
-            code,
-            password: pendingEmployee.password,
-            full_name: pendingEmployee.full_name,
-            company_code: pendingEmployee.company_code
-          });
-
-          const sb = getSupabase();
-          if(!sb){
-            $("emMsg2").classList.add("err");
-            $("emMsg2").textContent = "Supabase anon config missing in index.html. Add window.__SUPABASE_URL and window.__SUPABASE_ANON (public).";
-            return;
-          }
-          const { error } = await sb.auth.signInWithPassword({ email: pendingEmployee.email, password: pendingEmployee.password });
-          if(error){
-            $("emMsg2").classList.add("err");
-            $("emMsg2").textContent = "Account created, but login failed. Try logging in manually.";
-            return;
-          }
-
-          hideModal($("employeeModal"));
-          await sleep(250);
-          await loadMe();
-          renderDashboard();
-          showDashboard(true);
-        }catch(e){
-          $("emMsg2").classList.add("err");
-          $("emMsg2").textContent = e.message || String(e);
-        }finally{
-          $("emVerify").disabled = false;
-        }
-      });
-
-      // login modal
-      $("loginTopBtn").addEventListener("click", ()=>{
-        $("liMsg").textContent = "";
-        $("liBad").classList.add("hidden");
-        showModal($("loginModal"));
-      });
-
-      $("liHelp").addEventListener("click", ()=>{
-        showModal($("signupHelpModal"));
-      });
-
-      $("liGo").addEventListener("click", async ()=>{
-        $("liMsg").textContent = "";
-        const email = $("liEmail").value.trim().toLowerCase();
-        const password = $("liPass").value;
-        if(!email || !password){
-          $("liMsg").textContent = "Enter email and password.";
-          return;
-        }
-
-        const sb = getSupabase();
-        if(!sb){
-          $("liMsg").textContent = "Supabase anon config missing in index.html (window.__SUPABASE_URL / __SUPABASE_ANON).";
-          return;
-        }
-
-        const { error } = await sb.auth.signInWithPassword({ email, password });
-        if(error){
-          $("liBad").classList.remove("hidden");
-          $("liMsg").textContent = "";
-          return;
-        }
-
-        hideModal($("loginModal"));
-        await sleep(250);
-        await loadMe();
-        renderDashboard();
-        showDashboard(true);
-      });
-
-      // forgot password link (only shows after incorrect credentials)
-      $("liBad").addEventListener("click", async ()=>{
-        const email = $("liEmail").value.trim().toLowerCase();
-        if(!email){ $("liMsg").textContent = "Enter your email first."; return; }
-        const sb = getSupabase();
-        if(!sb){ $("liMsg").textContent = "Supabase anon config missing."; return; }
-
-        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
-        if(error){ $("liMsg").textContent = "Could not send reset email."; return; }
-        $("liMsg").textContent = "Password reset email sent (check inbox/junk).";
-      });
-
-      // onboarding wizard buttons
-      $("obNext1").addEventListener("click", async ()=>{
-        $("obMsg1").textContent = "";
-        const name = $("obCompanyName").value.trim();
-        if(!name){ $("obMsg1").textContent = "Enter your company name."; return; }
-        await saveCompanyPatch({ company_name: name });
-        await refreshDash();
-      });
-      $("obBack2").addEventListener("click", ()=>{});
-      $("obNext2").addEventListener("click", async ()=>{
-        $("obMsg2").textContent = "";
-        const addr = $("obCompanyAddress").value.trim();
-        if(!addr){ $("obMsg2").textContent = "Enter your company address."; return; }
-        await saveCompanyPatch({ company_address: addr });
-        await refreshDash();
-      });
-      $("obBack3").addEventListener("click", ()=>{});
-      $("obLogo").addEventListener("change", ()=>{
-        const f = $("obLogo").files?.[0];
-        $("obLogoName").textContent = f ? f.name : "No file chosen";
-      });
-      $("obFinish").addEventListener("click", async ()=>{
-        $("obMsg3").textContent = "";
-        const f = $("obLogo").files?.[0];
-        if(!f){ $("obMsg3").textContent = "Choose a logo file."; return; }
-        const dataUrl = await fileToDataURL(f);
-        await saveCompanyPatch({ logo_data_url: dataUrl });
-        await refreshDash();
-      });
-
-      // employees admin toggle
-      let empAdmin = false;
-      $("empAdminCheck").addEventListener("click", ()=>{
-        empAdmin = !empAdmin;
-        $("empAdminCheck").classList.toggle("on", empAdmin);
-      });
-
-      // add employee
-      $("empAddBtn").addEventListener("click", async ()=>{
-        $("empMsg").textContent = "";
-        if(!me?.company) return;
-
-        const full_name = $("empName").value.trim();
-        const job_title = $("empTitle").value.trim();
-        const job_category = $("empCategory").value.trim();
-        if(!full_name){ $("empMsg").textContent = "Enter a name."; return; }
-
-        try{
-          $("empAddBtn").disabled = true;
-          await authedApi("/api/add-employee", { full_name, job_title, job_category, is_admin: empAdmin });
-          $("empName").value = ""; $("empTitle").value = ""; $("empCategory").value = "";
-          empAdmin = false; $("empAdminCheck").classList.remove("on");
-          await refreshDash();
-          $("empMsg").textContent = "Employee added.";
-        }catch(e){
-          $("empMsg").textContent = e.message || String(e);
-        }finally{
-          $("empAddBtn").disabled = false;
-        }
-      });
-
-      // employee edit/delete delegation
-      $("empList").addEventListener("click", async (e)=>{
-        const editId = e.target.closest?.("[data-edit]")?.getAttribute("data-edit");
-        const delId  = e.target.closest?.("[data-del]")?.getAttribute("data-del");
-        if(editId){
-          const emp = (me.employees || []).find(x=>x.id === editId);
-          if(!emp) return;
-
-          // quick inline edit using confirm modal pattern
-          const newName = prompt("Edit full name:", emp.full_name || "");
-          if(newName == null) return;
-          const newTitle = prompt("Edit job title:", emp.job_title || "");
-          if(newTitle == null) return;
-          const newCat = prompt("Edit job category:", emp.job_category || "");
-          if(newCat == null) return;
-
-          await authedApi("/api/update-employee", { employee_row_id: emp.id, full_name: newName.trim(), job_title: newTitle.trim(), job_category: newCat.trim() });
-          await refreshDash();
-          return;
-        }
-
-        if(delId){
-          const emp = (me.employees || []).find(x=>x.id === delId);
-          if(!emp) return;
-
-          const companyName = me.company.company_name || "your company";
-          const suffix = companyName.endsWith("s") ? "'" : "'s";
-          confirmDialog(
-            "Remove employee",
-            `Are you sure you would like to remove ${emp.full_name} from ${companyName}${suffix} SmartDatabase? This action can not be undone.`,
-            async ()=>{
-              await authedApi("/api/remove-employee", { employee_row_id: emp.id });
-              await refreshDash();
-            }
-          );
-        }
-      });
-
-      // save modules
-      $("saveModulesBtn").addEventListener("click", async ()=>{
-        $("modsMsg").textContent = "";
-        try{
-          $("saveModulesBtn").disabled = true;
-          await authedApi("/api/update-modules", { module_ids: Array.from(buySelected) });
-          await refreshDash();
-          $("modsMsg").textContent = "Modules saved.";
-        }catch(e){
-          $("modsMsg").textContent = e.message || String(e);
-        }finally{
-          $("saveModulesBtn").disabled = false;
-        }
-      });
-
-      // save settings
-      $("saveSettingsBtn").addEventListener("click", async ()=>{
-        $("setMsg").textContent = "";
-        try{
-          $("saveSettingsBtn").disabled = true;
-          await saveCompanyPatch({
-            company_name: $("setName").value.trim(),
-            company_address: $("setAddress").value.trim(),
-            brand_primary: $("setPrimary").value.trim(),
-            brand_secondary: $("setSecondary").value.trim(),
-            brand_text: $("setText").value.trim(),
-          });
-          await refreshDash();
-          $("setMsg").textContent = "Settings saved.";
-        }catch(e){
-          $("setMsg").textContent = e.message || String(e);
-        }finally{
-          $("saveSettingsBtn").disabled = false;
-        }
-      });
-
-      // dashboard refresh
-      $("dashRefresh").addEventListener("click", refreshDash);
-
-      // sign out
-      $("dashSignOut").addEventListener("click", async ()=>{
-        const sb = getSupabase();
-        if(sb) await sb.auth.signOut();
-        me = null;
-        showDashboard(false);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-
-      // bootstrap totals
-      updateTotals();
-
-      // If already logged in, go dashboard
       try{
-        const sb = getSupabase();
-        if(sb){
-          const { data } = await sb.auth.getSession();
-          if(data?.session){
-            await loadMe();
-            renderDashboard();
-            showDashboard(true);
-          }
-        }
-      }catch{}
-    });
+        $("sendCodeBtn").disabled = true;
 
-    async function authedApi(path, payload){
-      const sb = getSupabase();
-      const { data } = await sb.auth.getSession();
-      const token = data?.session?.access_token;
-      if(!token) throw new Error("Not logged in.");
-      return apiPost(path, Object.assign({}, payload, { access_token: token }));
-    }
+        await apiPost("/api/send-code", {
+          email,
+          purpose: "owner_signup",
+        });
 
-    async function refreshDash(){
-      await loadMe();
-      renderDashboard();
-    }
+        setCheckoutStep(2);
+      }catch(e){
+        $("suMsg").textContent = e.message || String(e);
+      }finally{
+        $("sendCodeBtn").disabled = false;
+      }
+    };
 
-    async function saveCompanyPatch(patch){
-      $("setMsg").textContent = "";
-      const res = await authedApi("/api/update-company", patch);
-      return res;
-    }
+    $("verifyOnlyBtn").onclick = async () => {
+      $("suMsg2").textContent = "";
+      if (!pendingSignup) { $("suMsg2").textContent = "Please enter details first."; return; }
 
-    function fileToDataURL(file){
-      return new Promise((resolve, reject)=>{
-        const r = new FileReader();
-        r.onload = ()=>resolve(String(r.result || ""));
-        r.onerror = reject;
-        r.readAsDataURL(file);
+      const code = $("suCode").value.trim();
+      if (!code || code.length !== 6) { $("suMsg2").textContent = "Enter the 6-digit code."; return; }
+
+      try{
+        $("verifyOnlyBtn").disabled = true;
+
+        // PHASE: verify only (no user created)
+        const out = await apiPost("/api/verify-code", {
+          phase: "verify",
+          purpose: "owner_signup",
+          email: pendingSignup.email,
+          code
+        });
+
+        verifyToken = out.verify_token;
+
+        // show payment step
+        const modsTotal = pendingSignup.module_ids.reduce((sum,id)=> sum + (MODULES.find(m=>m.id===id)?.price||0), 0);
+        const total = pendingSignup.company_size_price + modsTotal;
+        $("paySummary").textContent =
+          `${pendingSignup.company_size_label}\nModules: ${pendingSignup.module_ids.length}\nTotal: ${money(total)} / month`;
+
+        setCheckoutStep(3);
+
+      }catch(e){
+        $("suMsg2").textContent = e.message || String(e);
+      }finally{
+        $("verifyOnlyBtn").disabled = false;
+      }
+    };
+
+    $("payDecline").onclick = () => {
+      $("payMsg").textContent = "Payment declined. No account was created.";
+      verifyToken = null;
+      // keep them here so they can accept if they want
+    };
+
+    $("payAccept").onclick = async () => {
+      $("payMsg").textContent = "";
+      if (!pendingSignup || !verifyToken) {
+        $("payMsg").textContent = "Please verify your code first.";
+        return;
+      }
+
+      // NOTE: Full name not asked yet in your current checkout UI.
+      // For now, we’ll use a simple placeholder from email prefix.
+      // (Next: we’ll add the proper “Tell us about you” onboarding step.)
+      const full_name = pendingSignup.email.split("@")[0].replace(/[._-]+/g," ").replace(/\b\w/g, c=>c.toUpperCase());
+
+      const modsTotal = pendingSignup.module_ids.reduce((sum,id)=> sum + (MODULES.find(m=>m.id===id)?.price||0), 0);
+      const total = pendingSignup.company_size_price + modsTotal;
+
+      try{
+        $("payAccept").disabled = true;
+
+        const created = await apiPost("/api/verify-code", {
+          phase: "finalise",
+          purpose: "owner_signup",
+          email: pendingSignup.email,
+          code: $("suCode").value.trim(),
+          verify_token: verifyToken,
+
+          // create payload
+          full_name,
+          password: pendingSignup.password,
+          company_name: pendingSignup.company_name,
+          company_size: pendingSignup.company_size,
+          company_size_label: pendingSignup.company_size_label,
+          company_size_price: pendingSignup.company_size_price,
+          module_ids: pendingSignup.module_ids,
+          modules_total: modsTotal,
+          total_monthly: total
+        });
+
+        // Now login (client-side) and show dashboard
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: pendingSignup.email,
+          password: pendingSignup.password,
+        });
+        if (error) throw new Error(error.message);
+
+        closeOverlay("checkoutOverlay");
+        openOverlay("dashOverlay");
+
+        // clear local signup state
+        verifyToken = null;
+        pendingSignup = null;
+
+      }catch(e){
+        $("payMsg").textContent = e.message || String(e);
+      }finally{
+        $("payAccept").disabled = false;
+      }
+    };
+
+    // --------- Login works ----------
+    $("loginBtn").onclick = async () => {
+      $("liMsg").textContent = "";
+      const email = $("liEmail").value.trim().toLowerCase();
+      const password = $("liPass").value;
+
+      if (!email || !password) { $("liMsg").textContent = "Enter your email and password."; return; }
+
+      try{
+        $("loginBtn").disabled = true;
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw new Error(error.message);
+
+        closeOverlay("loginOverlay");
+        openOverlay("dashOverlay");
+      }catch(e){
+        $("liMsg").textContent = e.message || String(e);
+      }finally{
+        $("loginBtn").disabled = false;
+      }
+    };
+
+    // --------- Sign out ----------
+    $("signOutBtn").onclick = async () => {
+      await supabase.auth.signOut();
+      closeOverlay("dashOverlay");
+      window.scrollTo({ top: 0, behavior:"smooth" });
+    };
+
+    // --------- Floating icon field (desktop only push effect) ----------
+    const isTouch = matchMedia("(hover: none)").matches || matchMedia("(pointer: coarse)").matches;
+    const iconField = $("iconField");
+
+    const ICONS = [
+      svgPlus(), svgCheck(), svgLock(), svgTarget(),
+      svgBriefcase(), svgList(), svgShield(), svgBolt(),
+      svgCloud(), svgCog()
+    ];
+
+    function createBubbles(){
+      iconField.innerHTML = "";
+
+      const spots = [
+        { x: 70,  y: 120, cls:"small" },
+        { x: 980, y: 120, cls:"small" },
+        { x: 120, y: 520, cls:"tiny"  },
+        { x: 940, y: 560, cls:"tiny"  },
+        { x: 740, y: 260, cls:"tiny"  },
+        { x: 280, y: 260, cls:"tiny"  },
+        { x: 880, y: 380, cls:"small" },
+        { x: 160, y: 360, cls:"small" },
+        { x: 520, y: 140, cls:"tiny" },
+        { x: 520, y: 650, cls:"tiny" },
+      ];
+
+      // Repeat lightly down the page too
+      const extra = [
+        { x: 80, y: window.innerHeight + 260, cls:"tiny" },
+        { x: 980, y: window.innerHeight + 380, cls:"tiny" },
+        { x: 520, y: window.innerHeight + 620, cls:"small" },
+      ];
+
+      const all = spots.concat(extra);
+
+      all.forEach((p, i) => {
+        const b = document.createElement("div");
+        b.className = "bubble " + p.cls;
+        b.style.left = (p.x - 75) + "px";
+        b.style.top  = (p.y - 75) + "px";
+        b.innerHTML = ICONS[i % ICONS.length];
+        b.dataset.baseX = "0";
+        b.dataset.baseY = "0";
+        iconField.appendChild(b);
       });
     }
-  </script>
 
-  <!-- PUBLIC SUPABASE CONFIG (optional hardcode) -->
-  <script>
-    // Put your public Supabase URL + anon key here (safe to be public).
-    // If you leave these blank, login/session won't work.
-    window.__SUPABASE_URL = "https://hjdpcfhozhoyeqevnupm.supabase.co";
-    window.__SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZHBjZmhvemhveWVxZXZudXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MTk3MzYsImV4cCI6MjA4MjQ5NTczNn0.BXosJO4NmEZOe73GXSGPa3z-i_4ZzF9zBAMBIf6Mkts";
+    createBubbles();
+    window.addEventListener("resize", () => createBubbles());
+
+    // Mouse push physics (desktop only)
+    if (!isTouch){
+      const bubbles = () => Array.from(document.querySelectorAll(".bubble"));
+      const state = new Map(); // el -> {x,y,vx,vy}
+
+      function initState(){
+        state.clear();
+        bubbles().forEach(el => state.set(el, { x:0, y:0, vx:0, vy:0 }));
+      }
+      initState();
+
+      let mouse = { x: -9999, y: -9999 };
+      window.addEventListener("mousemove", (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      function tick(){
+        for (const [el, s] of state.entries()){
+          const rect = el.getBoundingClientRect();
+          const cx = rect.left + rect.width/2;
+          const cy = rect.top + rect.height/2;
+
+          const dx = cx - mouse.x;
+          const dy = cy - mouse.y;
+          const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+
+          // push radius
+          const R = 180;
+          if (dist < R){
+            const force = (1 - dist/R) * 6.0;
+            s.vx += (dx/dist) * force;
+            s.vy += (dy/dist) * force;
+          }
+
+          // spring back
+          s.vx += (-s.x) * 0.02;
+          s.vy += (-s.y) * 0.02;
+
+          // damping
+          s.vx *= 0.86;
+          s.vy *= 0.86;
+
+          // integrate
+          s.x += s.vx;
+          s.y += s.vy;
+
+          el.style.setProperty("--x", s.x.toFixed(2) + "px");
+          el.style.setProperty("--y", s.y.toFixed(2) + "px");
+        }
+
+        requestAnimationFrame(tick);
+      }
+      tick();
+
+      // If DOM changes
+      const mo = new MutationObserver(()=> initState());
+      mo.observe(iconField, { childList:true, subtree:true });
+    }
+
+    // --------- SVG icons ----------
+    function svgPlus(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round"/></svg>`; }
+    function svgCheck(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M20 7 10 17l-5-5" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+    function svgLock(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round"/><path d="M6 11h12v10H6V11Z" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linejoin="round"/></svg>`; }
+    function svgTarget(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3v4M12 17v4M3 12h4M17 12h4" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" stroke="rgba(234,240,255,.9)" stroke-width="2"/></svg>`; }
+    function svgBriefcase(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M9 7V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1" stroke="rgba(234,240,255,.9)" stroke-width="2"/><path d="M4 7h16v13H4V7Z" stroke="rgba(234,240,255,.9)" stroke-width="2"/><path d="M4 12h16" stroke="rgba(234,240,255,.9)" stroke-width="2"/></svg>`; }
+    function svgList(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M8 6h13M8 12h13M8 18h13" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke="rgba(234,240,255,.9)" stroke-width="3" stroke-linecap="round"/></svg>`; }
+    function svgShield(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v6c0 5-3.5 8.5-8 8.5S4 18 4 13V7l8-4Z" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linejoin="round"/></svg>`; }
+    function svgBolt(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linejoin="round"/></svg>`; }
+    function svgCloud(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M7 18h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.5-1.5A4 4 0 0 0 7 18Z" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linejoin="round"/></svg>`; }
+    function svgCog(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="rgba(234,240,255,.9)" stroke-width="2"/><path d="M19.4 15a7.9 7.9 0 0 0 .1-1l2-1-2-4-2.3.5a8 8 0 0 0-1.7-1L15 4h-6l-.5 2.5a8 8 0 0 0-1.7 1L4.5 7 2.5 11l2 1a7.9 7.9 0 0 0 .1 1l-2 1 2 4 2.3-.5a8 8 0 0 0 1.7 1L9 20h6l.5-2.5a8 8 0 0 0 1.7-1l2.3.5 2-4-2.1-1Z" stroke="rgba(234,240,255,.55)" stroke-width="1.4" stroke-linejoin="round"/></svg>`; }
+
+    // Init
+    renderSizes();
+    renderModules();
+    updateTotal();
   </script>
 </body>
 </html>
-
-
