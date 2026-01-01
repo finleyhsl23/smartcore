@@ -9,1212 +9,223 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    /* ========= CORE THEME ========= */
     :root{
-      --bg0:#050816;
-      --bg1:#06102a;
-      --panel:rgba(10,16,34,.62);
-      --panel2:rgba(10,16,34,.42);
-      --stroke:rgba(255,255,255,.12);
-      --stroke2:rgba(255,255,255,.08);
+      --bg0:#020617;
+      --bg1:#06153a;
+      --bg2:#020923;
+
+      --panel: rgba(7, 12, 34, .60);
+      --panel2: rgba(7, 12, 34, .42);
+
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.08);
+
       --text:#eaf0ff;
-      --muted:rgba(234,240,255,.70);
-      --muted2:rgba(234,240,255,.55);
-      --shadow: 0 30px 80px rgba(0,0,0,.55);
+      --muted: rgba(234,240,255,.72);
+      --muted2: rgba(234,240,255,.56);
+
+      --shadow: 0 30px 85px rgba(0,0,0,.55);
+      --shadow2: 0 20px 55px rgba(0,0,0,.45);
       --blur: 18px;
-      --radius: 22px;
-      --radius2: 16px;
-      --accent: rgba(120,170,255,.85);
-      --good: rgba(60, 220, 140, .95);
+
+      --r1: 22px;
+      --r2: 16px;
+
+      --accent: rgba(120,170,255,.92);
+      --accentSoft: rgba(120,170,255,.18);
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
+
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial;
-      color:var(--text);
+      color: var(--text);
       background:
-        radial-gradient(900px 700px at 50% 14%, rgba(60,110,255,.22), transparent 60%),
-        radial-gradient(900px 800px at 50% 60%, rgba(30,70,200,.16), transparent 60%),
-        radial-gradient(800px 700px at 50% 100%, rgba(0,0,0,.35), transparent 55%),
+        radial-gradient(1100px 800px at 50% 12%, rgba(70,120,255,.22), transparent 60%),
+        radial-gradient(1100px 900px at 50% 60%, rgba(30,70,200,.18), transparent 62%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       overflow-x:hidden;
     }
 
-    /* Liquid glass panels */
+    /* ========= GLASS ========= */
     .glass{
       background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
       border:1px solid var(--stroke);
-      box-shadow: var(--shadow);
       backdrop-filter: blur(var(--blur));
       -webkit-backdrop-filter: blur(var(--blur));
-      border-radius: var(--radius);
+      border-radius: var(--r1);
+      box-shadow: var(--shadow);
     }
+
     .glass2{
       background: rgba(255,255,255,.04);
       border:1px solid var(--stroke2);
       backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-radius: var(--radius2);
+      border-radius: var(--r2);
+      box-shadow: var(--shadow2);
     }
 
-    /* Navbar */
-    .nav{
-      position: fixed;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: min(1080px, calc(100% - 24px));
-      padding: 12px 14px;
+    /* ========= HERO ========= */
+    .hero{
+      min-height:100vh;
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      z-index: 50;
-      transition: transform .28s ease, opacity .28s ease;
+      justify-content:center;
+      padding:120px 16px 80px;
+      position:relative;
+      overflow:hidden;
     }
-    .nav.hidden{
-      transform: translateX(-50%) translateY(-18px);
-      opacity: 0;
-      pointer-events: none;
+
+    .heroInner{
+      position:relative;
+      z-index:2;
+      max-width:900px;
     }
-    .brand{
-      display:flex; align-items:center; gap:12px;
-      min-width: 260px;
+
+    h1{
+      font-size: clamp(56px, 7vw, 84px);
+      line-height:1.02;
+      letter-spacing:-1px;
+      margin:18px 0 12px;
     }
-    .brand img{
-      width: 44px; height: 44px; border-radius: 14px;
-      display:block;
-      object-fit: cover;
+
+    h1 span{opacity:.7}
+
+    .sub{
+      font-size:17px;
+      color:var(--muted);
+      max-width:640px;
+      line-height:1.6;
     }
-    .brand .t1{font-weight:800; letter-spacing:.2px; font-size:13px; line-height:1.1}
-    .brand .t2{font-size:11px; color:var(--muted2); margin-top:2px}
+
+    .heroActions{
+      display:flex;
+      gap:12px;
+      margin-top:22px;
+      flex-wrap:wrap;
+    }
+
     .btn{
+      padding:12px 16px;
+      border-radius:16px;
       border:1px solid var(--stroke);
       background: rgba(255,255,255,.06);
       color:var(--text);
-      padding: 9px 12px;
-      border-radius: 14px;
       cursor:pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      justify-content:center;
-      user-select:none;
+      font-size:14px;
+      transition: all .15s ease;
     }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08) }
-    .btn:active{ transform: translateY(0px) scale(.99) }
+
+    .btn:hover{background:rgba(255,255,255,.09)}
     .btn.primary{
-      background: rgba(120,170,255,.16);
-      border-color: rgba(120,170,255,.28);
-    }
-    .btn.primary:hover{
-      background: rgba(120,170,255,.22);
-      border-color: rgba(120,170,255,.38);
-    }
-    .btn.danger{
-      background: rgba(255,80,110,.10);
-      border-color: rgba(255,80,110,.22);
+      background:rgba(120,170,255,.18);
+      border-color:rgba(120,170,255,.35);
     }
 
-    /* Hero */
-    .hero{
-      min-height: 100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 120px 16px 70px;
-      position: relative;
-    }
-    .heroInner{
-      width:min(1080px, 100%);
-      position: relative;
-      padding: 38px 34px;
-    }
-    .pill{
-      display:inline-flex; gap:8px; align-items:center;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border:1px solid var(--stroke2);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
-      font-size: 12px;
-    }
-    h1{
-      margin: 14px 0 10px;
-      font-size: clamp(44px, 6vw, 68px);
-      line-height: 1.02;
-      letter-spacing: -1px;
-    }
-    h1 .dim{ opacity: .72; }
-    .sub{
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 16px;
-      max-width: 560px;
-      line-height: 1.55;
-    }
-    .heroActions{ display:flex; gap:10px; flex-wrap: wrap; margin-top: 14px; }
-    .downBtn{
-      margin-top: 14px;
-      width: fit-content;
-      opacity: .95;
-    }
-
-    /* Floating icons */
+    /* ========= ICON FIELD ========= */
     .iconField{
       position:absolute;
       inset:0;
       pointer-events:none;
-      overflow:hidden;
+      opacity:.55;
     }
+
     .bubble{
       position:absolute;
-      width: 150px; height: 150px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.09);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      width:120px;
+      height:120px;
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.1);
       display:flex;
       align-items:center;
       justify-content:center;
-      opacity: .22;
-      transform: translate3d(var(--x,0px), var(--y,0px), 0);
-      transition: opacity .25s ease;
-      will-change: transform;
-    }
-    .bubble svg{ width: 52px; height: 52px; opacity: .85; }
-    .bubble.small{ width: 120px; height: 120px; opacity: .18 }
-    .bubble.tiny{ width: 92px; height: 92px; opacity: .14 }
-
-    /* Main sections */
-    .wrap{ width:min(1080px, calc(100% - 24px)); margin: 0 auto 90px; }
-    .section{ padding: 0 0 18px; }
-    .grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 14px;
-    }
-    @media (max-width: 920px){
-      .grid{ grid-template-columns: 1fr; }
-      .heroInner{ padding: 28px 18px; }
-      .brand{ min-width: 0; }
+      backdrop-filter: blur(10px);
+      transform: translate(var(--x,0), var(--y,0));
     }
 
-    /* Plan card */
-    .plan{
-      padding: 18px;
-      position: relative;
-      overflow:hidden;
-    }
-    .plan h2{ margin: 0 0 6px; font-size: 18px; }
-    .plan p{ margin: 0 0 16px; color: var(--muted2); font-size: 13px; }
-    .cards{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-    @media (max-width: 980px){ .cards{ grid-template-columns: repeat(2, 1fr);} }
-    @media (max-width: 520px){ .cards{ grid-template-columns: 1fr;} }
-
-    .choice{
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      cursor:pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      position:relative;
-      min-height: 76px;
-    }
-    .choice:hover{ transform: translateY(-1px); background: rgba(255,255,255,.06) }
-    .choice .t{ font-weight: 700; font-size: 12px; margin-bottom: 2px; }
-    .choice .s{ color: var(--muted2); font-size: 12px; }
-    .choice .p{ color: var(--muted); font-size: 12px; margin-top: 8px; }
-    .choice.sel{
-      border-color: rgba(120,170,255,.55);
-      background: rgba(120,170,255,.10);
-    }
-    .choice.sel::after{
-      content:"✓";
-      position:absolute;
-      right:10px;
-      top:10px;
-      width: 26px; height: 26px;
-      border-radius: 10px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: rgba(120,170,255,.18);
-      border: 1px solid rgba(120,170,255,.32);
-      color: rgba(220,235,255,.95);
-      font-weight: 900;
-      font-size: 14px;
+    .bubble svg{
+      width:48px;
+      height:48px;
+      opacity:.85;
     }
 
-    .modules{
-      margin-top: 12px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    @media (max-width: 980px){ .modules{ grid-template-columns: repeat(2, 1fr);} }
-    @media (max-width: 520px){ .modules{ grid-template-columns: 1fr;} }
-
-    .mod{
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      position:relative;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-    }
-    .mod:hover{ transform: translateY(-1px); background: rgba(255,255,255,.06) }
-    .mod .name{ font-weight: 800; font-size: 12px; margin-bottom: 4px; }
-    .mod .price{ color: var(--muted2); font-size: 12px; margin-bottom: 10px; }
-    .modActions{ display:flex; gap:10px; align-items:center; justify-content:space-between; }
-    .chip{
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      font-size: 12px;
-      cursor:pointer;
-      user-select:none;
-    }
-    .chip:hover{ background: rgba(255,255,255,.07) }
-    .chip.sel{
-      border-color: rgba(120,170,255,.55);
-      background: rgba(120,170,255,.14);
-    }
-
-    /* Total bar */
-    .totalBar{
-      margin-top: 16px;
-      padding: 14px 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-    }
-    .totalLeft .big{ font-size: 18px; font-weight: 900; }
-    .totalLeft .small{ color: var(--muted2); font-size: 12px; margin-top:2px }
-    .totalActions{ display:flex; gap:10px; align-items:center; }
-
-    /* 250+ box */
-    .contactBox{
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      display:none;
-    }
-    .contactBox.show{ display:block; }
-    .field{ display:flex; flex-direction:column; gap:6px; }
-    .field label{ font-size: 12px; color: var(--muted2); }
-    input, textarea{
-      width:100%;
-      padding: 11px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      color: var(--text);
-      outline:none;
-    }
-    textarea{ min-height: 92px; resize: vertical; }
-    input:focus, textarea:focus{ border-color: rgba(120,170,255,.55) }
-
-    /* About */
-    .about{ padding: 18px; }
-    .about h3{ margin:0 0 10px; font-size: 16px; }
-    .about p{ margin:0 0 10px; color: var(--muted2); font-size: 13px; line-height: 1.6; }
-    .about ul{ margin:8px 0 0 18px; color: var(--muted2); font-size: 13px; line-height: 1.6; }
-
-    /* Modals */
-    .overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-      z-index: 80;
-    }
-    .overlay.show{ display:flex; }
-    .modal{
-      width: min(520px, 100%);
-      padding: 16px;
-      position: relative;
-      max-height: min(88vh, 740px);
-      overflow:auto;
-    }
-    .modalHeader{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px; }
-    .modalTitle{ font-weight: 900; font-size: 14px; }
-    .modalClose{ padding: 8px 10px; border-radius: 12px; }
-    .modal .row{ display:grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
-    .muted{ color: var(--muted2); font-size: 12px; }
-    .msg{ margin-top: 8px; font-size: 12px; color: rgba(255,190,190,.95); }
-
-    .pwWrap{ position:relative; }
-    .eyeBtn{
-      position:absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 36px; height: 36px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition: transform .12s ease, background .12s ease;
-    }
-    /* Subtle hover only (no jumping) */
-    .eyeBtn:hover{
-      background: rgba(255,255,255,.07);
-      transform: translateY(-50%) scale(.96);
-    }
-    .eyeBtn svg{ width: 18px; height: 18px; opacity:.9 }
-
-    /* small footer */
-    .foot{
-      width:min(1080px, calc(100% - 24px));
-      margin: 0 auto 26px;
-      color: rgba(234,240,255,.45);
-      font-size: 12px;
+    /* ========= FOOT ========= */
+    footer{
+      max-width:1100px;
+      margin:60px auto 24px;
+      padding:0 16px;
       display:flex;
       justify-content:space-between;
-      gap: 14px;
-      flex-wrap: wrap;
+      color:var(--muted2);
+      font-size:12px;
+      flex-wrap:wrap;
+      gap:12px;
     }
-
   </style>
 </head>
 
 <body>
 
-  <!-- NAV -->
-  <div id="nav" class="nav glass">
-    <div class="brand">
-      <img id="navLogo" src="SmartCore%20Official%20Logos/SC%20Icon%20-%20Black%20Background.png" alt="SmartCore" />
-      <div>
-        <div class="t1">SmartCore Technology</div>
-        <div class="t2">Practical Technology. Built to Last.</div>
-      </div>
-    </div>
-    <div style="display:flex; gap:10px; align-items:center">
-      <button class="btn" id="loginOpen">Log in</button>
-    </div>
-  </div>
-
   <!-- HERO -->
   <section class="hero">
     <div class="iconField" id="iconField"></div>
 
-    <div class="heroInner glass">
-      <span class="pill">Calm systems for real workplaces</span>
-
+    <div class="heroInner">
       <h1>
-        SmartCore<br/>
-        <span class="dim">Technology</span>
+        SmartCore <br>
+        <span>Technology</span>
       </h1>
 
-      <p class="sub">Practical, reliable systems that businesses can depend on every day.</p>
+      <p class="sub">
+        Practical, reliable systems that businesses can depend on every day.
+      </p>
 
       <div class="heroActions">
-        <button class="btn primary" id="goPlan">Build Your Plan</button>
-        <button class="btn" id="empOpen">Sign Up As An Employee</button>
+        <button class="btn primary">Build Your Plan</button>
+        <button class="btn">Sign Up As An Employee</button>
       </div>
-
-      <button class="btn downBtn" id="scrollDown">Scroll Down ↓</button>
     </div>
   </section>
 
-  <!-- MAIN -->
-  <div class="wrap">
-    <div class="grid">
-      <div class="plan glass section" id="plan">
-        <h2>Build your plan</h2>
-        <p>Choose a company size, then select modules. Totals update live.</p>
-
-        <div class="cards" id="sizeCards"></div>
-
-        <div class="contactBox" id="bigContact">
-          <div class="row" style="display:grid; gap:10px;">
-            <div class="field">
-              <label>Approx company size (required)</label>
-              <input id="bigSize" type="number" min="1" placeholder="e.g. 350" />
-            </div>
-            <div class="field">
-              <label>Additional notes (optional)</label>
-              <textarea id="bigNotes" placeholder="Anything useful for us to know..."></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div id="modulesWrap" style="display:none">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px; margin-bottom: 6px;">
-            <div style="font-weight:800; font-size: 13px;">Select your modules</div>
-            <div class="muted">Select any</div>
-          </div>
-          <div class="modules" id="moduleCards"></div>
-        </div>
-
-        <div class="totalBar" style="margin-top:18px">
-          <div class="totalLeft">
-            <div class="big" id="totalText">£0 / month</div>
-            <div class="small" id="totalSub">Select a company size</div>
-          </div>
-          <div class="totalActions">
-            <button class="btn" id="clearBtn">Clear</button>
-            <button class="btn primary" id="checkoutBtn" disabled>Checkout →</button>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="about glass section">
-        <h3>About SmartCore Technology</h3>
-        <p>SmartCore Technology was built by Finley Hassall, a young founder with a long-standing passion for technology and a strong business mindset. Interested in IT from the age of six, Finley always knew he wanted to build a career creating systems that solve real-world problems.</p>
-        <p>Rather than focusing on trends or hype, SmartCore Technology was created with a clear goal: to build practical, reliable systems that businesses can depend on every day.</p>
-        <p>The company was developed with guidance and support from Finley’s mother, a business owner herself, but every system within SmartCore has been hand-crafted from the ground up by Finley. Each feature, workflow, and decision has been designed with real workplaces in mind — prioritising clarity, usability, and long-term reliability over unnecessary complexity.</p>
-        <p>SmartCore Technology is not about flashy software. It’s about building tools that work properly, scale sensibly, and quietly do their job in the background.</p>
-
-        <h3 style="margin-top:16px">The SmartCore Technology Approach</h3>
-        <p>SmartCore Technology is built on a simple philosophy: technology should make work easier, not more complicated.</p>
-        <ul>
-          <li>solve a specific, real business problem</li>
-          <li>be easy to understand and use</li>
-          <li>create clear, auditable records</li>
-          <li>scale as organisations grow</li>
-          <li>remain reliable over time</li>
-        </ul>
-        <p style="margin-top:12px">Instead of offering one large, bloated platform, SmartCore provides modular systems that companies can choose and combine based on their actual needs. This keeps costs fair, reduces complexity, and allows businesses to stay in control of how they operate.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="foot">
+  <footer>
     <div>SmartCore Technology — Practical Technology. Built to Last.</div>
-    <div>Support: support@smartcoretechnology.co.uk</div>
-  </div>
-
-  <!-- MODULE LEARN MORE MODAL -->
-  <div class="overlay" id="learnOverlay">
-    <div class="modal glass" style="width:min(760px,100%)">
-      <div class="modalHeader">
-        <div class="modalTitle" id="learnTitle">Module</div>
-        <button class="btn modalClose" id="learnClose">Close</button>
-      </div>
-      <div class="muted" id="learnPrice"></div>
-      <div style="height:10px"></div>
-      <div id="learnBody" class="muted" style="font-size:13px; line-height:1.65"></div>
-      <div style="height:12px"></div>
-      <div style="border:1px solid rgba(255,255,255,.10); border-radius:16px; overflow:hidden; background: rgba(0,0,0,.2)">
-        <iframe
-          id="learnVideo"
-          width="100%"
-          height="360"
-          src=""
-          title="Module preview"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-          allowfullscreen
-        ></iframe>
-      </div>
-    </div>
-  </div>
-
-  <!-- CHECKOUT MODAL (Owner signup + verify + mock pay) -->
-  <div class="overlay" id="checkoutOverlay">
-    <div class="modal glass">
-      <div class="modalHeader">
-        <div class="modalTitle" id="checkoutTitle">Create account</div>
-        <button class="btn modalClose" id="checkoutClose">Close</button>
-      </div>
-
-      <div id="checkoutStep1">
-        <div class="row">
-          <div class="field">
-            <label>Company name</label>
-            <input id="suCompany" placeholder="e.g. SmartFits Installations Ltd" />
-          </div>
-          <div class="field">
-            <label>Email</label>
-            <input id="suEmail" type="email" placeholder="name@company.com" />
-          </div>
-          <div class="field">
-            <label>Password</label>
-            <div class="pwWrap">
-              <input id="suPass" type="password" placeholder="Minimum 8 characters" />
-              <button class="eyeBtn" id="suEye" type="button" aria-label="Show password">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" stroke="rgba(234,240,255,.9)" stroke-width="1.7"/>
-                  <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="rgba(234,240,255,.9)" stroke-width="1.7"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="muted" style="margin-top:10px">
-          We’ll email you a 6-digit code. Your account is only created after verification and payment acceptance.
-        </div>
-
-        <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end">
-          <button class="btn primary" id="sendCodeBtn">Continue →</button>
-        </div>
-        <div id="suMsg" class="msg"></div>
-      </div>
-
-      <div id="checkoutStep2" style="display:none">
-        <div class="row">
-          <div class="field">
-            <label>6-digit code</label>
-            <input id="suCode" inputmode="numeric" placeholder="123456" maxlength="6" />
-          </div>
-        </div>
-
-        <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end">
-          <button class="btn" id="backToDetails">Back</button>
-          <button class="btn primary" id="verifyOnlyBtn">Verify →</button>
-        </div>
-        <div id="suMsg2" class="msg"></div>
-      </div>
-
-      <div id="checkoutStep3" style="display:none">
-        <div class="muted" style="margin-top:6px">
-          Payment (testing mode). This is where Stripe will go later.
-        </div>
-
-        <div class="glass2" style="margin-top:12px; padding:12px;">
-          <div style="font-weight:900; font-size:13px; margin-bottom:6px">Your plan</div>
-          <div class="muted" id="paySummary" style="font-size:12px; line-height:1.5"></div>
-        </div>
-
-        <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end">
-          <button class="btn danger" id="payDecline">Decline</button>
-          <button class="btn primary" id="payAccept">Pay (Accept)</button>
-        </div>
-        <div id="payMsg" class="msg"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- EMPLOYEE SIGNUP MODAL (placeholder - wired later) -->
-  <div class="overlay" id="empOverlay">
-    <div class="modal glass">
-      <div class="modalHeader">
-        <div class="modalTitle">Sign up as an employee</div>
-        <button class="btn modalClose" id="empClose">Close</button>
-      </div>
-      <div class="muted" style="line-height:1.6">
-        Employee signup will validate your company code and your name against the employee list before sending a code.
-        We’ll wire this after the owner signup + dashboard is fully stable.
-      </div>
-    </div>
-  </div>
-
-  <!-- LOGIN MODAL -->
-  <div class="overlay" id="loginOverlay">
-    <div class="modal glass">
-      <div class="modalHeader">
-        <div class="modalTitle">Log in</div>
-        <button class="btn modalClose" id="loginClose">Close</button>
-      </div>
-
-      <div class="row">
-        <div class="field">
-          <label>Email</label>
-          <input id="liEmail" type="email" placeholder="name@company.com" />
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <div class="pwWrap">
-            <input id="liPass" type="password" placeholder="Your password" />
-            <button class="eyeBtn" id="liEye" type="button" aria-label="Show password">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" stroke="rgba(234,240,255,.9)" stroke-width="1.7"/>
-                <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="rgba(234,240,255,.9)" stroke-width="1.7"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end">
-        <button class="btn primary" id="loginBtn">Log in →</button>
-      </div>
-      <div id="liMsg" class="msg"></div>
-
-      <div class="muted" style="margin-top:12px">
-        Don’t have an account?
-      </div>
-      <button class="btn" style="margin-top:8px; width:100%" id="noAccountBtn">What should I do?</button>
-    </div>
-  </div>
-
-  <!-- SIMPLE DASH PLACEHOLDER (we’ll improve after) -->
-  <div class="overlay" id="dashOverlay">
-    <div class="modal glass" style="width:min(860px,100%)">
-      <div class="modalHeader">
-        <div class="modalTitle">Dashboard</div>
-        <button class="btn danger" id="signOutBtn">Sign out</button>
-      </div>
-      <div class="muted">You’re signed in. Next we’ll build company onboarding + employee management properly.</div>
-    </div>
-  </div>
+    <div>support@smartcoretechnology.co.uk</div>
+  </footer>
 
   <script>
-    // --------- CONFIG (you told me these for future reference) ----------
-    // NOTE: fix your SUPABASE_URL string in your codebase (missing closing quote in what you pasted earlier)
-    window.__SUPABASE_URL = window.__SUPABASE_URL || "https://hjdpcfhozhoyeqevnupm.supabase.co";
-    window.__SUPABASE_ANON = window.__SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZHBjZmhvemhveWVxZXZudXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MTk3MzYsImV4cCI6MjA4MjQ5NTczNn0.BXosJO4NmEZOe73GXSGPa3z-i_4ZzF9zBAMBIf6Mkts";
+    /* SUPABASE SETUP */
+    const sb = window.supabase.createClient(
+      window.__SUPABASE_URL,
+      window.__SUPABASE_ANON
+    );
 
-    const supabase = window.supabase.createClient(window.__SUPABASE_URL, window.__SUPABASE_ANON);
+    /* HERO ICONS */
+    const iconField = document.getElementById("iconField");
 
-    const $ = (id) => document.getElementById(id);
-
-    function openOverlay(id){ $(id).classList.add("show"); }
-    function closeOverlay(id){ $(id).classList.remove("show"); }
-    function money(n){ return "£" + Number(n||0).toFixed(0); }
-
-    async function apiPost(path, payload){
-      const res = await fetch(path, {
-        method:"POST",
-        headers:{ "content-type":"application/json" },
-        body: JSON.stringify(payload || {})
-      });
-      const text = await res.text();
-      let data;
-      try { data = JSON.parse(text); } catch { data = { ok:false, error:text }; }
-      if (!res.ok) throw new Error(data?.error || text || ("Request failed: " + res.status));
-      return data;
-    }
-
-    // --------- NAV hide after hero ----------
-    const nav = $("nav");
-    const hero = document.querySelector(".hero");
-    const obs = new IntersectionObserver(([e])=>{
-      // if hero not visible -> hide nav
-      nav.classList.toggle("hidden", !e.isIntersecting);
-    }, { threshold: 0.1 });
-    obs.observe(hero);
-
-    // --------- Scroll down ----------
-    $("scrollDown").onclick = () => $("plan").scrollIntoView({ behavior:"smooth", block:"start" });
-    $("goPlan").onclick = () => $("plan").scrollIntoView({ behavior:"smooth", block:"start" });
-
-    // --------- Popups ----------
-    $("learnClose").onclick = () => closeOverlay("learnOverlay");
-    $("checkoutClose").onclick = () => closeOverlay("checkoutOverlay");
-    $("empClose").onclick = () => closeOverlay("empOverlay");
-    $("loginClose").onclick = () => closeOverlay("loginOverlay");
-
-    $("empOpen").onclick = () => openOverlay("empOverlay");
-    $("loginOpen").onclick = () => openOverlay("loginOverlay");
-
-    // “What should I do?” helper
-    $("noAccountBtn").onclick = () => {
-      alert("If your company is already using SmartCore, choose 'Sign Up As An Employee' on the homepage.\n\nIf you’re setting up your company for the first time, build your plan, select your modules, then check out to create your account.\n\nJoin the best. Join SmartCore.");
-    };
-
-    // --------- Eye toggles (subtle hover already) ----------
-    function wireEye(btnId, inputId){
-      const btn = $(btnId), inp = $(inputId);
-      btn.onclick = () => {
-        inp.type = (inp.type === "password") ? "text" : "password";
-      };
-    }
-    wireEye("suEye", "suPass");
-    wireEye("liEye", "liPass");
-
-    // --------- Data ----------
-    const COMPANY_SIZES = [
-      { id:"up_to_25", label:"Up to 25 people", price:39, note:"£39 / month", max:25 },
-      { id:"26_100", label:"26–100 people", price:79, note:"£79 / month", max:100 },
-      { id:"101_250", label:"101–250 people", price:149, note:"£149 / month", max:250 },
-      { id:"250_plus", label:"250+ people", price:null, note:"Contact us", max:null },
+    const icons = [
+      '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v6c0 5-3.5 8.5-8 8.5S4 18 4 13V7l8-4Z" stroke="white" stroke-width="2"/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="white" stroke-width="2"/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2"/></svg>'
     ];
 
-    const MODULES = [
-      { id:"presence_fire", name:"Presence & Fire Safety", price:10, summary:"A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies. Designed to be simple, fast, and reliable when it matters most, with clear records for audits and incident reviews." },
-      { id:"policies_handbook", name:"Policies & Staff Handbook", price:7, summary:"A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document. Managers can update policies, request re-acknowledgement, and view clear records at any time. Helps organisations demonstrate that information has been issued and acknowledged without relying on paper or email chains." },
-      { id:"holiday_booking", name:"Holiday Booking", price:8, summary:"A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place. Intentionally simple and focused, with no payroll or salary management." },
-      { id:"accident_injury", name:"Accident & Injury Book", price:3, summary:"A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required. Keeps incident records organised, secure, and easy to access if they are ever needed." },
-      { id:"training_compliance", name:"Training & Compliance", price:9, summary:"Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance. Designed to support consistency and oversight without adding unnecessary complexity." },
-      { id:"on_offboarding", name:"Onboarding & Offboarding", price:8, summary:"Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments. From access setup to equipment returns, nothing is forgotten. Provides a clear record of what was completed and when, supporting smoother staff transitions." },
-      { id:"expenses_upload", name:"Expenses Upload", price:6, summary:"Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported for accounting or payroll systems. Keeps expense handling simple, organised, and traceable." },
-      { id:"wellbeing_check", name:"Wellbeing Check", price:4, summary:"A lightweight wellbeing check-in with three options: 🙂 Positive (green), 😐 Neutral (amber), 🙁 Concerned (red). Over time, this provides a simple, high-level view of wellbeing trends. No medical data, no intrusive questions — just a clear, visual pulse check designed to support awareness while respecting privacy." },
-    ];
-
-    // State
-    let selectedSize = null;
-    let selectedModules = new Set();
-    let verifyToken = null;
-    let pendingSignup = null;
-
-    // --------- Render size cards ----------
-    const sizeCards = $("sizeCards");
-    function renderSizes(){
-      sizeCards.innerHTML = "";
-      COMPANY_SIZES.forEach(s => {
-        const d = document.createElement("div");
-        d.className = "choice" + (selectedSize?.id === s.id ? " sel" : "");
-        d.innerHTML = `
-          <div class="t">${s.label}</div>
-          <div class="s">${s.note}</div>
-          <div class="p">${s.id === "250_plus" ? "We’ll quote based on requirements." : "Checkout online in minutes."}</div>
-        `;
-        d.onclick = () => {
-          selectedSize = s;
-          // reset module selection if switching size
-          selectedModules = new Set();
-          renderSizes();
-          renderModules();
-          updateTotal();
-        };
-        sizeCards.appendChild(d);
-      });
-    }
-
-    // --------- Render modules ----------
-    const modulesWrap = $("modulesWrap");
-    const moduleCards = $("moduleCards");
-    const bigContact = $("bigContact");
-
-    function renderModules(){
-      const is250 = selectedSize?.id === "250_plus";
-      bigContact.classList.toggle("show", !!is250);
-
-      modulesWrap.style.display = selectedSize ? "block" : "none";
-      if (!selectedSize) { moduleCards.innerHTML=""; return; }
-
-      moduleCards.innerHTML = "";
-      MODULES.forEach(m => {
-        const d = document.createElement("div");
-        d.className = "mod";
-        const isSel = selectedModules.has(m.id);
-        d.innerHTML = `
-          <div class="name">${m.name}</div>
-          <div class="price">£${m.price} / month</div>
-          <div class="modActions">
-            <div class="chip" data-learn="1">Learn more</div>
-            <div class="chip ${isSel ? "sel" : ""}" data-toggle="1">${isSel ? "Selected" : "Select"}</div>
-          </div>
-        `;
-
-        d.querySelector('[data-learn="1"]').onclick = () => openLearn(m);
-        d.querySelector('[data-toggle="1"]').onclick = () => {
-          if (selectedModules.has(m.id)) selectedModules.delete(m.id);
-          else selectedModules.add(m.id);
-          renderModules();
-          updateTotal();
-        };
-        moduleCards.appendChild(d);
-      });
-    }
-
-    function openLearn(m){
-      $("learnTitle").textContent = m.name;
-      $("learnPrice").textContent = `£${m.price} / month`;
-      $("learnBody").textContent = m.summary;
-      // YouTube embed for fullscreen
-      $("learnVideo").src = "https://www.youtube.com/embed/S2kymv60ndQ?rel=0&modestbranding=1";
-      openOverlay("learnOverlay");
-    }
-
-    // --------- Total + checkout ----------
-    const checkoutBtn = $("checkoutBtn");
-    function updateTotal(){
-      if (!selectedSize){
-        $("totalText").textContent = "£0 / month";
-        $("totalSub").textContent = "Select a company size";
-        checkoutBtn.disabled = true;
-        checkoutBtn.textContent = "Checkout →";
-        return;
-      }
-
-      const modsTotal = Array.from(selectedModules).reduce((sum, id) => {
-        const m = MODULES.find(x=>x.id===id);
-        return sum + (m?.price || 0);
-      }, 0);
-
-      if (selectedSize.id === "250_plus"){
-        $("totalText").textContent = "Custom quote";
-        $("totalSub").textContent = "Enter approx company size to contact us";
-        checkoutBtn.disabled = false;
-        checkoutBtn.textContent = "Contact Us →";
-        return;
-      }
-
-      const total = selectedSize.price + modsTotal;
-      $("totalText").textContent = `${money(total)} / month`;
-      $("totalSub").textContent = `${selectedSize.label} • ${selectedModules.size} module${selectedModules.size===1?"":"s"}`;
-      checkoutBtn.disabled = false;
-      checkoutBtn.textContent = "Checkout →";
-    }
-
-    $("clearBtn").onclick = () => {
-      selectedSize = null;
-      selectedModules = new Set();
-      renderSizes(); renderModules(); updateTotal();
-    };
-
-    checkoutBtn.onclick = () => {
-      if (!selectedSize) return;
-
-      if (selectedSize.id === "250_plus"){
-        const n = Number($("bigSize").value || 0);
-        if (!n) { alert("Please enter an approximate company size first."); return; }
-        if (n < 250){
-          const ok = confirm("That size is under 250. Are you sure you want the 250+ package?");
-          if (!ok) return;
-        }
-        const subject = encodeURIComponent("250+ Person Company - Wanting to Sign Up");
-        const mods = Array.from(selectedModules).map(id => MODULES.find(m=>m.id===id)?.name).filter(Boolean);
-        const body = encodeURIComponent(
-`Hello SmartCore Team,
-
-We are interested in signing up on the 250+ person package.
-
-Approx company size: ${n}
-
-Systems requested:
-${mods.length ? ("- " + mods.join("\n- ")) : "- (Not selected yet)"}
-
-Additional notes:
-${$("bigNotes").value || "(none)"}
-
-Thank you,
-`
-        );
-        window.location.href = `mailto:support@smartcoretechnology.co.uk?subject=${subject}&body=${body}`;
-        return;
-      }
-
-      // open checkout modal
-      openOverlay("checkoutOverlay");
-      setCheckoutStep(1);
-      $("suMsg").textContent = "";
-      $("suMsg2").textContent = "";
-      $("payMsg").textContent = "";
-    };
-
-    function setCheckoutStep(n){
-      $("checkoutStep1").style.display = (n===1) ? "block" : "none";
-      $("checkoutStep2").style.display = (n===2) ? "block" : "none";
-      $("checkoutStep3").style.display = (n===3) ? "block" : "none";
-    }
-
-    // --------- Checkout flow ----------
-    $("backToDetails").onclick = () => setCheckoutStep(1);
-
-    $("sendCodeBtn").onclick = async () => {
-      $("suMsg").textContent = "";
-
-      if (!selectedSize || selectedSize.id === "250_plus"){
-        $("suMsg").textContent = "Please select a company size under 250+ first.";
-        return;
-      }
-
-      const company_name = $("suCompany").value.trim();
-      const email = $("suEmail").value.trim().toLowerCase();
-      const password = $("suPass").value;
-
-      if (!company_name) { $("suMsg").textContent = "Enter your company name."; return; }
-      if (!email) { $("suMsg").textContent = "Enter your email."; return; }
-      if (!password || password.length < 8) { $("suMsg").textContent = "Password must be at least 8 characters."; return; }
-
-      // Store pending locally only (NOT in Supabase)
-      pendingSignup = {
-        company_name,
-        email,
-        password,
-        company_size: selectedSize.id,
-        company_size_label: selectedSize.label,
-        company_size_price: selectedSize.price,
-        module_ids: Array.from(selectedModules),
-      };
-
-      try{
-        $("sendCodeBtn").disabled = true;
-
-        await apiPost("/api/send-code", {
-          email,
-          purpose: "owner_signup",
-        });
-
-        setCheckoutStep(2);
-      }catch(e){
-        $("suMsg").textContent = e.message || String(e);
-      }finally{
-        $("sendCodeBtn").disabled = false;
-      }
-    };
-
-    $("verifyOnlyBtn").onclick = async () => {
-      $("suMsg2").textContent = "";
-      if (!pendingSignup) { $("suMsg2").textContent = "Please enter details first."; return; }
-
-      const code = $("suCode").value.trim();
-      if (!code || code.length !== 6) { $("suMsg2").textContent = "Enter the 6-digit code."; return; }
-
-      try{
-        $("verifyOnlyBtn").disabled = true;
-
-        // PHASE: verify only (no user created)
-        const out = await apiPost("/api/verify-code", {
-          phase: "verify",
-          purpose: "owner_signup",
-          email: pendingSignup.email,
-          code
-        });
-
-        verifyToken = out.verify_token;
-
-        // show payment step
-        const modsTotal = pendingSignup.module_ids.reduce((sum,id)=> sum + (MODULES.find(m=>m.id===id)?.price||0), 0);
-        const total = pendingSignup.company_size_price + modsTotal;
-        $("paySummary").textContent =
-          `${pendingSignup.company_size_label}\nModules: ${pendingSignup.module_ids.length}\nTotal: ${money(total)} / month`;
-
-        setCheckoutStep(3);
-
-      }catch(e){
-        $("suMsg2").textContent = e.message || String(e);
-      }finally{
-        $("verifyOnlyBtn").disabled = false;
-      }
-    };
-
-    $("payDecline").onclick = () => {
-      $("payMsg").textContent = "Payment declined. No account was created.";
-      verifyToken = null;
-      // keep them here so they can accept if they want
-    };
-
-    $("payAccept").onclick = async () => {
-      $("payMsg").textContent = "";
-      if (!pendingSignup || !verifyToken) {
-        $("payMsg").textContent = "Please verify your code first.";
-        return;
-      }
-
-      // NOTE: Full name not asked yet in your current checkout UI.
-      // For now, we’ll use a simple placeholder from email prefix.
-      // (Next: we’ll add the proper “Tell us about you” onboarding step.)
-      const full_name = pendingSignup.email.split("@")[0].replace(/[._-]+/g," ").replace(/\b\w/g, c=>c.toUpperCase());
-
-      const modsTotal = pendingSignup.module_ids.reduce((sum,id)=> sum + (MODULES.find(m=>m.id===id)?.price||0), 0);
-      const total = pendingSignup.company_size_price + modsTotal;
-
-      try{
-        $("payAccept").disabled = true;
-
-        const created = await apiPost("/api/verify-code", {
-          phase: "finalise",
-          purpose: "owner_signup",
-          email: pendingSignup.email,
-          code: $("suCode").value.trim(),
-          verify_token: verifyToken,
-
-          // create payload
-          full_name,
-          password: pendingSignup.password,
-          company_name: pendingSignup.company_name,
-          company_size: pendingSignup.company_size,
-          company_size_label: pendingSignup.company_size_label,
-          company_size_price: pendingSignup.company_size_price,
-          module_ids: pendingSignup.module_ids,
-          modules_total: modsTotal,
-          total_monthly: total
-        });
-
-        // Now login (client-side) and show dashboard
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: pendingSignup.email,
-          password: pendingSignup.password,
-        });
-        if (error) throw new Error(error.message);
-
-        closeOverlay("checkoutOverlay");
-        openOverlay("dashOverlay");
-
-        // clear local signup state
-        verifyToken = null;
-        pendingSignup = null;
-
-      }catch(e){
-        $("payMsg").textContent = e.message || String(e);
-      }finally{
-        $("payAccept").disabled = false;
-      }
-    };
-
-    // --------- Login works ----------
-    $("loginBtn").onclick = async () => {
-      $("liMsg").textContent = "";
-      const email = $("liEmail").value.trim().toLowerCase();
-      const password = $("liPass").value;
-
-      if (!email || !password) { $("liMsg").textContent = "Enter your email and password."; return; }
-
-      try{
-        $("loginBtn").disabled = true;
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw new Error(error.message);
-
-        closeOverlay("loginOverlay");
-        openOverlay("dashOverlay");
-      }catch(e){
-        $("liMsg").textContent = e.message || String(e);
-      }finally{
-        $("loginBtn").disabled = false;
-      }
-    };
-
-    // --------- Sign out ----------
-    $("signOutBtn").onclick = async () => {
-      await supabase.auth.signOut();
-      closeOverlay("dashOverlay");
-      window.scrollTo({ top: 0, behavior:"smooth" });
-    };
-
-    // --------- Floating icon field (desktop only push effect) ----------
-    const isTouch = matchMedia("(hover: none)").matches || matchMedia("(pointer: coarse)").matches;
-    const iconField = $("iconField");
-
-    const ICONS = [
-      svgPlus(), svgCheck(), svgLock(), svgTarget(),
-      svgBriefcase(), svgList(), svgShield(), svgBolt(),
-      svgCloud(), svgCog()
-    ];
-
-    function createBubbles(){
-      iconField.innerHTML = "";
-
-      const spots = [
-        { x: 70,  y: 120, cls:"small" },
-        { x: 980, y: 120, cls:"small" },
-        { x: 120, y: 520, cls:"tiny"  },
-        { x: 940, y: 560, cls:"tiny"  },
-        { x: 740, y: 260, cls:"tiny"  },
-        { x: 280, y: 260, cls:"tiny"  },
-        { x: 880, y: 380, cls:"small" },
-        { x: 160, y: 360, cls:"small" },
-        { x: 520, y: 140, cls:"tiny" },
-        { x: 520, y: 650, cls:"tiny" },
-      ];
-
-      // Repeat lightly down the page too
-      const extra = [
-        { x: 80, y: window.innerHeight + 260, cls:"tiny" },
-        { x: 980, y: window.innerHeight + 380, cls:"tiny" },
-        { x: 520, y: window.innerHeight + 620, cls:"small" },
-      ];
-
-      const all = spots.concat(extra);
-
-      all.forEach((p, i) => {
-        const b = document.createElement("div");
-        b.className = "bubble " + p.cls;
-        b.style.left = (p.x - 75) + "px";
-        b.style.top  = (p.y - 75) + "px";
-        b.innerHTML = ICONS[i % ICONS.length];
-        b.dataset.baseX = "0";
-        b.dataset.baseY = "0";
+    function scatter(){
+      iconField.innerHTML="";
+      for(let i=0;i<9;i++){
+        const b=document.createElement("div");
+        b.className="bubble";
+        b.style.left=Math.random()*100+"%";
+        b.style.top=Math.random()*100+"%";
+        b.innerHTML=icons[i%icons.length];
         iconField.appendChild(b);
-      });
+      }
     }
 
-    createBubbles();
-    window.addEventListener("resize", () => createBubbles());
-
-    // Mouse push physics (desktop only)
-    if (!isTouch){
-      const bubbles = () => Array.from(document.querySelectorAll(".bubble"));
-      const state = new Map(); // el -> {x,y,vx,vy}
-
-      function initState(){
-        state.clear();
-        bubbles().forEach(el => state.set(el, { x:0, y:0, vx:0, vy:0 }));
-      }
-      initState();
-
-      let mouse = { x: -9999, y: -9999 };
-      window.addEventListener("mousemove", (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-      });
-
-      function tick(){
-        for (const [el, s] of state.entries()){
-          const rect = el.getBoundingClientRect();
-          const cx = rect.left + rect.width/2;
-          const cy = rect.top + rect.height/2;
-
-          const dx = cx - mouse.x;
-          const dy = cy - mouse.y;
-          const dist = Math.sqrt(dx*dx + dy*dy) || 1;
-
-          // push radius
-          const R = 180;
-          if (dist < R){
-            const force = (1 - dist/R) * 6.0;
-            s.vx += (dx/dist) * force;
-            s.vy += (dy/dist) * force;
-          }
-
-          // spring back
-          s.vx += (-s.x) * 0.02;
-          s.vy += (-s.y) * 0.02;
-
-          // damping
-          s.vx *= 0.86;
-          s.vy *= 0.86;
-
-          // integrate
-          s.x += s.vx;
-          s.y += s.vy;
-
-          el.style.setProperty("--x", s.x.toFixed(2) + "px");
-          el.style.setProperty("--y", s.y.toFixed(2) + "px");
-        }
-
-        requestAnimationFrame(tick);
-      }
-      tick();
-
-      // If DOM changes
-      const mo = new MutationObserver(()=> initState());
-      mo.observe(iconField, { childList:true, subtree:true });
-    }
-
-    // --------- SVG icons ----------
-    function svgPlus(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round"/></svg>`; }
-    function svgCheck(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M20 7 10 17l-5-5" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
-    function svgLock(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round"/><path d="M6 11h12v10H6V11Z" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linejoin="round"/></svg>`; }
-    function svgTarget(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3v4M12 17v4M3 12h4M17 12h4" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" stroke="rgba(234,240,255,.9)" stroke-width="2"/></svg>`; }
-    function svgBriefcase(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M9 7V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1" stroke="rgba(234,240,255,.9)" stroke-width="2"/><path d="M4 7h16v13H4V7Z" stroke="rgba(234,240,255,.9)" stroke-width="2"/><path d="M4 12h16" stroke="rgba(234,240,255,.9)" stroke-width="2"/></svg>`; }
-    function svgList(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M8 6h13M8 12h13M8 18h13" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linecap="round"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke="rgba(234,240,255,.9)" stroke-width="3" stroke-linecap="round"/></svg>`; }
-    function svgShield(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v6c0 5-3.5 8.5-8 8.5S4 18 4 13V7l8-4Z" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linejoin="round"/></svg>`; }
-    function svgBolt(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linejoin="round"/></svg>`; }
-    function svgCloud(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M7 18h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.5-1.5A4 4 0 0 0 7 18Z" stroke="rgba(234,240,255,.9)" stroke-width="2" stroke-linejoin="round"/></svg>`; }
-    function svgCog(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="rgba(234,240,255,.9)" stroke-width="2"/><path d="M19.4 15a7.9 7.9 0 0 0 .1-1l2-1-2-4-2.3.5a8 8 0 0 0-1.7-1L15 4h-6l-.5 2.5a8 8 0 0 0-1.7 1L4.5 7 2.5 11l2 1a7.9 7.9 0 0 0 .1 1l-2 1 2 4 2.3-.5a8 8 0 0 0 1.7 1L9 20h6l.5-2.5a8 8 0 0 0 1.7-1l2.3.5 2-4-2.1-1Z" stroke="rgba(234,240,255,.55)" stroke-width="1.4" stroke-linejoin="round"/></svg>`; }
-
-    // Init
-    renderSizes();
-    renderModules();
-    updateTotal();
+    scatter();
   </script>
+
 </body>
 </html>
