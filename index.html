@@ -1934,20 +1934,96 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     /******************************************************************
       ACCOUNT LOADING + DASHBOARD
     ******************************************************************/
-    async function loadAccount(){
-      // session
-      const { data: { session } } = await sb.auth.getSession();
-      state.session = session || null;
 
-      if(!state.session?.user){
-        state.profile = null;
-        state.company = null;
-        state.subscription = null;
-        state.employees = [];
-        return;
-      }
+    // --- Profiles key helper: supports either profiles.id OR profiles.user_id ---
+async function getProfileByAuthUserId(uid){
+  // Try common schemas in order.
+  // 1) profiles.user_id = auth.users.id (most common)
+  {
+    const { data, error } = await sb.from("profiles").select("*").eq("user_id", uid).maybeSingle();
+    if (!error) return { profile: data || null, key: "user_id" };
+    // If the column doesn't exist, try next.
+    if (!String(error.message || "").toLowerCase().includes("column") ) throw error;
+  }
 
-      const uid = state.session.user.id;
+  // 2) profiles.id = auth.users.id
+  {
+    const { data, error } = await sb.from("profiles").select("*").eq("id", uid).maybeSingle();
+    if (!error) return { profile: data || null, key: "id" };
+    throw error;
+  }
+}
+
+   async function loadAccount(){
+  // session
+  const { data: { session } } = await sb.auth.getSession();
+  state.session = session || null;
+
+  if(!state.session?.user){
+    state.profile = null;
+    state.company = null;
+    state.subscription = null;
+    state.employees = [];
+    return;
+  }
+
+  const uid = state.session.user.id;
+
+  // profile (supports either profiles.user_id or profiles.id)
+  let profKey = "user_id";
+  try{
+    const r = await getProfileByAuthUserId(uid);
+    state.profile = r.profile;
+    profKey = r.key;
+  }catch(e){
+    throw new Error("Profile load failed: " + (e.message || e));
+  }
+
+  // company
+  let comp = null;
+
+  // If profile has company_id, use it
+  if(state.profile?.company_id){
+    const { data, error } = await sb.from("companies").select("*").eq("id", state.profile.company_id).maybeSingle();
+    if(error) throw new Error("Company load failed: " + error.message);
+    comp = data;
+  } else {
+    // fallback: companies.owner_user_id = auth uid
+    const { data, error } = await sb.from("companies").select("*").eq("owner_user_id", uid).maybeSingle();
+    if(error) throw new Error("Company load failed: " + error.message);
+    comp = data;
+  }
+
+  state.company = comp || null;
+
+  // subscription (latest)
+  if(state.company?.id){
+    const { data: sub, error: sErr } = await sb
+      .from("subscriptions")
+      .select("*")
+      .eq("company_id", state.company.id)
+      .order("created_at", { ascending:false })
+      .limit(1)
+      .maybeSingle();
+
+    state.subscription = sErr ? null : (sub || null);
+
+    // employees
+    const { data: emps, error: eErr } = await sb
+      .from("employees")
+      .select("*")
+      .eq("company_id", state.company.id)
+      .order("created_at", { ascending:true });
+
+    state.employees = eErr ? [] : (emps || []);
+  } else {
+    state.subscription = null;
+    state.employees = [];
+  }
+
+  // store for updateProfile() to use later
+  state.__profilesKey = profKey;
+}
 
       // profile
       const { data: prof, error: pErr } = await sb
@@ -2259,15 +2335,18 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     async function updateProfile(patch){
-      const uid = state.session?.user?.id;
-      if(!uid) return;
+  const uid = state.session?.user?.id;
+  if(!uid) return;
 
-      const { error } = await sb.from("profiles").update(patch).eq("id", uid);
-      if(error) return showErr($("onbMsg"), error.message);
+  const key = state.__profilesKey || "user_id";
 
-      await loadAccount();
-      showDashboard();
-    }
+  const { error } = await sb.from("profiles").update(patch).eq(key, uid);
+  if(error) return showErr($("onbMsg"), error.message);
+
+  await loadAccount();
+  showDashboard();
+}
+
 
     async function uploadCompanyLogo(file){
       try{
@@ -2748,3 +2827,4 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
 </body>
 </html>
+
