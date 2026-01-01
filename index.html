@@ -1,991 +1,1820 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SmartCore Technology — Practical Technology. Built to Last.</title>
+  <title>SmartCore Technology</title>
+
+  <!-- Tailwind (CDN ok for now while building) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CDN (testing/dev ok) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
   <!-- Supabase JS v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
-      --bg0:#020617; /* near-black */
-      --bg1:#050b1f; /* deep navy */
-      --bg2:#07122e; /* slightly brighter */
-      --panel: rgba(255,255,255,.055);
-      --panel2: rgba(255,255,255,.040);
-      --stroke: rgba(255,255,255,.10);
-      --stroke2: rgba(255,255,255,.085);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.70);
-      --muted2: rgba(255,255,255,.55);
-      --accent:#4d7cff;   /* subtle blue */
-      --accent2:#82a3ff;
-      --r: 14px;
-      --shadow: 0 14px 40px rgba(0,0,0,.28);
+      --bg0:#020617;
+      --bg1:#06153a;
+      --bg2:#020923;
+      --panelA: rgba(8, 12, 28, .62);
+      --panelB: rgba(8, 12, 28, .45);
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.08);
+      --text: #eaf0ff;
+      --muted: rgba(234,240,255,.74);
+      --muted2: rgba(234,240,255,.58);
+      --accent: rgba(120,170,255,.95);
+      --accentSoft: rgba(120,170,255,.18);
+      --shadow: 0 26px 80px rgba(0,0,0,.55);
+      --shadow2: 0 18px 55px rgba(0,0,0,.45);
+      --r1: 22px;
+      --r2: 16px;
+      --blur: 16px;
     }
-    html,body{
-      height:100%;
+
+    html,body{height:100%}
+    body{
+      margin:0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color: var(--text);
       background:
-        radial-gradient(1100px 700px at 20% -10%, rgba(77,124,255,.16), transparent 60%),
-        radial-gradient(900px 600px at 85% 10%, rgba(130,163,255,.10), transparent 55%),
-        linear-gradient(180deg, var(--bg0), var(--bg1) 45%, var(--bg0));
+        radial-gradient(1100px 800px at 50% 10%, rgba(70,120,255,.20), transparent 60%),
+        radial-gradient(1200px 900px at 50% 60%, rgba(35,80,220,.14), transparent 62%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
       overflow-x:hidden;
     }
+
     .glass{
-      background: var(--panel);
-      border: 1px solid var(--stroke);
-      border-radius: var(--r);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--stroke);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      border-radius: var(--r1);
       box-shadow: var(--shadow);
     }
-    .glass-soft{
-      background: var(--panel2);
-      border: 1px solid var(--stroke2);
-      border-radius: var(--r);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-    .btn{
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      transition: transform .14s ease, background .14s ease, border-color .14s ease, opacity .14s ease;
-      user-select:none;
-    }
-    .btn:hover{ background: rgba(255,255,255,.085); border-color: rgba(255,255,255,.18); }
-    .btn:active{ transform: translateY(1px); }
-    .btn-primary{
-      background: linear-gradient(180deg, rgba(77,124,255,.95), rgba(77,124,255,.78));
-      border: 1px solid rgba(77,124,255,.65);
-      color: #07122e;
-      font-weight: 800;
-    }
-    .card{
-      border-radius: var(--r);
-      border: 1px solid rgba(255,255,255,.10);
+    .glass2{
       background: rgba(255,255,255,.045);
-      transition: transform .14s ease, border-color .14s ease, background .14s ease;
-    }
-    .card:hover{ border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.06); }
-    .selected{
-      border-color: rgba(77,124,255,.88) !important;
-      background: rgba(77,124,255,.11) !important;
-      outline: 2px solid rgba(77,124,255,.22);
-    }
-    .chip{
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      border-radius: 999px;
+      border:1px solid var(--stroke2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--r2);
+      box-shadow: var(--shadow2);
     }
 
-    /* Subtle appear */
-    .reveal{ opacity:0; transform: translateY(10px); }
-    .reveal.show{ opacity:1; transform: translateY(0); transition: opacity .65s ease, transform .65s ease; }
+    .fadeUp{
+      opacity:0;
+      transform: translateY(10px);
+      transition: opacity .45s ease, transform .45s ease;
+    }
+    .fadeUp.in{
+      opacity:1;
+      transform: translateY(0);
+    }
 
-    /* Modal */
-    .overlay{
-      position:fixed; inset:0; z-index:60;
-      background: rgba(0,0,0,.58);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+    .navHide{
+      transform: translateY(-120%);
+      transition: transform .28s ease;
+    }
+    .navShow{
+      transform: translateY(0);
+      transition: transform .28s ease;
+    }
+
+    .hero{
+      min-height: 100vh;
+      position: relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 120px 16px 80px;
+      overflow:hidden;
+    }
+
+    .iconField{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+    }
+    .bubble{
+      position:absolute;
+      width:110px;
+      height:110px;
+      border-radius:999px;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      opacity:.35;
+      transform: translate3d(var(--tx,0px), var(--ty,0px), 0);
+      transition: transform .12s ease;
+    }
+    .bubble svg{
+      width:44px;
+      height:44px;
+      opacity:.9;
+    }
+
+    .modalBackdrop{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.62);
       display:none;
-      align-items:center; justify-content:center;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
       padding: 18px;
     }
-    .overlay.show{ display:flex; }
+    .modalBackdrop.show{display:flex;}
     .modal{
-      width: min(1040px, 96vw);
-      max-height: 88vh;
-      overflow:auto;
-      -webkit-overflow-scrolling: touch;
+      max-width: 980px;
+      width: 100%;
+      max-height: 86vh;
+      overflow: auto;
+      border-radius: 20px;
     }
+    .noScroll{overflow:hidden;}
 
-    /* HERO scattered icons (desktop only; never behind text) */
-    .hero-icons{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
-    .hicon{
-      position:absolute;
-      width: 44px; height: 44px;
-      opacity:.14;
-      filter: saturate(.95);
-      transform: translate(0,0);
-      transition: transform .08s ease;
-      z-index: 0;
-    }
-    .hero-content{ position:relative; z-index: 10; }
-
-    /* Stop icons overlapping text on mobile */
-    @media (max-width: 768px){
-      .hero-icons{ display:none; }
-    }
-
-    /* Nav slide */
-    #navWrap{ transform: translateY(0); transition: transform .18s ease; }
-    .navHidden{ transform: translateY(-120%) !important; }
-
-    /* Input */
     .inp{
-      border-radius: 12px;
+      width:100%;
+      border-radius: 14px;
+      border:1px solid var(--stroke2);
       background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.10);
+      padding: 12px 12px;
       outline:none;
       color: var(--text);
     }
-    .inp:focus{ border-color: rgba(255,255,255,.18); }
+    .inp::placeholder{color: rgba(234,240,255,.45);}
+    .inp:focus{
+      border-color: rgba(120,170,255,.35);
+      box-shadow: 0 0 0 3px rgba(120,170,255,.10);
+    }
 
-    /* Make the eye hover subtle (no jumping) */
-    .eyeBtn:hover{ transform: scale(.96); }
+    input[type="file"]{display:none;}
+    .fileBtn{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border:1px solid var(--stroke2);
+      background: rgba(255,255,255,.05);
+      cursor:pointer;
+      transition: background .15s ease;
+      user-select:none;
+    }
+    .fileBtn:hover{background: rgba(255,255,255,.08);}
 
-    /* Keep summary bar from feeling cramped */
-    #summarySpacer{ height: 110px; }
+    .chkWrap{display:flex; align-items:center; gap:10px; user-select:none; cursor:pointer;}
+    .chk{
+      width:18px; height:18px; border-radius:6px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.04);
+      display:flex; align-items:center; justify-content:center;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .chk.on{
+      background: rgba(120,170,255,.22);
+      border-color: rgba(120,170,255,.38);
+    }
+
+    .eyeBtn{
+      border:1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      border-radius: 12px;
+      padding: 10px 12px;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .eyeBtn:hover{
+      background: rgba(255,255,255,.07);
+      transform: scale(0.98);
+    }
+
+    .selected{
+      outline: 2px solid rgba(120,170,255,.30);
+      background: rgba(120,170,255,.10) !important;
+    }
+    .tickDot{
+      width:10px; height:10px; border-radius:999px;
+      background: rgba(255,255,255,.22);
+    }
+    .selected .tickDot{
+      background: rgba(120,170,255,.95);
+      box-shadow: 0 0 0 4px rgba(120,170,255,.14);
+    }
+
+    html { scroll-behavior: smooth; }
   </style>
 
   <script>
-    // Your Supabase details (must be valid strings)
-    window.__SUPABASE_URL  = "https://hjdpcfhozhoyeqevnupm.supabase.co";
-    window.__SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZHBjZmhvemhveWVxZXZudXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MTk3MzYsImV4cCI6MjA4MjQ5NTczNn0.BXosJO4NmEZOe73GXSGPa3z-i_4ZzF9zBAMBIf6Mkts";
-    // Cloudflare Pages Functions live at /api/...
-    window.__API_BASE = "";
+    // Set these in HTML or keep here.
+    // IMPORTANT: don't overwrite if already set elsewhere.
+    window.__SUPABASE_URL = window.__SUPABASE_URL || "https://hjdpcfhozhoyeqevnupm.supabase.co";
+    window.__SUPABASE_ANON = window.__SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZHBjZmhvemhveWVxZXZudXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MTk3MzYsImV4cCI6MjA4MjQ5NTczNn0.BXosJO4NmEZOe73GXSGPa3z-i_4ZzF9zBAMBIf6Mkts";
   </script>
 </head>
 
 <body>
 
   <!-- NAV -->
-  <header class="fixed top-0 left-0 right-0 z-50">
-    <div class="mx-auto max-w-6xl px-4 py-3" id="navWrap">
-      <div class="glass flex items-center justify-between px-4 py-3">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+  <header id="nav" class="fixed top-4 left-0 right-0 z-40 navShow">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="glass2 flex items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-2xl overflow-hidden bg-black/30 border border-white/10 flex items-center justify-center shrink-0">
             <img
               src="SmartCore Official Logos/SC Icon - Black Background.png"
               alt="SmartCore"
-              class="w-full h-full object-contain translate-y-[-3px]"
+              class="w-8 h-8 object-contain translate-y-[-1px]"
+              onerror="this.style.display='none'"
             />
           </div>
-          <div class="leading-tight">
-            <div class="text-sm font-semibold tracking-tight">
-              SmartCore <span class="text-white/75">Technology</span>
+          <div class="min-w-0">
+            <div class="font-semibold tracking-tight leading-tight">
+              SmartCore <span class="opacity-70">Technology</span>
             </div>
-            <div class="text-xs text-white/55">Practical Technology. Built to Last.</div>
+            <div class="text-xs opacity-70 leading-tight">Practical Technology. Built to Last.</div>
           </div>
         </div>
 
         <div class="flex items-center gap-2">
-          <button id="navLogin" class="btn px-3 py-2 text-sm">Log In</button>
+          <button id="navHome" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">
+            Home
+          </button>
+          <button id="navLogin" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">
+            Log In
+          </button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- HOME -->
-  <main id="home">
-    <!-- HERO full screen (no box) -->
-    <section id="hero" class="relative pt-24">
-      <div class="mx-auto max-w-6xl px-4">
-        <div class="relative min-h-[calc(100vh-96px)] flex items-center">
-          <div id="heroIcons" class="hero-icons"></div>
+  <!-- HERO -->
+  <section id="hero" class="hero">
+    <div id="iconField" class="iconField"></div>
 
-          <div class="hero-content w-full">
-            <div class="max-w-3xl">
-              <div class="flex flex-wrap gap-2 mb-6 reveal">
-                <span class="chip px-3 py-1 text-xs text-white/70">HR & Safety Systems</span>
-                <span class="chip px-3 py-1 text-xs text-white/70">Modular SaaS</span>
-                <span class="chip px-3 py-1 text-xs text-white/70">Built to be reliable</span>
-              </div>
-
-              <h1 class="reveal text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.02]">
-                SmartCore <span class="text-white/75">Technology</span>
-              </h1>
-
-              <p class="reveal mt-5 text-lg sm:text-xl text-white/70 max-w-2xl">
-                Practical, dependable systems for presence, safety and people operations — built to run quietly in the background and work when it matters.
-              </p>
-
-              <div class="reveal mt-9 flex flex-wrap items-center gap-3">
-                <button id="btnPackages" class="btn btn-primary px-6 py-3">
-                  View Packages
-                </button>
-                <button id="btnArrow" class="btn px-6 py-3 inline-flex items-center gap-2">
-                  Scroll Down
-                  <svg class="w-4 h-4 text-white/70" viewBox="0 0 24 24" fill="none">
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </button>
-              </div>
-
-              <div class="reveal mt-10 text-sm text-white/55">
-                Calm, professional software — no hype. Just tools built to last.
-              </div>
-            </div>
+    <div class="relative z-10 w-full max-w-6xl mx-auto px-4">
+      <div class="max-w-3xl">
+        <div class="fadeUp" data-anim>
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-xs opacity-80">
+            <span class="w-2.5 h-2.5 rounded-full" style="background: rgba(120,170,255,.85)"></span>
+            SmartCore Platform
           </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- PACKAGES -->
-    <section id="packages" class="py-16">
-      <div class="mx-auto max-w-6xl px-4">
-        <div class="reveal mb-10">
-          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Build Your Plan</h2>
-          <p class="mt-2 text-white/65 max-w-2xl">
-            Choose your company size first. Modules appear after selection.
-          </p>
         </div>
 
-        <!-- Company size -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 reveal">
-          <button class="card p-5 text-left" data-size="s25">
-            <div class="text-sm text-white/65">Up to 25 people</div>
-            <div class="mt-2 text-2xl font-bold">£39<span class="text-sm font-medium text-white/60">/month</span></div>
+        <h1 class="mt-5 font-extrabold tracking-tight leading-[1.02] fadeUp" data-anim style="font-size: clamp(56px, 7vw, 92px);">
+          SmartCore <br>
+          <span style="opacity:.72">Technology</span>
+        </h1>
+
+        <p class="mt-4 text-[15px] sm:text-[17px] leading-relaxed fadeUp" data-anim style="color: var(--muted); max-width: 42rem;">
+          Practical, reliable systems for people, safety, and operational clarity.
+          Built to scale sensibly, and designed to work quietly in the background.
+        </p>
+
+        <div class="mt-7 flex flex-wrap items-center gap-3 fadeUp" data-anim>
+          <button id="heroBuild" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+            Build Your Plan
           </button>
-          <button class="card p-5 text-left" data-size="s100">
-            <div class="text-sm text-white/65">26–100 people</div>
-            <div class="mt-2 text-2xl font-bold">£79<span class="text-sm font-medium text-white/60">/month</span></div>
+          <button id="heroEmployee" class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium">
+            Sign Up As An Employee
           </button>
-          <button class="card p-5 text-left" data-size="s250">
-            <div class="text-sm text-white/65">101–250 people</div>
-            <div class="mt-2 text-2xl font-bold">£149<span class="text-sm font-medium text-white/60">/month</span></div>
-          </button>
-          <button class="card p-5 text-left" data-size="s250p">
-            <div class="text-sm text-white/65">250+ people</div>
-            <div class="mt-2 text-2xl font-bold">Contact<span class="text-sm font-medium text-white/60"> us</span></div>
+          <button id="heroDown" class="px-3 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8" aria-label="Scroll down">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v12" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
+              <path d="M7 14l5 5 5-5" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </button>
         </div>
 
-        <!-- 250+ details -->
-        <div id="bigBox" class="mt-6 hidden reveal">
-          <div class="glass p-5">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div class="lg:col-span-1">
-                <label class="text-sm text-white/70">Approximate company size</label>
-                <input id="bigSize" type="number" min="1" placeholder="e.g. 420" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" />
-                <div id="bigWarn" class="mt-2 text-sm text-white/55"></div>
-              </div>
-              <div class="lg:col-span-2">
-                <label class="text-sm text-white/70">Additional notes (optional)</label>
-                <textarea id="bigNotes" rows="2" placeholder="Anything we should know…" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35"></textarea>
-              </div>
-            </div>
+        <div class="mt-8 fadeUp" data-anim>
+          <div class="text-xs opacity-60">
+            Support: <a class="underline hover:opacity-100" href="mailto:support@smartcoretechnology.co.uk">support@smartcoretechnology.co.uk</a>
           </div>
         </div>
-
-        <!-- Modules (hidden until company size selected) -->
-        <div id="modulesWrap" class="mt-12 hidden">
-          <div class="reveal flex items-end justify-between gap-4 flex-wrap">
-            <div>
-              <h3 class="text-xl font-semibold">Modules</h3>
-              <p class="text-white/60 text-sm mt-1">Select what you need. Add or remove later.</p>
-            </div>
-          </div>
-
-          <div id="modulesGrid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
-        </div>
-
-        <!-- Spacer so sticky bar never smashes content -->
-        <div id="summarySpacer" class="hidden"></div>
-      </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" class="py-16">
-      <div class="mx-auto max-w-6xl px-4">
-        <div class="glass p-7 reveal">
-          <h2 class="text-2xl font-bold">About SmartCore Technology</h2>
-          <div class="mt-3 text-white/70 leading-relaxed space-y-4">
-            <p>
-              SmartCore Technology was built by Finley Hassall, a young founder with a long-standing passion for technology and a strong business mindset. Interested in IT from the age of six, Finley always knew he wanted to build a career creating systems that solve real-world problems.
-            </p>
-            <p>
-              Rather than focusing on trends or hype, SmartCore Technology was created with a clear goal: to build practical, reliable systems that businesses can depend on every day.
-            </p>
-            <p>
-              The company was developed with guidance and support from Finley’s mother, a business owner herself, but every system within SmartCore has been hand-crafted from the ground up by Finley. Each feature, workflow, and decision has been designed with real workplaces in mind — prioritising clarity, usability, and long-term reliability over unnecessary complexity.
-            </p>
-            <p>
-              SmartCore Technology is not about flashy software. It’s about building tools that work properly, scale sensibly, and quietly do their job in the background.
-            </p>
-
-            <h3 class="text-xl font-semibold pt-2">The SmartCore Technology Approach</h3>
-            <p>SmartCore Technology is built on a simple philosophy: technology should make work easier, not more complicated.</p>
-            <ul class="list-disc pl-6 space-y-1">
-              <li>solve a specific, real business problem</li>
-              <li>be easy to understand and use</li>
-              <li>create clear, auditable records</li>
-              <li>scale as organisations grow</li>
-              <li>remain reliable over time</li>
-            </ul>
-            <p>
-              Instead of offering one large, bloated platform, SmartCore provides modular systems that companies can choose and combine based on their actual needs. This keeps costs fair, reduces complexity, and allows businesses to stay in control of how they operate.
-            </p>
-            <p>
-              SmartCore Technology focuses on the areas that matter most — people, safety, and operational clarity — delivering tools that support organisations without getting in the way.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="py-10">
-      <div class="mx-auto max-w-6xl px-4">
-        <div class="glass-soft px-5 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 reveal">
-          <div class="text-sm text-white/70">© <span id="year"></span> SmartCore Technology</div>
-          <a class="text-sm text-white/70 hover:text-white" href="mailto:support@smartcoretechnology.co.uk">support@smartcoretechnology.co.uk</a>
-        </div>
-      </div>
-    </footer>
-  </main>
-
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="hidden pt-24 pb-16">
-    <div class="mx-auto max-w-6xl px-4">
-      <div class="glass p-6">
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div>
-            <div class="text-xs text-white/55">Dashboard</div>
-            <h2 class="text-2xl font-bold mt-1" id="dashCompany">Your Company</h2>
-            <div class="mt-2 text-sm text-white/65" id="dashMeta"></div>
-          </div>
-          <div class="flex items-center gap-2">
-            <button id="dashSignOut" class="btn px-4 py-3">Sign Out</button>
-            <button id="dashHome" class="btn px-4 py-3">Back to site</button>
-          </div>
-        </div>
-
-        <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div class="glass-soft p-5 lg:col-span-2">
-            <div class="flex items-center justify-between">
-              <h3 class="font-semibold">Your Systems</h3>
-              <button id="dashBuyMore" class="btn px-3 py-2 text-sm">Buy More</button>
-            </div>
-            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3" id="dashSystems"></div>
-          </div>
-
-          <div class="glass-soft p-5">
-            <h3 class="font-semibold">Company Details</h3>
-            <div class="mt-3 space-y-2 text-sm text-white/70">
-              <div><span class="text-white/55">Company ID:</span> <span id="dashCompanyCode" class="font-semibold"></span></div>
-              <div><span class="text-white/55">Team size:</span> <span id="dashSize"></span></div>
-              <div><span class="text-white/55">Plan total:</span> <span id="dashTotal"></span></div>
-            </div>
-          </div>
-        </div>
-
-        <div id="dashMsg" class="mt-4 text-sm text-white/70"></div>
       </div>
     </div>
   </section>
 
+  <!-- MAIN -->
+  <main id="main" class="relative z-10">
+    <!-- BUILD PLAN -->
+    <section id="packages" class="max-w-6xl mx-auto px-4 pb-24">
+      <div class="pt-10 sm:pt-16">
+        <div class="fadeUp" data-anim>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Build Your Plan</h2>
+          <p class="mt-2 text-sm sm:text-[15px]" style="color: var(--muted); max-width: 52rem;">
+            Choose a company size, then add only the systems you need. Clear pricing, modular setup, and a calm, reliable experience.
+          </p>
+        </div>
+
+        <!-- Company size cards -->
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 fadeUp" data-anim>
+          <button class="glass2 p-4 text-left hover:bg-white/6 transition" data-size="s25">
+            <div class="flex items-center justify-between">
+              <div class="font-semibold">Up to 25 People</div>
+              <div class="tickDot"></div>
+            </div>
+            <div class="mt-1 text-sm opacity-80">£39 / month</div>
+            <div class="mt-2 text-xs opacity-60">Ideal for small teams and single sites.</div>
+          </button>
+
+          <button class="glass2 p-4 text-left hover:bg-white/6 transition" data-size="s100">
+            <div class="flex items-center justify-between">
+              <div class="font-semibold">26–100 People</div>
+              <div class="tickDot"></div>
+            </div>
+            <div class="mt-1 text-sm opacity-80">£79 / month</div>
+            <div class="mt-2 text-xs opacity-60">For growing businesses and multiple teams.</div>
+          </button>
+
+          <button class="glass2 p-4 text-left hover:bg-white/6 transition" data-size="s250">
+            <div class="flex items-center justify-between">
+              <div class="font-semibold">101–250 People</div>
+              <div class="tickDot"></div>
+            </div>
+            <div class="mt-1 text-sm opacity-80">£149 / month</div>
+            <div class="mt-2 text-xs opacity-60">For structured ops and larger organisations.</div>
+          </button>
+
+          <button class="glass2 p-4 text-left hover:bg-white/6 transition" data-size="s250plus">
+            <div class="flex items-center justify-between">
+              <div class="font-semibold">250+ People</div>
+              <div class="tickDot"></div>
+            </div>
+            <div class="mt-1 text-sm opacity-80">Contact us</div>
+            <div class="mt-2 text-xs opacity-60">We’ll tailor the plan sensibly.</div>
+          </button>
+        </div>
+
+        <!-- 250+ extra input -->
+        <div id="plusBox" class="mt-4 hidden fadeUp" data-anim>
+          <div class="glass2 p-4">
+            <div class="font-semibold">250+ Company Size</div>
+            <p class="mt-1 text-sm opacity-75">Enter an approximate headcount. This is required before you can contact us.</p>
+            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs opacity-70">Approx. employee count</label>
+                <input id="plusCount" class="inp mt-1" type="number" min="1" placeholder="e.g. 420">
+                <div id="plusWarn" class="mt-2 text-xs text-red-300 hidden"></div>
+              </div>
+              <div>
+                <label class="text-xs opacity-70">Additional notes (optional)</label>
+                <input id="plusNotes" class="inp mt-1" type="text" placeholder="Anything helpful for us to know">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modules (hidden until company size chosen) -->
+        <div id="modulesWrap" class="mt-8 hidden">
+          <div class="fadeUp" data-anim>
+            <h3 class="text-lg font-semibold">System Modules</h3>
+            <p class="mt-1 text-sm" style="color: var(--muted);">Select the modules you want to include in your plan.</p>
+          </div>
+
+          <div id="modulesGrid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+        </div>
+
+        <!-- About -->
+        <div class="mt-14 fadeUp" data-anim>
+          <div class="glass p-6 sm:p-8">
+            <h3 class="text-xl sm:text-2xl font-bold tracking-tight">About SmartCore Technology</h3>
+
+            <p class="mt-4 text-sm sm:text-[15px] leading-relaxed" style="color: var(--muted);">
+              SmartCore Technology was built by Finley Hassall, a young founder with a long-standing passion for technology and a strong business mindset.
+              Interested in IT from the age of six, Finley always knew he wanted to build a career creating systems that solve real-world problems.
+            </p>
+
+            <p class="mt-4 text-sm sm:text-[15px] leading-relaxed" style="color: var(--muted);">
+              Rather than focusing on trends or hype, SmartCore Technology was created with a clear goal: to build practical, reliable systems that businesses can depend on every day.
+            </p>
+
+            <p class="mt-4 text-sm sm:text-[15px] leading-relaxed" style="color: var(--muted);">
+              The company was developed with guidance and support from Finley’s mother, a business owner herself, but every system within SmartCore has been hand-crafted from the ground up by Finley.
+              Each feature, workflow, and decision has been designed with real workplaces in mind — prioritising clarity, usability, and long-term reliability over unnecessary complexity.
+            </p>
+
+            <p class="mt-4 text-sm sm:text-[15px] leading-relaxed" style="color: var(--muted);">
+              SmartCore Technology is not about flashy software. It’s about building tools that work properly, scale sensibly, and quietly do their job in the background.
+            </p>
+
+            <div class="mt-7">
+              <h4 class="text-lg font-semibold">The SmartCore Technology Approach</h4>
+              <p class="mt-3 text-sm sm:text-[15px] leading-relaxed" style="color: var(--muted);">
+                SmartCore Technology is built on a simple philosophy: technology should make work easier, not more complicated.
+              </p>
+
+              <ul class="mt-4 grid sm:grid-cols-2 gap-2 text-sm" style="color: var(--muted);">
+                <li class="flex gap-2"><span class="opacity-80">•</span> solve a specific, real business problem</li>
+                <li class="flex gap-2"><span class="opacity-80">•</span> be easy to understand and use</li>
+                <li class="flex gap-2"><span class="opacity-80">•</span> create clear, auditable records</li>
+                <li class="flex gap-2"><span class="opacity-80">•</span> scale as organisations grow</li>
+                <li class="flex gap-2"><span class="opacity-80">•</span> remain reliable over time</li>
+              </ul>
+
+              <p class="mt-4 text-sm sm:text-[15px] leading-relaxed" style="color: var(--muted);">
+                Instead of offering one large, bloated platform, SmartCore provides modular systems that companies can choose and combine based on their actual needs.
+                This keeps costs fair, reduces complexity, and allows businesses to stay in control of how they operate.
+              </p>
+
+              <p class="mt-4 text-sm sm:text-[15px] leading-relaxed" style="color: var(--muted);">
+                SmartCore Technology focuses on the areas that matter most — people, safety, and operational clarity — delivering tools that support organisations without getting in the way.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="max-w-6xl mx-auto px-4 pb-10">
+      <div class="glass2 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div class="text-sm opacity-80">SmartCore Technology</div>
+        <a class="text-sm opacity-80 underline hover:opacity-100" href="mailto:support@smartcoretechnology.co.uk">
+          support@smartcoretechnology.co.uk
+        </a>
+      </div>
+    </footer>
+  </main>
+
   <!-- STICKY SUMMARY (only after company size selected) -->
-  <div id="summaryBar" class="fixed bottom-0 left-0 right-0 z-40 hidden">
-    <div class="mx-auto max-w-6xl px-4 pb-4">
-      <div class="glass flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-4">
-        <div>
-          <div class="text-sm text-white/60">Monthly Total</div>
-          <div class="text-2xl font-bold" id="totalText">£0 / month</div>
-          <div class="text-xs text-white/45 mt-1" id="summaryHint"></div>
+  <div id="summaryBar" class="fixed bottom-4 left-0 right-0 z-30 hidden">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="glass2 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="flex items-center justify-between sm:justify-start gap-6">
+          <div>
+            <div class="text-xs opacity-70">Monthly total</div>
+            <div class="text-lg font-semibold" id="totalText">£0 / month</div>
+          </div>
+          <div class="hidden sm:block text-xs opacity-60" id="summaryMini">Select a company size to begin.</div>
         </div>
-        <div class="flex items-center gap-2">
-          <button id="checkoutBtn" class="btn btn-primary px-6 py-3">Continue</button>
-        </div>
+
+        <button id="checkoutBtn" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+          Continue
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- MODULE MODAL -->
-  <div id="moduleModal" class="overlay" aria-hidden="true">
-    <div class="modal glass p-6">
-      <div class="flex items-start justify-between gap-4">
+  <!-- MODAL: Module Learn More -->
+  <div id="moduleModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6">
+      <div class="flex items-start justify-between gap-3">
         <div>
-          <div class="text-xs text-white/55" id="mmPrice">£0 / month</div>
-          <h3 class="text-2xl font-bold mt-1" id="mmTitle">Module</h3>
-          <p class="mt-2 text-white/70" id="mmSummary"></p>
+          <div id="mmTitle" class="text-xl sm:text-2xl font-bold"></div>
+          <div id="mmPrice" class="mt-1 text-sm opacity-80"></div>
         </div>
-        <button id="mmClose" class="btn px-3 py-2 text-sm">Close</button>
+        <button id="mmClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
       </div>
 
-      <div class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="glass-soft p-4">
-          <div class="text-sm text-white/70 mb-2">Preview</div>
-          <div class="rounded-xl overflow-hidden border border-white/10">
+      <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="glass2 p-4">
+          <div class="text-sm font-semibold">Preview</div>
+          <div class="mt-3 rounded-2xl overflow-hidden border border-white/10 bg-black/30">
             <iframe
               id="mmVideo"
               class="w-full aspect-video"
-              src="https://www.youtube-nocookie.com/embed/S2kymv60ndQ"
-              title="Preview"
+              src="https://www.youtube.com/embed/S2kymv60ndQ"
+              title="Module preview"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-              allowfullscreen>
-            </iframe>
+              allowfullscreen
+            ></iframe>
           </div>
-          <div class="mt-3 text-xs text-white/55">Use the player controls to go fullscreen.</div>
+          <div class="mt-2 text-xs opacity-60">Open fullscreen using the video player controls.</div>
         </div>
 
-        <div class="glass-soft p-4">
-          <div class="text-sm text-white/70 mb-2">Features</div>
-          <ul class="space-y-2 text-white/70 text-sm" id="mmFeatures"></ul>
+        <div class="glass2 p-4">
+          <div class="text-sm font-semibold">Summary</div>
+          <p id="mmSummary" class="mt-2 text-sm leading-relaxed opacity-80"></p>
+
+          <div class="mt-4 text-sm font-semibold">Key features</div>
+          <ul id="mmBullets" class="mt-2 space-y-2 text-sm opacity-80"></ul>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- LOGIN MODAL -->
-  <div id="loginModal" class="overlay" aria-hidden="true">
-    <div class="modal glass p-6" style="width:min(560px, 96vw)">
-      <div class="flex items-start justify-between gap-4">
+  <!-- MODAL: Signup entry -->
+  <div id="signupModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6" style="max-width: 720px;">
+      <div class="flex items-start justify-between gap-3">
         <div>
-          <h3 class="text-2xl font-bold">Log In</h3>
-          <p class="mt-2 text-white/70 text-sm">Access your dashboard and systems.</p>
+          <div class="text-xl sm:text-2xl font-bold">Create your company account</div>
+          <div class="mt-1 text-sm opacity-75">Enter your details, then verify with a 6-digit code.</div>
         </div>
-        <button id="loginClose" class="btn px-3 py-2 text-sm">Close</button>
+        <button id="suClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
       </div>
 
-      <div class="mt-5 space-y-3">
-        <div>
-          <label class="text-sm text-white/70">Email</label>
-          <input id="liEmail" type="email" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" placeholder="name@company.co.uk">
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Company name</label>
+          <input id="suCompanyName" class="inp mt-1" placeholder="e.g. SmartFits Installations Ltd" />
         </div>
 
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Email</label>
+          <input id="suEmail" type="email" class="inp mt-1" placeholder="name@company.co.uk" />
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Password</label>
+          <div class="mt-1 flex gap-2">
+            <input id="suPassword" type="password" class="inp" placeholder="Minimum 8 characters" />
+            <button id="suEye" type="button" class="eyeBtn" aria-label="Show/hide password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" stroke="white" stroke-opacity=".85" stroke-width="2"/>
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="white" stroke-opacity=".85" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+          <div class="mt-2 text-xs opacity-60">We’ll only create your account after verification.</div>
+        </div>
+      </div>
+
+      <div id="suMsg" class="mt-4 text-sm text-red-300 hidden"></div>
+
+      <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <button id="suContinue" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+          Continue
+        </button>
+
+        <div class="text-sm opacity-70">
+          <div class="block">Already have an account?</div>
+          <button id="suGoLogin" class="underline hover:opacity-100">Log In Instead</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Verify code -->
+  <div id="verifyModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6" style="max-width: 620px;">
+      <div class="flex items-start justify-between gap-3">
         <div>
-          <label class="text-sm text-white/70">Password</label>
-          <div class="mt-2 relative">
-            <input id="liPass" type="password" class="inp w-full px-4 py-3 pr-12 placeholder:text-white/35" placeholder="••••••••">
-            <button id="liEye" type="button" class="eyeBtn absolute right-2 top-1/2 -translate-y-1/2 btn px-3 py-2 text-xs" title="Show/Hide">👁</button>
+          <div class="text-xl sm:text-2xl font-bold">Verify your email</div>
+          <div class="mt-1 text-sm opacity-75">Enter the 6-digit code we sent to <span id="vEmail" class="font-medium"></span>.</div>
+        </div>
+        <button id="vClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
+      </div>
+
+      <div class="mt-5">
+        <label class="text-xs opacity-70">6-digit code</label>
+        <input id="vCode" class="inp mt-1 text-center tracking-[0.4em]" maxlength="6" placeholder="123456" />
+      </div>
+
+      <div id="vMsg" class="mt-4 text-sm text-red-300 hidden"></div>
+
+      <div class="mt-5 flex items-center justify-between gap-3">
+        <button id="vVerify" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+          Continue
+        </button>
+        <button id="vResend" class="px-3 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">
+          Resend code
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Payment placeholder -->
+  <div id="payModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6" style="max-width: 720px;">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="text-xl sm:text-2xl font-bold">Payment</div>
+          <div class="mt-1 text-sm opacity-75">Testing mode: accept or decline.</div>
+        </div>
+        <button id="payClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
+      </div>
+
+      <div class="mt-5 glass2 p-4">
+        <div class="text-sm opacity-80">Plan summary</div>
+        <div class="mt-2 text-lg font-semibold" id="payTotal">£0 / month</div>
+        <div class="mt-2 text-xs opacity-60" id="paySummary"></div>
+      </div>
+
+      <div id="payMsg" class="mt-4 text-sm text-red-300 hidden"></div>
+
+      <div class="mt-5 flex flex-col sm:flex-row gap-3">
+        <button id="payAccept" class="flex-1 px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+          Accept
+        </button>
+        <button id="payDecline" class="flex-1 px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium">
+          Decline
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Login -->
+  <div id="loginModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6" style="max-width: 680px;">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="text-xl sm:text-2xl font-bold">Log in</div>
+          <div class="mt-1 text-sm opacity-75">Access your dashboard and systems.</div>
+        </div>
+        <button id="liClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 gap-3">
+        <div>
+          <label class="text-xs opacity-70">Email</label>
+          <input id="liEmail" class="inp mt-1" type="email" placeholder="name@company.co.uk" />
+        </div>
+        <div>
+          <label class="text-xs opacity-70">Password</label>
+          <div class="mt-1 flex gap-2">
+            <input id="liPassword" class="inp" type="password" placeholder="Your password" />
+            <button id="liEye" type="button" class="eyeBtn" aria-label="Show/hide password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" stroke="white" stroke-opacity=".85" stroke-width="2"/>
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="white" stroke-opacity=".85" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="liMsg" class="mt-4 text-sm text-red-300 hidden"></div>
+
+      <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <button id="liLogin" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+          Log In
+        </button>
+
+        <div class="text-sm opacity-70">
+          <div id="liWrong" class="hidden">
+            <button id="liReset" class="underline hover:opacity-100">Incorrect credentials — Forgot your password?</button>
+          </div>
+          <div class="mt-2">
+            <button id="liNoAcc" class="underline hover:opacity-100">Don’t have an account?</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: “Don’t have an account?” -->
+  <div id="noAccModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6" style="max-width: 780px;">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="text-xl sm:text-2xl font-bold">Getting started</div>
+          <div class="mt-1 text-sm opacity-75">Choose the right route based on your company.</div>
+        </div>
+        <button id="noAccClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="glass2 p-4">
+          <div class="font-semibold">Sign up as an employee</div>
+          <p class="mt-2 text-sm opacity-80">
+            If your company already uses SmartCore, ask your admin for the company code and sign up as an employee.
+          </p>
+          <button id="noAccEmployee" class="mt-4 px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium">
+            Sign Up As An Employee
+          </button>
+        </div>
+
+        <div class="glass2 p-4">
+          <div class="font-semibold">Build your plan</div>
+          <p class="mt-2 text-sm opacity-80">
+            If your company is new to SmartCore, build a plan, select modules, and create a company account.
+          </p>
+          <button id="noAccBuild" class="mt-4 px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+            Build Your Plan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Employee signup -->
+  <div id="empModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6" style="max-width: 760px;">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="text-xl sm:text-2xl font-bold">Employee sign-up</div>
+          <div class="mt-1 text-sm opacity-75">Enter your company code and your name exactly as your admin added it.</div>
+        </div>
+        <button id="empClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Company code</label>
+          <input id="empCompanyCode" class="inp mt-1" placeholder="e.g. SMA624564" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Full name</label>
+          <input id="empFullName" class="inp mt-1" placeholder="e.g. Finley Hassall" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Email</label>
+          <input id="empEmail" class="inp mt-1" type="email" placeholder="you@company.co.uk" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Password</label>
+          <div class="mt-1 flex gap-2">
+            <input id="empPassword" class="inp" type="password" placeholder="Minimum 8 characters" />
+            <button id="empEye" type="button" class="eyeBtn" aria-label="Show/hide password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" stroke="white" stroke-opacity=".85" stroke-width="2"/>
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="white" stroke-opacity=".85" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="empMsg" class="mt-4 text-sm text-red-300 hidden"></div>
+
+      <div class="mt-5 flex items-center justify-between gap-3">
+        <button id="empSend" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+          Continue
+        </button>
+      </div>
+
+      <div id="empVerifyBox" class="mt-5 hidden glass2 p-4">
+        <div class="font-semibold">Verify</div>
+        <div class="mt-2 text-sm opacity-75">Enter the 6-digit code sent to your email.</div>
+
+        <div class="mt-3">
+          <label class="text-xs opacity-70">6-digit code</label>
+          <input id="empCode" class="inp mt-1 text-center tracking-[0.4em]" maxlength="6" placeholder="123456" />
+        </div>
+
+        <div id="empVerifyMsg" class="mt-3 text-sm text-red-300 hidden"></div>
+
+        <div class="mt-4 flex gap-3">
+          <button id="empVerify" class="flex-1 px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+            Continue
+          </button>
+          <button id="empResend" class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium">
+            Resend
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="hidden">
+    <div class="max-w-6xl mx-auto px-4 pt-28 pb-24">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="fadeUp" data-anim>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h2>
+          <p id="dashSub" class="mt-1 text-sm" style="color: var(--muted);">Loading your account…</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="dashBuyMore" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">
+            Buy more systems
+          </button>
+          <button id="dashSignOut" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">
+            Sign out
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="glass p-5">
+          <div class="text-sm opacity-80 font-semibold">Company</div>
+          <div class="mt-3 space-y-2 text-sm">
+            <div><span class="opacity-60">Name:</span> <span id="dashCompanyName" class="font-medium"></span></div>
+            <div><span class="opacity-60">Address:</span> <span id="dashCompanyAddress" class="font-medium"></span></div>
+            <div><span class="opacity-60">Company code:</span> <span id="dashCompanyCode" class="font-medium"></span></div>
+            <div><span class="opacity-60">Plan:</span> <span id="dashPlan" class="font-medium"></span></div>
+            <div><span class="opacity-60">Max employees:</span> <span id="dashMaxEmp" class="font-medium"></span></div>
           </div>
 
-          <button id="liBad" class="mt-3 text-sm text-white/55 hover:text-white hidden text-left">
-            Incorrect credentials — forgot your password?
-          </button>
-
-          <div class="mt-3">
-            <button id="noAccountBtn" class="text-sm text-white/70 hover:text-white underline underline-offset-4">
-              Don’t have an account?
+          <div class="mt-4">
+            <button id="dashSettingsBtn" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">
+              Company settings
             </button>
           </div>
         </div>
 
-        <div class="pt-2">
-          <button id="loginBtn" class="btn btn-primary px-5 py-3 w-full">Continue</button>
-        </div>
-
-        <div id="liMsg" class="text-sm text-white/70"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SIGNUP MODAL -->
-  <div id="signupModal" class="overlay" aria-hidden="true">
-    <div class="modal glass p-6" style="width:min(620px, 96vw)">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h3 class="text-2xl font-bold">Create Company Account</h3>
-          <p class="mt-2 text-white/70 text-sm">
-            Enter details, then confirm with a 6-digit email code. Your account is only created after code verification.
-          </p>
-        </div>
-        <button id="suClose" class="btn px-3 py-2 text-sm">Close</button>
-      </div>
-
-      <div class="mt-5 space-y-3">
-        <div>
-          <label class="text-sm text-white/70">Company name</label>
-          <input id="suCompany" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" placeholder="Your company name">
-        </div>
-        <div>
-          <label class="text-sm text-white/70">Email</label>
-          <input id="suEmail" type="email" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" placeholder="name@company.co.uk">
-        </div>
-        <div>
-          <label class="text-sm text-white/70">Password</label>
-          <div class="mt-2 relative">
-            <input id="suPass" type="password" class="inp w-full px-4 py-3 pr-12 placeholder:text-white/35" placeholder="Minimum 8 characters">
-            <button id="suEye" type="button" class="eyeBtn absolute right-2 top-1/2 -translate-y-1/2 btn px-3 py-2 text-xs" title="Show/Hide">👁</button>
+        <div class="glass p-5 lg:col-span-2">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-sm opacity-80 font-semibold">Your systems</div>
+              <div class="mt-1 text-sm opacity-70">Quick links for the modules you own.</div>
+            </div>
+            <div class="text-sm opacity-70" id="dashTotal"></div>
           </div>
-        </div>
 
-        <div class="pt-2">
-          <button id="sendCodeBtn" class="btn btn-primary px-5 py-3 w-full">Continue</button>
+          <div id="dashSystems" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
         </div>
+      </div>
 
-        <div id="codeBox" class="hidden pt-2">
-          <div class="glass-soft p-4">
-            <div class="text-sm text-white/70">Enter verification code</div>
-            <input id="suCode" maxlength="6" class="inp mt-2 w-full px-4 py-3 placeholder:text-white/35" placeholder="6-digit code">
-            <button id="goPayBtn" class="mt-3 btn btn-primary px-5 py-3 w-full">Continue</button>
-            <div class="mt-2 text-xs text-white/55">Codes expire after 10 minutes.</div>
+      <!-- ONBOARDING WIZARD -->
+      <div class="mt-6 glass p-5">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <div class="text-sm opacity-80 font-semibold">Company onboarding</div>
+            <div id="onbHint" class="mt-1 text-sm opacity-70">Complete the steps below to finish setup.</div>
           </div>
+          <div class="text-xs opacity-60" id="onbStepLabel"></div>
         </div>
 
-        <div id="suMsg" class="text-sm text-white/70"></div>
+        <div id="onbStepBox" class="mt-4 glass2 p-4"></div>
       </div>
+
+      <!-- EMPLOYEES -->
+      <div class="mt-6 glass p-5">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <div class="text-sm opacity-80 font-semibold">Employees</div>
+            <div class="mt-1 text-sm opacity-70">Add, edit, and remove employees. IDs are generated automatically.</div>
+          </div>
+          <button id="empAddBtn" class="px-3 py-2 rounded-xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+            Add employee
+          </button>
+        </div>
+
+        <div id="empLimitMsg" class="mt-3 text-sm text-red-300 hidden"></div>
+
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left opacity-70">
+              <tr>
+                <th class="py-2 pr-3">Employee</th>
+                <th class="py-2 pr-3">Role</th>
+                <th class="py-2 pr-3">Category</th>
+                <th class="py-2 pr-3">ID</th>
+                <th class="py-2 pr-3">Admin</th>
+                <th class="py-2 pr-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="empTable"></tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
-  </div>
+  </section>
 
-  <!-- PAYMENT MODAL -->
-  <div id="payModal" class="overlay" aria-hidden="true">
-    <div class="modal glass p-6" style="width:min(620px, 96vw)">
-      <div class="flex items-start justify-between gap-4">
+  <!-- MODAL: Company settings -->
+  <div id="settingsModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6" style="max-width: 820px;">
+      <div class="flex items-start justify-between gap-3">
         <div>
-          <h3 class="text-2xl font-bold">Payment</h3>
-          <p class="mt-2 text-white/70 text-sm">Testing mode — choose Accept or Decline. (Stripe later.)</p>
+          <div class="text-xl sm:text-2xl font-bold">Company settings</div>
+          <div class="mt-1 text-sm opacity-75">Update details and colours. These can be used across SmartCore systems.</div>
         </div>
-        <button id="payClose" class="btn px-3 py-2 text-sm">Close</button>
-      </div>
-
-      <div class="mt-6 glass-soft p-5">
-        <div class="text-sm text-white/60">Total</div>
-        <div class="text-2xl font-bold mt-1" id="payTotal">£0 / month</div>
-        <div class="text-sm text-white/55 mt-2" id="paySummary"></div>
+        <button id="setClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
       </div>
 
       <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button id="payAccept" class="btn btn-primary px-5 py-3">Accept</button>
-        <button id="payDecline" class="btn px-5 py-3">Decline</button>
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Company name</label>
+          <input id="setName" class="inp mt-1" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Company address</label>
+          <input id="setAddr" class="inp mt-1" />
+        </div>
+        <div>
+          <label class="text-xs opacity-70">Primary colour</label>
+          <input id="setPrimary" class="inp mt-1" placeholder="#ff0000" />
+        </div>
+        <div>
+          <label class="text-xs opacity-70">Secondary colour</label>
+          <input id="setSecondary" class="inp mt-1" placeholder="#000000" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Text colour</label>
+          <input id="setText" class="inp mt-1" placeholder="#ffffff" />
+        </div>
       </div>
 
-      <div id="payMsg" class="mt-3 text-sm text-white/70"></div>
+      <div id="setMsg" class="mt-4 text-sm text-red-300 hidden"></div>
+
+      <div class="mt-5 flex justify-end gap-3">
+        <button id="setSave" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Add/Edit employee -->
+  <div id="empEditModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6" style="max-width: 820px;">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div id="empEditTitle" class="text-xl sm:text-2xl font-bold">Add employee</div>
+          <div class="mt-1 text-sm opacity-75">Names must match for employee self sign-up.</div>
+        </div>
+        <button id="empEditClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="sm:col-span-2">
+          <label class="text-xs opacity-70">Full name</label>
+          <input id="empEName" class="inp mt-1" placeholder="e.g. Finley Hassall" />
+        </div>
+        <div>
+          <label class="text-xs opacity-70">Job title</label>
+          <input id="empETitle" class="inp mt-1" placeholder="e.g. Founder" />
+        </div>
+        <div>
+          <label class="text-xs opacity-70">Job category</label>
+          <input id="empECategory" class="inp mt-1" placeholder="e.g. Senior management team" />
+        </div>
+
+        <div class="sm:col-span-2 mt-1">
+          <div class="chkWrap" id="empEAdminWrap">
+            <div class="chk" id="empEAdminChk">
+              <svg id="empEAdminTick" width="14" height="14" viewBox="0 0 24 24" fill="none" class="hidden">
+                <path d="M20 6L9 17l-5-5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-sm font-medium">Admin access</div>
+              <div class="text-xs opacity-70">Admins can manage employees and system settings.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="empEditMsg" class="mt-4 text-sm text-red-300 hidden"></div>
+
+      <div class="mt-5 flex justify-end gap-3">
+        <button id="empESave" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Confirm remove -->
+  <div id="confirmModalBackdrop" class="modalBackdrop">
+    <div class="modal glass p-5 sm:p-6" style="max-width: 720px;">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="text-xl sm:text-2xl font-bold">Confirm removal</div>
+          <div id="confirmText" class="mt-2 text-sm opacity-80"></div>
+        </div>
+        <button id="confirmClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
+      </div>
+
+      <div class="mt-6 flex flex-col sm:flex-row gap-3">
+        <button id="confirmYes" class="flex-1 px-4 py-3 rounded-2xl border border-[rgba(255,80,80,.35)] bg-[rgba(255,80,80,.12)] hover:bg-[rgba(255,80,80,.18)] text-sm font-medium">
+          Yes, remove
+        </button>
+        <button id="confirmNo" class="flex-1 px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium">
+          No, keep
+        </button>
+      </div>
     </div>
   </div>
 
   <script>
-    // ---------- helpers ----------
-    const $ = (id)=>document.getElementById(id);
+    /******************************************************************
+      UTIL
+    ******************************************************************/
+    const $ = (id) => document.getElementById(id);
 
-    function showOverlay(el){
-      el.classList.add("show");
-      el.setAttribute("aria-hidden","false");
-      document.body.style.overflow = "hidden";
-    }
-    function hideOverlay(el){
-      el.classList.remove("show");
-      el.setAttribute("aria-hidden","true");
-      document.body.style.overflow = "";
-    }
-    function money(n){ return `£${Number(n||0).toFixed(0)}`; }
-    function scrollToEl(el){ el.scrollIntoView({behavior:"smooth", block:"start"}); }
+    function show(el){ el.classList.remove("hidden"); }
+    function hide(el){ el.classList.add("hidden"); }
+    function setText(el, t){ el.textContent = t; }
 
-    async function apiPost(path, body){
-      const res = await fetch((window.__API_BASE||"") + path, {
-        method: "POST",
-        headers: { "content-type":"application/json" },
-        body: JSON.stringify(body || {})
-      });
-      const text = await res.text();
-      let data = null;
-      try{ data = JSON.parse(text); }catch(_e){}
-      if(!res.ok){
-        throw new Error(data?.error || text || `Request failed (${res.status})`);
-      }
-      return data ?? {};
+    function openModal(backdrop){
+      backdrop.classList.add("show");
+      document.body.classList.add("noScroll");
+    }
+    function closeModal(backdrop){
+      backdrop.classList.remove("show");
+      document.body.classList.remove("noScroll");
     }
 
-    // ---------- data ----------
+    function showErr(el, msg){
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+    function clearErr(el){
+      el.textContent = "";
+      el.classList.add("hidden");
+      // also reset any green class we might have applied
+      el.classList.remove("text-green-300");
+      el.classList.add("text-red-300");
+    }
+
+    function money(n){
+      const v = Number(n || 0);
+      return "£" + v.toFixed(0);
+    }
+
+    function companyPrefix(name){
+      const clean = (name||"").replace(/[^a-zA-Z]/g,"").toUpperCase();
+      return (clean.slice(0,3) || "COM").padEnd(3,"X");
+    }
+
+    function randDigits(len){
+      let out = "";
+      for(let i=0;i<len;i++) out += Math.floor(Math.random()*10);
+      return out;
+    }
+
+    const EMP_NOT_FOUND_MSG =
+      "We couldn’t find your details linked to this company. Please contact your system admin and ask them to confirm your name has been added exactly as shown.";
+
+    /******************************************************************
+      SUPABASE (single init)
+    ******************************************************************/
+    let sb = window.__SB_CLIENT;
+    if (!sb){
+      sb = window.supabase.createClient(window.__SUPABASE_URL, window.__SUPABASE_ANON);
+      window.__SB_CLIENT = sb;
+    }
+
+    /******************************************************************
+      DATA: Company sizes + modules
+    ******************************************************************/
     const COMPANY_SIZES = [
-      { id:"s25",  label:"Up to 25 people",  price:39,  max:25 },
-      { id:"s100", label:"26–100 people",    price:79,  max:100 },
-      { id:"s250", label:"101–250 people",   price:149, max:250 },
-      { id:"s250p",label:"250+ people",      price:0,   max:999999 }
+      { id:"s25", label:"Up to 25 People", price:39, maxEmployees:25 },
+      { id:"s100", label:"26–100 People", price:79, maxEmployees:100 },
+      { id:"s250", label:"101–250 People", price:149, maxEmployees:250 },
+      { id:"s250plus", label:"250+ People", price:0, maxEmployees:null }
     ];
 
     const MODULES = [
-      {
-        id:"presence_fire",
-        name:"Presence & Fire Safety",
-        price:10,
-        summary:"A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.",
-        features:[
-          "Live on-site list for staff and visitors",
-          "Instant evacuation roll call",
-          "Digital sign-in / sign-out",
-          "Clear records for audits and reviews",
-          "Designed to be fast and reliable"
-        ]
+      { id:"presence_fire", name:"Presence & Fire Safety", price:10,
+        summary:"A real-time presence system that shows exactly who is on site at any moment.",
+        full:`A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.
+
+Designed to be simple, fast, and reliable when it matters most, with clear records for audits and incident reviews.`,
+        bullets:["Live on-site list for staff and visitors","Instant evacuation roll call","Fire drill & incident reporting support","Clear, auditable sign-in history","Fast kiosk-friendly workflows"]
       },
-      {
-        id:"policies_handbook",
-        name:"Policies & Staff Handbook",
-        price:7,
-        summary:"A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document.",
-        features:[
-          "Upload and organise policies",
-          "Read & acknowledge tracking",
-          "Re-acknowledgement on updates",
-          "Manager visibility and reporting",
-          "No paper or email chains"
-        ]
+      { id:"policies_handbook", name:"Policies & Staff Handbook", price:7,
+        summary:"A central location for policies and staff handbooks with acknowledgement tracking.",
+        full:`A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document. Managers can update policies, request re-acknowledgement, and view clear records at any time.
+
+Helps organisations demonstrate that information has been issued and acknowledged without relying on paper or email chains.`,
+        bullets:["Policy library with versioning","Read & acknowledge tracking","Manager visibility and reporting","Re-acknowledgement requests","Simple exports for audits"]
       },
-      {
-        id:"holiday_booking",
-        name:"Holiday Booking",
-        price:8,
-        summary:"A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place.",
-        features:[
-          "Quick holiday requests",
-          "Approve / decline workflows",
-          "Team visibility for absences",
-          "Simple and focused (no payroll)",
-          "Clear record of decisions"
-        ]
+      { id:"holiday_booking", name:"Holiday Booking", price:8,
+        summary:"A straightforward holiday request and approval system with a clean team view.",
+        full:`A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place.
+
+Intentionally simple and focused, with no payroll or salary management.`,
+        bullets:["Clean request → approve/decline flow","Team calendar view of absences","Clear audit history of decisions","Designed to stay simple","No payroll complexity"]
       },
-      {
-        id:"accident_injury",
-        name:"Accident & Injury Book",
-        price:3,
-        summary:"A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details.",
-        features:[
-          "Fast incident logging",
-          "Photos, notes and details",
-          "Witness capture if needed",
-          "Export when required",
-          "Secure organised records"
-        ]
+      { id:"accident_injury", name:"Accident & Injury Book", price:3,
+        summary:"Digital accident and injury reporting that replaces paper books and stays organised.",
+        full:`A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required.
+
+Keeps incident records organised, secure, and easy to access if they are ever needed.`,
+        bullets:["Quick incident logging","Photos and witness details","Secure searchable records","Export when required","Better organisation than paper"]
       },
-      {
-        id:"training_compliance",
-        name:"Training & Compliance",
-        price:9,
-        summary:"Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed.",
-        features:[
-          "Expiry tracking",
-          "Automated reminders",
-          "Compliance schedules",
-          "Oversight across teams",
-          "Designed for consistency"
-        ]
+      { id:"training_compliance", name:"Training & Compliance", price:9,
+        summary:"Tracks training expiry dates, compliance requirements and scheduled checks.",
+        full:`Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance.
+
+Designed to support consistency and oversight without adding unnecessary complexity.`,
+        bullets:["Expiry date tracking","Automated reminders","Compliance calendar view","Simple oversight for managers","Supports consistent standards"]
       },
-      {
-        id:"on_offboarding",
-        name:"Onboarding & Offboarding",
-        price:8,
-        summary:"Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments.",
-        features:[
-          "New starter checklists",
-          "Leaver checklists",
-          "Cross-department task coverage",
-          "Completion records",
-          "Smoother staff transitions"
-        ]
+      { id:"onboarding_offboarding", name:"Onboarding & Offboarding", price:8,
+        summary:"Structured checklists for starters and leavers, keeping transitions consistent.",
+        full:`Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments. From access setup to equipment returns, nothing is forgotten.
+
+Provides a clear record of what was completed and when, supporting smoother staff transitions.`,
+        bullets:["Starter & leaver checklists","Clear ownership of tasks","Audit trail of completion","Avoid missed steps","Consistent transitions"]
       },
-      {
-        id:"expenses_upload",
-        name:"Expenses Upload",
-        price:6,
-        summary:"Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported.",
-        features:[
-          "Receipt uploads",
-          "Notes and categories",
-          "Review workflow",
-          "Export for accounts/payroll",
-          "Traceable and organised"
-        ]
+      { id:"expenses_upload", name:"Expenses Upload", price:6,
+        summary:"Upload receipts digitally with notes and categories, then export for accounts.",
+        full:`Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported for accounting or payroll systems.
+
+Keeps expense handling simple, organised, and traceable.`,
+        bullets:["Receipt uploads with notes","Simple categories","Review & approval flow","Exports for accounts/payroll","No paper chasing"]
       },
-      {
-        id:"wellbeing_check",
-        name:"Wellbeing Check",
-        price:4,
-        summary:"A lightweight wellbeing check-in that allows staff to quickly select one of three options. No medical data, no intrusive questions — just a clear visual pulse check.",
-        features:[
-          "🙂 Positive (green)",
-          "😐 Neutral (amber)",
-          "🙁 Concerned (red)",
-          "Trend view over time",
-          "Privacy-respecting by design"
-        ]
+      { id:"wellbeing_check", name:"Wellbeing Check", price:4,
+        summary:"A lightweight wellbeing check-in with a simple, privacy-respecting pulse view.",
+        full:`A lightweight wellbeing check-in that allows staff to quickly select one of three options:
+
+🙂 Positive (green)
+😐 Neutral (amber)
+🙁 Concerned (red)
+
+Over time, this provides managers with a simple, high-level view of wellbeing trends across teams, helping highlight when additional attention may be needed.
+
+No medical data, no intrusive questions — just a clear, visual pulse check designed to support awareness while respecting privacy.`,
+        bullets:["Simple 3-state wellbeing pulse","Trend visibility over time","Privacy-respecting (no medical data)","Lightweight and quick to use","Helps surface support needs"]
       }
     ];
 
-    // ---------- state ----------
-    // IMPORTANT: do NOT redeclare "supabase" (that causes your 'already declared' crash)
-    const sb = window.supabase.createClient(window.__SUPABASE_URL, window.__SUPABASE_ANON);
-
+    /******************************************************************
+      STATE
+      FIX ADDED: profileKey (profiles table might use user_id instead of id)
+    ******************************************************************/
     const state = {
       size: null,
-      modules: new Set(),
-      pending: null,        // pending signup details (before verify/payment accept)
-      bigSize: null,
+      selectedModules: new Set(),
+      plusApprox: null,
+      plusNotes: "",
+      pendingSignup: null,
+      pendingEmployee: null,
       session: null,
       profile: null,
+      profileKey: "id",     // <-- FIX: will auto-switch to "user_id" if needed
       company: null,
       subscription: null,
-      __profilesKey: "user_id"
+      employees: [],
+      onboardingStep: 1,
+      editingEmployee: null,
+      confirmAction: null
     };
 
-    // ---------- reveal animations ----------
-    function setupReveal(){
-      const els = document.querySelectorAll(".reveal");
-      const io = new IntersectionObserver((entries)=>{
-        for(const e of entries){
-          if(e.isIntersecting){
-            e.target.classList.add("show");
-            io.unobserve(e.target);
-          }
-        }
-      }, { threshold: 0.12 });
-      els.forEach(el=>io.observe(el));
-    }
-
-    // ---------- hero icons (desktop only, scattered) ----------
-    const ICON_SVGS = [
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 12h10M12 7v10" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 8h10M7 12h10M7 16h7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v10l-8 4-8-4V7l8-4z" stroke="white" stroke-width="2"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 16 0" stroke="white" stroke-width="2"/><path d="M12 12l3-3" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 12l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M12 2v6m0 8v6M4 12h6m8 0h6" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`
+    /******************************************************************
+      ICONS (desktop only)
+    ******************************************************************/
+    const iconField = $("iconField");
+    const iconSVGs = [
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v6c0 5-3.5 8.5-8 8.5S4 18 4 13V7l8-4Z" stroke="white" stroke-opacity=".92" stroke-width="2"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6Z" stroke="white" stroke-opacity=".92" stroke-width="2"/><path d="M19.4 15a8 8 0 10-14.8 0" stroke="white" stroke-opacity=".55" stroke-width="2"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7V7Z" stroke="white" stroke-opacity=".92" stroke-width="2"/><path d="M4 10V4h6" stroke="white" stroke-opacity=".6" stroke-width="2"/><path d="M20 14v6h-6" stroke="white" stroke-opacity=".6" stroke-width="2"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M8 12h8" stroke="white" stroke-opacity=".92" stroke-width="2" stroke-linecap="round"/><path d="M12 8v8" stroke="white" stroke-opacity=".92" stroke-width="2" stroke-linecap="round"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M4 12h16" stroke="white" stroke-opacity=".8" stroke-width="2"/><path d="M12 4v16" stroke="white" stroke-opacity=".8" stroke-width="2"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M6 19h12M9 19V9l3-4 3 4v10" stroke="white" stroke-opacity=".85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
     ];
-    const hObjs = [];
 
-    function buildHeroIcons(){
-      const host = $("heroIcons");
-      host.innerHTML = "";
-      hObjs.length = 0;
+    const bubbles = [];
+    function buildBubbles(){
+      iconField.innerHTML = "";
+      bubbles.length = 0;
 
-      const fine = window.matchMedia("(pointer:fine)").matches;
-      if(!fine) return;
+      const isDesktop = window.matchMedia("(pointer:fine)").matches && window.innerWidth >= 900;
+      if (!isDesktop) return;
 
-      const count = 10; // “a dozen-ish” feel but not cluttered
-      for(let i=0;i<count;i++){
-        const el = document.createElement("div");
-        el.className = "hicon";
-        el.innerHTML = ICON_SVGS[i % ICON_SVGS.length];
+      const positions = [
+        {x: 12, y: 18}, {x: 72, y: 16}, {x: 86, y: 48}, {x: 58, y: 62},
+        {x: 18, y: 60}, {x: 36, y: 36}, {x: 84, y: 78}, {x: 10, y: 82}
+      ];
 
-        // scatter across screen, but keep a central “read zone” clear
-        let x = Math.random();
-        let y = Math.random();
-        const inReadZone = (x>0.18 && x<0.72 && y>0.18 && y<0.74);
-        if(inReadZone){
-          x = x < 0.45 ? x - 0.22 : x + 0.22;
-          y = y < 0.45 ? y - 0.18 : y + 0.18;
-        }
-        x = Math.min(0.96, Math.max(0.02, x));
-        y = Math.min(0.92, Math.max(0.02, y));
-
-        el.style.left = (x*100) + "%";
-        el.style.top  = (y*100) + "%";
-        host.appendChild(el);
-
-        hObjs.push({ el, bx:x, by:y, tx:0, ty:0, vx:0, vy:0 });
-      }
+      positions.forEach((p, i) => {
+        const b = document.createElement("div");
+        b.className = "bubble";
+        b.style.left = p.x + "%";
+        b.style.top = p.y + "%";
+        b.innerHTML = iconSVGs[i % iconSVGs.length];
+        b.style.setProperty("--tx", "0px");
+        b.style.setProperty("--ty", "0px");
+        iconField.appendChild(b);
+        bubbles.push(b);
+      });
     }
 
-    function heroMousePush(){
-      const fine = window.matchMedia("(pointer:fine)").matches;
-      if(!fine) return;
+    function bubbleParallax(e){
+      if (!bubbles.length) return;
+      const rect = $("hero").getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      const dx = (e.clientX - cx) / rect.width;
+      const dy = (e.clientY - cy) / rect.height;
 
+      bubbles.forEach((b, idx) => {
+        const strength = 18 + (idx % 3) * 6;
+        const tx = (dx * strength * -1);
+        const ty = (dy * strength * -1);
+        b.style.setProperty("--tx", tx.toFixed(1) + "px");
+        b.style.setProperty("--ty", ty.toFixed(1) + "px");
+      });
+    }
+
+    /******************************************************************
+      ANIMATIONS
+    ******************************************************************/
+    function initAnim(){
+      const els = document.querySelectorAll("[data-anim]");
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(en=>{
+          if(en.isIntersecting) en.target.classList.add("in");
+        });
+      }, { threshold: 0.12 });
+      els.forEach(el=>{
+        el.classList.add("fadeUp");
+        io.observe(el);
+      });
+    }
+
+    /******************************************************************
+      NAV hide/show
+    ******************************************************************/
+    function initNavHide(){
+      const nav = $("nav");
       const hero = $("hero");
-      hero.addEventListener("mousemove", (e)=>{
-        const r = hero.getBoundingClientRect();
-        const mx = (e.clientX - r.left) / r.width;
-        const my = (e.clientY - r.top) / r.height;
-
-        for(const o of hObjs){
-          const dx = o.bx - mx;
-          const dy = o.by - my;
-          const dist = Math.sqrt(dx*dx + dy*dy) || 0.001;
-          const near = Math.max(0, 0.20 - dist) / 0.20; // 0..1
-          const push = 22 * near;
-          o.tx = (dx/dist) * push;
-          o.ty = (dy/dist) * push;
+      const io = new IntersectionObserver((entries)=>{
+        const en = entries[0];
+        if(en.isIntersecting){
+          nav.classList.remove("navHide");
+          nav.classList.add("navShow");
+        }else{
+          nav.classList.remove("navShow");
+          nav.classList.add("navHide");
         }
-      });
-      hero.addEventListener("mouseleave", ()=>{
-        for(const o of hObjs){ o.tx=0; o.ty=0; }
-      });
-
-      const tick = ()=>{
-        for(const o of hObjs){
-          o.vx += (o.tx - o.vx) * 0.12;
-          o.vy += (o.ty - o.vy) * 0.12;
-          o.el.style.transform = `translate(${o.vx}px, ${o.vy}px)`;
-        }
-        requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
+      }, { threshold: 0.10 });
+      io.observe(hero);
     }
 
-    // ---------- packages/modules ----------
+    /******************************************************************
+      MODULE RENDER
+    ******************************************************************/
     function renderModules(){
       const grid = $("modulesGrid");
       grid.innerHTML = "";
 
-      for(const m of MODULES){
+      MODULES.forEach(m => {
+        const selected = state.selectedModules.has(m.id);
+
         const card = document.createElement("div");
-        card.className = "card p-5";
-        card.dataset.mid = m.id;
+        card.className = "glass2 p-4 flex flex-col gap-3 hover:bg-white/6 transition cursor-pointer";
+        if (selected) card.classList.add("selected");
 
         card.innerHTML = `
           <div class="flex items-start justify-between gap-3">
             <div>
-              <div class="text-sm font-semibold text-white/85">${m.name}</div>
-              <div class="mt-1 text-xs text-white/55">${money(m.price)} / month</div>
+              <div class="font-semibold leading-tight">${m.name}</div>
+              <div class="text-sm opacity-80 mt-1">${money(m.price)} / month</div>
             </div>
-            <div class="w-9 h-9 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-white/70">
-              ✓
-            </div>
+            <div class="tickDot mt-1"></div>
           </div>
-          <div class="mt-4 flex items-center justify-between gap-2">
-            <button class="btn px-3 py-2 text-sm learnMore">Learn more</button>
-            <button class="btn px-3 py-2 text-sm selBtn">Select</button>
+
+          <div class="flex items-center justify-between gap-3 mt-1">
+            <button class="learnMore px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm whitespace-nowrap">
+              Learn more
+            </button>
+            <div class="text-xs opacity-60">${selected ? "Selected" : "Click to select"}</div>
           </div>
         `;
 
-        card.addEventListener("click", (e)=>{
-          if(e.target.closest("button")) return;
+        card.addEventListener("click", (e) => {
+          if (e.target && e.target.classList.contains("learnMore")) return;
           toggleModule(m.id);
         });
-        card.querySelector(".learnMore").addEventListener("click", ()=> openModule(m.id));
-        card.querySelector(".selBtn").addEventListener("click", ()=> toggleModule(m.id));
+
+        card.querySelector(".learnMore").addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openModuleModal(m.id);
+        });
 
         grid.appendChild(card);
-      }
-
-      syncModuleUI();
-    }
-
-    function toggleModule(mid){
-      if(state.modules.has(mid)) state.modules.delete(mid);
-      else state.modules.add(mid);
-      syncModuleUI();
-      updateTotals();
-    }
-
-    function syncModuleUI(){
-      document.querySelectorAll("[data-mid]").forEach(el=>{
-        const mid = el.dataset.mid;
-        const on = state.modules.has(mid);
-        el.classList.toggle("selected", on);
-        const b = el.querySelector(".selBtn");
-        b.textContent = on ? "Selected" : "Select";
-        b.classList.toggle("btn-primary", on);
-      });
-    }
-
-    function selectSize(id){
-      state.size = COMPANY_SIZES.find(s=>s.id===id) || null;
-
-      document.querySelectorAll("[data-size]").forEach(btn=>{
-        btn.classList.toggle("selected", btn.dataset.size === id);
       });
 
-      // show modules + summary AFTER selection
-      const hasSize = !!state.size;
-      $("modulesWrap").classList.toggle("hidden", !hasSize);
-      $("summaryBar").classList.toggle("hidden", !hasSize);
-      $("summarySpacer").classList.toggle("hidden", !hasSize);
+      updateTotal();
+    }
 
-      const isBig = state.size?.id === "s250p";
-      $("bigBox").classList.toggle("hidden", !isBig);
-
-      // set checkout label
-      $("checkoutBtn").textContent = isBig ? "Contact Us" : "Continue";
-
-      // modules render (first time)
+    function toggleModule(id){
+      if (state.selectedModules.has(id)) state.selectedModules.delete(id);
+      else state.selectedModules.add(id);
       renderModules();
-      updateTotals();
     }
 
-    function calcTotals(){
-      const base = state.size ? state.size.price : 0;
-      let mods = 0;
-      for(const id of state.modules){
-        const m = MODULES.find(x=>x.id===id);
-        if(m) mods += m.price;
-      }
-      return { base, mods, total: base + mods };
-    }
-
-    function updateTotals(){
-      const t = calcTotals();
-      $("totalText").textContent = `${money(t.total)} / month`;
-      const sizeLabel = state.size ? state.size.label : "—";
-      $("summaryHint").textContent = `Package: ${sizeLabel} • Modules: ${state.modules.size}`;
-
-      $("payTotal").textContent = `${money(t.total)} / month`;
-      const modNames = [...state.modules].map(id=>MODULES.find(m=>m.id===id)?.name).filter(Boolean);
-      $("paySummary").textContent = modNames.length ? `Includes: ${modNames.join(", ")}` : "No modules selected.";
-    }
-
-    // ---------- module modal ----------
-    function openModule(mid){
-      const m = MODULES.find(x=>x.id===mid);
+    function openModuleModal(id){
+      const m = MODULES.find(x=>x.id===id);
       if(!m) return;
 
-      $("mmTitle").textContent = m.name;
-      $("mmSummary").textContent = m.summary;
-      $("mmPrice").textContent = `${money(m.price)} / month`;
+      setText($("mmTitle"), m.name);
+      setText($("mmPrice"), `${money(m.price)} / month`);
+      setText($("mmSummary"), m.full);
 
-      const ul = $("mmFeatures");
-      ul.innerHTML = "";
-      for(const f of m.features){
+      const bullets = $("mmBullets");
+      bullets.innerHTML = "";
+      m.bullets.forEach(b=>{
         const li = document.createElement("li");
         li.className = "flex gap-2";
-        li.innerHTML = `<span class="text-white/60">•</span><span>${f}</span>`;
-        ul.appendChild(li);
-      }
+        li.innerHTML = `<span class="opacity-70">•</span><span>${b}</span>`;
+        bullets.appendChild(li);
+      });
 
-      // keep a consistent embed
-      $("mmVideo").src = "https://www.youtube-nocookie.com/embed/S2kymv60ndQ";
+      $("mmVideo").src = "https://www.youtube.com/embed/S2kymv60ndQ";
 
-      showOverlay($("moduleModal"));
+      openModal($("moduleModalBackdrop"));
     }
 
-    // ---------- big company mailto ----------
-    function buildMailto(){
-      const sizeNum = Number($("bigSize").value || 0);
-      const notes = $("bigNotes").value || "";
-      const modNames = [...state.modules].map(id=>MODULES.find(m=>m.id===id)?.name).filter(Boolean);
+    /******************************************************************
+      COMPANY SIZE SELECTION
+    ******************************************************************/
+    function setCompanySize(sizeId){
+      const size = COMPANY_SIZES.find(s=>s.id===sizeId);
+      state.size = size || null;
 
+      document.querySelectorAll("[data-size]").forEach(btn=>{
+        btn.classList.remove("selected");
+        if(btn.dataset.size === sizeId) btn.classList.add("selected");
+      });
+
+      if(state.size){
+        show($("modulesWrap"));
+        show($("summaryBar"));
+        if (state.size.id === "s250plus"){
+          show($("plusBox"));
+        } else {
+          hide($("plusBox"));
+          $("plusCount").value = "";
+          $("plusNotes").value = "";
+          hide($("plusWarn"));
+          state.plusApprox = null;
+          state.plusNotes = "";
+        }
+      } else {
+        hide($("modulesWrap"));
+        hide($("summaryBar"));
+        hide($("plusBox"));
+      }
+
+      renderModules();
+      updateTotal();
+    }
+
+    function updateTotal(){
+      const totalEl = $("totalText");
+      const mini = $("summaryMini");
+
+      if(!state.size){
+        setText(totalEl, "£0 / month");
+        setText(mini, "Select a company size to begin.");
+        return;
+      }
+
+      let modulesTotal = 0;
+      state.selectedModules.forEach(id=>{
+        const m = MODULES.find(x=>x.id===id);
+        modulesTotal += (m?.price || 0);
+      });
+
+      const base = state.size.price || 0;
+      const total = base + modulesTotal;
+
+      setText(totalEl, `${money(total)} / month`);
+      setText(mini, `${state.size.label} + ${state.selectedModules.size} module(s)`);
+
+      $("checkoutBtn").textContent = (state.size.id === "s250plus") ? "Contact us" : "Continue";
+    }
+
+    /******************************************************************
+      CONTACT EMAIL FOR 250+
+    ******************************************************************/
+    function buildContactEmail(){
+      const approx = Number($("plusCount").value || 0);
+      const notes = ($("plusNotes").value || "").trim();
+
+      if(!approx || approx < 1){
+        showErr($("plusWarn"), "Please enter an approximate company size to continue.");
+        return null;
+      }
+      hide($("plusWarn"));
+
+      if(approx < 250){
+        return { confirm: true, approx, notes };
+      }
+
+      const selected = Array.from(state.selectedModules).map(id => MODULES.find(m=>m.id===id)?.name).filter(Boolean);
       const subject = "250+ Person Company - Wanting to Sign Up";
-      const body = [
+
+      const bodyLines = [
         "Hello SmartCore Technology,",
         "",
-        "We would like to enquire about onboarding a 250+ person organisation.",
+        "We would like to discuss a SmartCore subscription for a 250+ person organisation.",
         "",
-        `Approximate company size: ${sizeNum || "Not provided"}`,
+        `Approximate headcount: ${approx}`,
         "",
-        "Requested modules:",
-        modNames.length ? modNames.map(n=>`- ${n}`).join("\n") : "- (None selected yet)",
+        "Requested systems:",
+        selected.length ? selected.map(s=>`- ${s}`).join("\n") : "- (none selected yet)",
         "",
-        notes ? "Additional notes:\n" + notes : "Additional notes: (none)",
+        notes ? `Additional notes:\n${notes}\n` : "",
+        "Please let us know the next steps and any information you need from us.",
         "",
-        "Regards,",
+        "Kind regards,",
         "(Your name)"
       ].join("\n");
 
-      return `mailto:support@smartcoretechnology.co.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      const mailto = `mailto:support@smartcoretechnology.co.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines)}`;
+      return { mailto };
     }
 
-    // ---------- auth: schema-safe profile lookup (fixes your profiles.id error) ----------
-    async function getProfileByAuthUserId(uid){
-      // Try profiles.user_id first
-      {
-        const { data, error } = await sb.from("profiles").select("*").eq("user_id", uid).maybeSingle();
-        if(!error) return { profile: data || null, key: "user_id" };
-        // if it's not a missing column error, throw
-        if(!String(error.message||"").toLowerCase().includes("column")) throw error;
+    /******************************************************************
+      API HELPERS (Cloudflare Functions)
+    ******************************************************************/
+    async function apiPost(path, payload){
+      const res = await fetch(path, {
+        method:"POST",
+        headers: { "content-type":"application/json" },
+        body: JSON.stringify(payload || {})
+      });
+      const txt = await res.text();
+      let data = null;
+      try{ data = JSON.parse(txt); }catch(_){}
+      if(!res.ok){
+        const msg = (data && (data.error || data.message)) ? (data.error || data.message) : txt;
+        throw new Error(msg || ("Request failed: " + res.status));
       }
-      // Try profiles.id fallback
-      {
-        const { data, error } = await sb.from("profiles").select("*").eq("id", uid).maybeSingle();
-        if(!error) return { profile: data || null, key: "id" };
-        throw error;
+      return data ?? {};
+    }
+
+    /******************************************************************
+      SIGNUP FLOW (OWNER)
+    ******************************************************************/
+    async function ownerSendCode(){
+      clearErr($("suMsg"));
+
+      if(!state.size){
+        showErr($("suMsg"), "Please select a company size first.");
+        return;
+      }
+
+      const company_name = $("suCompanyName").value.trim();
+      const email = $("suEmail").value.trim().toLowerCase();
+      const password = $("suPassword").value;
+
+      if(!company_name) return showErr($("suMsg"), "Please enter your company name.");
+      if(!email) return showErr($("suMsg"), "Please enter your email.");
+      if(!password || password.length < 8) return showErr($("suMsg"), "Password must be at least 8 characters.");
+
+      if(state.size.id === "s250plus"){
+        showErr($("suMsg"), "Please use Contact us for 250+ companies.");
+        return;
+      }
+
+      state.pendingSignup = {
+        company_name,
+        email,
+        password,
+        company_size_id: state.size.id,
+        company_size_label: state.size.label,
+        company_size_price: state.size.price,
+        max_employees: state.size.maxEmployees,
+        module_ids: Array.from(state.selectedModules),
+      };
+
+      $("suContinue").disabled = true;
+      $("suContinue").classList.add("opacity-60");
+
+      try{
+        await apiPost("/api/send-code", { email, purpose:"owner_signup" });
+
+        closeModal($("signupModalBackdrop"));
+        setText($("vEmail"), email);
+        $("vCode").value = "";
+        clearErr($("vMsg"));
+        openModal($("verifyModalBackdrop"));
+
+      }catch(e){
+        const msg = String(e.message || "");
+        if(msg.toLowerCase().includes("already") || msg.toLowerCase().includes("registered")){
+          showErr($("suMsg"), "This email is already registered to a SmartCore account — log in instead?");
+          return;
+        }
+        showErr($("suMsg"), msg || "Failed to send code.");
+      }finally{
+        $("suContinue").disabled = false;
+        $("suContinue").classList.remove("opacity-60");
       }
     }
 
+    async function ownerVerifyAndCreate(){
+      clearErr($("vMsg"));
+      if(!state.pendingSignup){
+        showErr($("vMsg"), "Please start again from Create your company account.");
+        return;
+      }
+
+      const code = $("vCode").value.trim();
+      if(!code || code.length !== 6){
+        showErr($("vMsg"), "Please enter the 6-digit code.");
+        return;
+      }
+
+      $("vVerify").disabled = true;
+      $("vVerify").classList.add("opacity-60");
+
+      try{
+        const payload = {
+          purpose: "owner_signup",
+          email: state.pendingSignup.email,
+          password: state.pendingSignup.password,
+          full_name: "",
+          code,
+          company_name: state.pendingSignup.company_name,
+          company_size_id: state.pendingSignup.company_size_id,
+          company_size_label: state.pendingSignup.company_size_label,
+          company_size_price: state.pendingSignup.company_size_price,
+          max_employees: state.pendingSignup.max_employees,
+          module_ids: state.pendingSignup.module_ids
+        };
+
+        const res = await apiPost("/api/verify-code", payload);
+
+        if(res.session){
+          await sb.auth.setSession(res.session);
+        } else {
+          const { error } = await sb.auth.signInWithPassword({
+            email: state.pendingSignup.email,
+            password: state.pendingSignup.password
+          });
+          if(error) throw new Error(error.message);
+        }
+
+        closeModal($("verifyModalBackdrop"));
+
+        const total = computeTotal();
+        setText($("payTotal"), `${money(total)} / month`);
+        setText($("paySummary"), buildPaySummaryText());
+        clearErr($("payMsg"));
+        openModal($("payModalBackdrop"));
+
+      }catch(e){
+        showErr($("vMsg"), String(e.message || "Verification failed."));
+      }finally{
+        $("vVerify").disabled = false;
+        $("vVerify").classList.remove("opacity-60");
+      }
+    }
+
+    async function resendOwnerCode(){
+      clearErr($("vMsg"));
+      if(!state.pendingSignup) return showErr($("vMsg"), "Start signup again first.");
+      try{
+        await apiPost("/api/send-code", { email: state.pendingSignup.email, purpose:"owner_signup" });
+        $("vMsg").textContent = "New code sent. Please check your inbox.";
+        $("vMsg").classList.remove("hidden");
+        $("vMsg").classList.remove("text-red-300");
+        $("vMsg").classList.add("text-green-300");
+        setTimeout(()=> clearErr($("vMsg")), 2500);
+      }catch(e){
+        showErr($("vMsg"), String(e.message || "Failed to resend code."));
+      }
+    }
+
+    function computeTotal(){
+      const base = state.size?.price || 0;
+      let mods = 0;
+      state.selectedModules.forEach(id=>{
+        const m = MODULES.find(x=>x.id===id);
+        mods += (m?.price || 0);
+      });
+      return base + mods;
+    }
+
+    function buildPaySummaryText(){
+      const sizeLabel = state.size?.label || "—";
+      const modules = Array.from(state.selectedModules).map(id => MODULES.find(m=>m.id===id)?.name).filter(Boolean);
+      const mText = modules.length ? modules.join(", ") : "No modules selected";
+      return `Plan: ${sizeLabel}. Modules: ${mText}.`;
+    }
+
+    async function paymentAccept(){
+      clearErr($("payMsg"));
+
+      try{
+        const { data: { user }, error: uerr } = await sb.auth.getUser();
+        if(uerr) throw new Error(uerr.message);
+        if(!user) throw new Error("Not signed in.");
+
+        // Load company/profile from DB (this is where your error happened)
+        await loadAccount();
+
+        if(!state.company?.id) throw new Error("Company not found for your account.");
+
+        const total = computeTotal();
+        const moduleTotal = Array.from(state.selectedModules).reduce((sum, id)=>{
+          const m = MODULES.find(x=>x.id===id);
+          return sum + (m?.price || 0);
+        }, 0);
+
+        const subRow = {
+          company_id: state.company.id,
+          company_size_label: state.size?.label || null,
+          company_size_price: state.size?.price || 0,
+          module_ids: Array.from(state.selectedModules),
+          module_total: moduleTotal,
+          total: total,
+          status: "active"
+        };
+
+        const { error: insErr } = await sb.from("subscriptions").insert(subRow);
+        if(insErr) throw new Error("Subscription save failed: " + insErr.message);
+
+        closeModal($("payModalBackdrop"));
+        showDashboard();
+
+      }catch(e){
+        showErr($("payMsg"), String(e.message || "Payment accept failed."));
+      }
+    }
+
+    async function paymentDecline(){
+      closeModal($("payModalBackdrop"));
+      state.pendingSignup = null;
+      alert("Payment declined (testing). No subscription has been saved.");
+      window.location.hash = "#home";
+    }
+
+    /******************************************************************
+      LOGIN FLOW
+    ******************************************************************/
+    async function login(){
+      clearErr($("liMsg"));
+      $("liWrong").classList.add("hidden");
+
+      const email = $("liEmail").value.trim().toLowerCase();
+      const password = $("liPassword").value;
+
+      if(!email) return showErr($("liMsg"), "Please enter your email.");
+      if(!password) return showErr($("liMsg"), "Please enter your password.");
+
+      $("liLogin").disabled = true;
+      $("liLogin").classList.add("opacity-60");
+
+      try{
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if(error){
+          $("liWrong").classList.remove("hidden");
+          throw new Error(error.message);
+        }
+
+        closeModal($("loginModalBackdrop"));
+        await loadAccount();
+        showDashboard();
+
+      }catch(e){
+        showErr($("liMsg"), String(e.message || "Login failed."));
+      }finally{
+        $("liLogin").disabled = false;
+        $("liLogin").classList.remove("opacity-60");
+      }
+    }
+
+    async function resetPassword(){
+      clearErr($("liMsg"));
+      const email = $("liEmail").value.trim().toLowerCase();
+      if(!email) return showErr($("liMsg"), "Enter your email above, then click the reset link again.");
+
+      try{
+        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + "/#reset" });
+        if(error) throw new Error(error.message);
+        $("liMsg").textContent = "Password reset email sent. Please check your inbox.";
+        $("liMsg").classList.remove("hidden");
+        $("liMsg").classList.remove("text-red-300");
+        $("liMsg").classList.add("text-green-300");
+      }catch(e){
+        showErr($("liMsg"), String(e.message || "Failed to send reset email."));
+      }
+    }
+
+    async function signOut(){
+      await sb.auth.signOut();
+      state.session = null;
+      state.profile = null;
+      state.company = null;
+      state.subscription = null;
+      state.employees = [];
+      hide($("dashboard"));
+      show($("main"));
+      window.location.hash = "#home";
+      window.scrollTo({ top:0, behavior:"smooth" });
+    }
+
+    /******************************************************************
+      EMPLOYEE SIGNUP
+    ******************************************************************/
+    async function employeeSendCode(){
+      clearErr($("empMsg"));
+      clearErr($("empVerifyMsg"));
+
+      const company_code = $("empCompanyCode").value.trim().toUpperCase();
+      const full_name = $("empFullName").value.trim();
+      const email = $("empEmail").value.trim().toLowerCase();
+      const password = $("empPassword").value;
+
+      if(!company_code) return showErr($("empMsg"), "Please enter your company code.");
+      if(!full_name) return showErr($("empMsg"), "Please enter your full name.");
+      if(!email) return showErr($("empMsg"), "Please enter your email.");
+      if(!password || password.length < 8) return showErr($("empMsg"), "Password must be at least 8 characters.");
+
+      try{
+        const { data, error } = await sb
+          .from("employees")
+          .select("id, full_name, company_id")
+          .eq("company_code", company_code)
+          .ilike("full_name", full_name)
+          .limit(1);
+
+        if(error) throw new Error(error.message);
+        if(!data || !data.length){
+          showErr($("empMsg"), EMP_NOT_FOUND_MSG);
+          return;
+        }
+
+        state.pendingEmployee = { company_code, full_name, email, password };
+
+        await apiPost("/api/send-code", { email, purpose:"employee_signup", company_code });
+
+        show($("empVerifyBox"));
+        $("empCode").value = "";
+        $("empMsg").classList.add("hidden");
+
+      }catch(e){
+        showErr($("empMsg"), String(e.message || "Failed to send code."));
+      }
+    }
+
+    async function employeeVerifyAndCreate(){
+      clearErr($("empVerifyMsg"));
+      if(!state.pendingEmployee) return showErr($("empVerifyMsg"), "Start again from the employee sign-up form.");
+
+      const code = $("empCode").value.trim();
+      if(!code || code.length !== 6) return showErr($("empVerifyMsg"), "Enter the 6-digit code.");
+
+      try{
+        const payload = {
+          purpose: "employee_signup",
+          email: state.pendingEmployee.email,
+          password: state.pendingEmployee.password,
+          full_name: state.pendingEmployee.full_name,
+          code,
+          company_code: state.pendingEmployee.company_code
+        };
+
+        await apiPost("/api/verify-code", payload);
+
+        const { error } = await sb.auth.signInWithPassword({
+          email: state.pendingEmployee.email,
+          password: state.pendingEmployee.password
+        });
+        if(error) throw new Error(error.message);
+
+        closeModal($("empModalBackdrop"));
+        await loadAccount();
+        showDashboard();
+
+      }catch(e){
+        showErr($("empVerifyMsg"), String(e.message || "Verification failed."));
+      }
+    }
+
+    async function employeeResend(){
+      clearErr($("empVerifyMsg"));
+      if(!state.pendingEmployee) return showErr($("empVerifyMsg"), "Start again first.");
+      try{
+        await apiPost("/api/send-code", { email: state.pendingEmployee.email, purpose:"employee_signup", company_code: state.pendingEmployee.company_code });
+        $("empVerifyMsg").textContent = "New code sent. Please check your inbox.";
+        $("empVerifyMsg").classList.remove("hidden");
+        $("empVerifyMsg").classList.remove("text-red-300");
+        $("empVerifyMsg").classList.add("text-green-300");
+        setTimeout(()=> clearErr($("empVerifyMsg")), 2500);
+      }catch(e){
+        showErr($("empVerifyMsg"), String(e.message || "Failed to resend code."));
+      }
+    }
+
+    /******************************************************************
+      FIX: profiles table key detection (id vs user_id)
+      Your error: "Profile load failed: column profiles.id does not exist"
+      -> this automatically retries with profiles.user_id
+    ******************************************************************/
+    async function fetchProfileByUid(uid){
+      // Try common patterns in order:
+      // 1) profiles.id (UUID == auth uid)
+      // 2) profiles.user_id (UUID == auth uid)
+      // 3) profiles.uid (UUID == auth uid)
+      const candidates = ["id", "user_id", "uid"];
+
+      for (const key of candidates){
+        const { data, error } = await sb.from("profiles").select("*").eq(key, uid).maybeSingle();
+        if (!error){
+          state.profileKey = key;
+          return data || null;
+        }
+
+        const msg = (error?.message || "").toLowerCase();
+        // If column doesn't exist, try next candidate
+        if (msg.includes("column") && msg.includes("does not exist")) continue;
+
+        // If it's a different error, throw it
+        throw new Error("Profile load failed: " + error.message);
+      }
+
+      // If none of the keys exist, give a clear message
+      throw new Error("Profile load failed: your profiles table has no id/user_id/uid column to match auth users.");
+    }
+
+    /******************************************************************
+      ACCOUNT LOADING + DASHBOARD
+    ******************************************************************/
     async function loadAccount(){
       const { data: { session } } = await sb.auth.getSession();
       state.session = session || null;
@@ -994,30 +1823,30 @@
         state.profile = null;
         state.company = null;
         state.subscription = null;
+        state.employees = [];
         return;
       }
 
       const uid = state.session.user.id;
 
-      // Profile (auto-detect key)
-      const r = await getProfileByAuthUserId(uid);
-      state.profile = r.profile;
-      state.__profilesKey = r.key;
+      // FIXED: profile load (auto-detect key)
+      state.profile = await fetchProfileByUid(uid);
 
-      // Company (prefer profile.company_id)
-      let company = null;
+      // company (by profile.company_id or ownership)
+      let comp = null;
+
       if(state.profile?.company_id){
         const { data, error } = await sb.from("companies").select("*").eq("id", state.profile.company_id).maybeSingle();
         if(error) throw new Error("Company load failed: " + error.message);
-        company = data;
-      }else{
+        comp = data;
+      } else {
         const { data, error } = await sb.from("companies").select("*").eq("owner_user_id", uid).maybeSingle();
         if(error) throw new Error("Company load failed: " + error.message);
-        company = data;
+        comp = data;
       }
-      state.company = company || null;
 
-      // Subscription latest
+      state.company = comp || null;
+
       if(state.company?.id){
         const { data: sub, error: sErr } = await sb
           .from("subscriptions")
@@ -1026,356 +1855,663 @@
           .order("created_at", { ascending:false })
           .limit(1)
           .maybeSingle();
+
         state.subscription = sErr ? null : (sub || null);
-      }else{
+
+        const { data: emps, error: eErr } = await sb
+          .from("employees")
+          .select("*")
+          .eq("company_id", state.company.id)
+          .order("created_at", { ascending:true });
+
+        state.employees = eErr ? [] : (emps || []);
+      } else {
         state.subscription = null;
+        state.employees = [];
       }
     }
 
     function showDashboard(){
-      $("home").classList.add("hidden");
-      $("dashboard").classList.remove("hidden");
-      location.hash = "#dashboard";
+      hide($("main"));
+      show($("dashboard"));
 
-      const c = state.company;
-      $("dashCompany").textContent = c?.company_name || "Your Company";
+      const compName = state.company?.company_name || "(not set)";
+      const compAddr = state.company?.company_address || "(not set)";
+      const compCode = state.company?.company_code || "(not set)";
+      const plan = state.subscription?.company_size_label || state.company?.company_size_label || "(not set)";
+      const max = state.company?.max_employees ?? state.subscription?.max_employees ?? null;
 
-      const meta = [];
-      if(state.session?.user?.email) meta.push(state.session.user.email);
-      if(c?.company_address) meta.push(c.company_address);
-      $("dashMeta").textContent = meta.join(" • ");
+      setText($("dashCompanyName"), compName);
+      setText($("dashCompanyAddress"), compAddr);
+      setText($("dashCompanyCode"), compCode);
+      setText($("dashPlan"), plan);
+      setText($("dashMaxEmp"), (max ? String(max) : "Unlimited"));
 
-      $("dashCompanyCode").textContent = c?.company_code || "—";
-      $("dashSize").textContent = c?.company_size_label || c?.company_size || "—";
+      const total = state.subscription?.total ?? null;
+      setText($("dashTotal"), total ? `${money(total)} / month` : "");
 
-      const total = state.subscription?.monthly_total ?? null;
-      $("dashTotal").textContent = total !== null ? `${money(total)} / month` : "—";
+      setText($("dashSub"), "Manage your company, systems, and employees.");
 
-      const ownedRaw = state.subscription?.module_ids || state.subscription?.selected_modules || [];
-      const owned = new Set(Array.isArray(ownedRaw) ? ownedRaw : []);
+      renderSystems();
+      renderEmployees();
+      computeOnboardingStep();
+      renderOnboardingStep();
+
+      window.location.hash = "#dashboard";
+      window.scrollTo({ top:0, behavior:"smooth" });
+    }
+
+    function renderSystems(){
       const wrap = $("dashSystems");
       wrap.innerHTML = "";
 
-      const ownedMods = MODULES.filter(m=>owned.has(m.id));
-      if(!ownedMods.length){
-        wrap.innerHTML = `<div class="text-sm text-white/60">No modules purchased yet.</div>`;
-      }else{
-        for(const m of ownedMods){
-          const a = document.createElement("a");
-          a.href = "https://smartcoretechnology.co.uk";
-          a.target = "_blank";
-          a.className = "card p-4 block";
-          a.innerHTML = `
-            <div class="text-sm font-semibold">${m.name}</div>
-            <div class="text-xs text-white/60 mt-1">Open system</div>
-          `;
-          wrap.appendChild(a);
-        }
-      }
-    }
+      const ownedIds = Array.isArray(state.subscription?.module_ids) ? state.subscription.module_ids : [];
+      const owned = MODULES.filter(m => ownedIds.includes(m.id));
 
-    function showHome(){
-      $("dashboard").classList.add("hidden");
-      $("home").classList.remove("hidden");
-      location.hash = "#";
-    }
-
-    async function signOut(){
-      await sb.auth.signOut();
-      state.session = null; state.profile=null; state.company=null; state.subscription=null;
-      showHome();
-      scrollToEl($("hero"));
-    }
-
-    // ---------- login ----------
-    async function login(){
-      $("liMsg").textContent = "";
-      $("liBad").classList.add("hidden");
-
-      const email = $("liEmail").value.trim().toLowerCase();
-      const password = $("liPass").value;
-
-      if(!email || !password){
-        $("liMsg").textContent = "Enter email and password.";
+      if(!owned.length){
+        wrap.innerHTML = `
+          <div class="glass2 p-4 sm:col-span-2 lg:col-span-3">
+            <div class="font-semibold">No modules found</div>
+            <div class="mt-1 text-sm opacity-75">Once you complete payment (testing), your modules will appear here.</div>
+          </div>
+        `;
         return;
       }
 
-      $("loginBtn").disabled = true;
-      $("loginBtn").classList.add("opacity-50");
+      owned.forEach(m=>{
+        const a = document.createElement("a");
+        a.href = "https://smartfits.co.uk";
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.className = "glass2 p-4 hover:bg-white/6 transition block";
+        a.innerHTML = `
+          <div class="font-semibold">${m.name}</div>
+          <div class="mt-1 text-sm opacity-75">Open system</div>
+        `;
+        wrap.appendChild(a);
+      });
+    }
+
+    /******************************************************************
+      ONBOARDING WIZARD
+    ******************************************************************/
+    function computeOnboardingStep(){
+      const c = state.company || {};
+      const p = state.profile || {};
+
+      if(!c.company_name) { state.onboardingStep = 1; return; }
+      if(!c.company_address) { state.onboardingStep = 2; return; }
+      if(!c.company_logo_url) { state.onboardingStep = 3; return; }
+      if(!p.full_name || !p.job_title || !p.job_category) { state.onboardingStep = 4; return; }
+      if(!state.employees || state.employees.length < 1) { state.onboardingStep = 5; return; }
+
+      state.onboardingStep = 6;
+    }
+
+    function renderOnboardingStep(){
+      const box = $("onbStepBox");
+      const label = $("onbStepLabel");
+      box.innerHTML = "";
+
+      if(state.onboardingStep === 6){
+        setText(label, "Completed");
+        box.innerHTML = `
+          <div class="font-semibold">Onboarding complete</div>
+          <div class="mt-2 text-sm opacity-75">Your company is set up and ready to use.</div>
+        `;
+        return;
+      }
+
+      setText(label, `Step ${state.onboardingStep} of 5`);
+
+      if(state.onboardingStep === 1){
+        box.innerHTML = `
+          <div class="font-semibold">Company name</div>
+          <div class="mt-2 text-sm opacity-75">Enter your full company name.</div>
+          <div class="mt-3">
+            <input id="onbCompanyName" class="inp" placeholder="Full company name" value="${(state.company?.company_name||"")}" />
+          </div>
+          <div class="mt-4">
+            <button id="onbNext1" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
+            <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
+          </div>
+        `;
+        $("onbNext1").onclick = async ()=>{
+          const v = $("onbCompanyName").value.trim();
+          if(!v) return showErr($("onbMsg"), "Please enter your company name.");
+          await updateCompany({ company_name: v });
+        };
+        return;
+      }
+
+      if(state.onboardingStep === 2){
+        box.innerHTML = `
+          <div class="font-semibold">Company address</div>
+          <div class="mt-2 text-sm opacity-75">Enter the full company address.</div>
+          <div class="mt-3">
+            <input id="onbCompanyAddr" class="inp" placeholder="Full company address" value="${(state.company?.company_address||"")}" />
+          </div>
+          <div class="mt-4">
+            <button id="onbNext2" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
+            <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
+          </div>
+        `;
+        $("onbNext2").onclick = async ()=>{
+          const v = $("onbCompanyAddr").value.trim();
+          if(!v) return showErr($("onbMsg"), "Please enter your company address.");
+          await updateCompany({ company_address: v });
+        };
+        return;
+      }
+
+      if(state.onboardingStep === 3){
+        box.innerHTML = `
+          <div class="font-semibold">Company logo</div>
+          <div class="mt-2 text-sm opacity-75">Upload a logo (preferably with no background).</div>
+          <div class="mt-3 flex flex-wrap items-center gap-3">
+            <label class="fileBtn">
+              <input id="onbLogoFile" type="file" accept="image/*" />
+              <span class="text-sm font-medium">Choose logo</span>
+            </label>
+            <div id="onbLogoName" class="text-sm opacity-70">No file selected</div>
+          </div>
+          <div class="mt-4">
+            <button id="onbNext3" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
+            <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
+          </div>
+        `;
+        $("onbLogoFile").onchange = ()=>{
+          const f = $("onbLogoFile").files?.[0];
+          setText($("onbLogoName"), f ? f.name : "No file selected");
+        };
+        $("onbNext3").onclick = async ()=>{
+          const f = $("onbLogoFile").files?.[0];
+          if(!f) return showErr($("onbMsg"), "Please choose a logo file.");
+          await uploadCompanyLogo(f);
+        };
+        return;
+      }
+
+      if(state.onboardingStep === 4){
+        box.innerHTML = `
+          <div class="font-semibold">Tell us about you</div>
+          <div class="mt-2 text-sm opacity-75">This helps set the owner profile and permissions.</div>
+
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="sm:col-span-2">
+              <label class="text-xs opacity-70">Full name</label>
+              <input id="onbFullName" class="inp mt-1" placeholder="e.g. Finley Hassall" value="${(state.profile?.full_name||"")}" />
+            </div>
+            <div>
+              <label class="text-xs opacity-70">Job title</label>
+              <input id="onbJobTitle" class="inp mt-1" placeholder="e.g. Founder" value="${(state.profile?.job_title||"")}" />
+            </div>
+            <div>
+              <label class="text-xs opacity-70">Job category</label>
+              <input id="onbJobCategory" class="inp mt-1" placeholder="e.g. Senior management team" value="${(state.profile?.job_category||"")}" />
+            </div>
+
+            <div class="sm:col-span-2 mt-1">
+              <div class="chkWrap" id="onbAdminWrap">
+                <div class="chk on" id="onbAdminChk">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 6L9 17l-5-5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-sm font-medium">Admin access</div>
+                  <div class="text-xs opacity-70">Owners are admins by default. You can adjust employee admins later.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <button id="onbNext4" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
+            <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
+          </div>
+        `;
+        $("onbNext4").onclick = async ()=>{
+          const full_name = $("onbFullName").value.trim();
+          const job_title = $("onbJobTitle").value.trim();
+          const job_category = $("onbJobCategory").value.trim();
+          if(!full_name) return showErr($("onbMsg"), "Please enter your full name.");
+          if(!job_title) return showErr($("onbMsg"), "Please enter your job title.");
+          if(!job_category) return showErr($("onbMsg"), "Please enter your job category.");
+          await updateProfile({ full_name, job_title, job_category, role: "owner", is_admin: true });
+        };
+        return;
+      }
+
+      if(state.onboardingStep === 5){
+        box.innerHTML = `
+          <div class="font-semibold">Add employees</div>
+          <div class="mt-2 text-sm opacity-75">Add at least one employee. You can add more at any time.</div>
+
+          <div class="mt-4">
+            <button id="onbAddEmp" class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium">
+              Add your first employee
+            </button>
+          </div>
+
+          <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
+        `;
+        $("onbAddEmp").onclick = ()=> openEmployeeEditor(null);
+        return;
+      }
+    }
+
+    async function updateCompany(patch){
+      const c = state.company;
+      if(!c?.id) return;
+
+      const { error } = await sb.from("companies").update(patch).eq("id", c.id);
+      if(error) return showErr($("onbMsg"), error.message);
+
+      await loadAccount();
+      showDashboard();
+    }
+
+    // FIXED: updateProfile uses detected key (id vs user_id vs uid)
+    async function updateProfile(patch){
+      const uid = state.session?.user?.id;
+      if(!uid) return;
+
+      const key = state.profileKey || "id";
+      const { error } = await sb.from("profiles").update(patch).eq(key, uid);
+      if(error) return showErr($("onbMsg"), error.message);
+
+      await loadAccount();
+      showDashboard();
+    }
+
+    async function uploadCompanyLogo(file){
+      try{
+        const companyId = state.company?.id;
+        if(!companyId) throw new Error("Company not found.");
+
+        const ext = (file.name.split(".").pop() || "png").toLowerCase();
+        const path = `${companyId}/logo.${ext}`;
+
+        const up = await sb.storage.from("company-logos").upload(path, file, { upsert:true, contentType: file.type });
+        if(up.error) throw new Error(up.error.message);
+
+        const pub = sb.storage.from("company-logos").getPublicUrl(path);
+        const url = pub?.data?.publicUrl;
+        if(!url) throw new Error("Could not get logo URL.");
+
+        await updateCompany({ company_logo_url: url });
+
+      }catch(e){
+        showErr($("onbMsg"), String(e.message || "Logo upload failed."));
+      }
+    }
+
+    /******************************************************************
+      EMPLOYEE CRUD
+    ******************************************************************/
+    function renderEmployees(){
+      const tbody = $("empTable");
+      tbody.innerHTML = "";
+
+      const max = state.company?.max_employees ?? null;
+      const count = state.employees?.length || 0;
+
+      if(max && count >= max){
+        showErr($("empLimitMsg"), `You’ve reached your plan limit (${max} employees). Upgrade your plan to add more.`);
+      } else {
+        clearErr($("empLimitMsg"));
+      }
+
+      (state.employees || []).forEach(emp=>{
+        const tr = document.createElement("tr");
+        tr.className = "border-t border-white/5";
+        tr.innerHTML = `
+          <td class="py-3 pr-3">
+            <div class="font-medium">${emp.full_name || ""}</div>
+          </td>
+          <td class="py-3 pr-3">${emp.job_title || ""}</td>
+          <td class="py-3 pr-3">${emp.job_category || ""}</td>
+          <td class="py-3 pr-3 font-mono text-xs opacity-80">${emp.employee_code || ""}</td>
+          <td class="py-3 pr-3">
+            ${emp.is_admin ? `<span class="px-2 py-1 rounded-lg bg-[rgba(120,170,255,.14)] border border-[rgba(120,170,255,.20)] text-xs">Admin</span>` : `<span class="text-xs opacity-60">—</span>`}
+          </td>
+          <td class="py-3 pr-1 text-right">
+            <div class="inline-flex gap-2">
+              <button class="edit px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-xs" title="Edit">✎</button>
+              <button class="del px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-xs" title="Remove">✕</button>
+            </div>
+          </td>
+        `;
+        tr.querySelector(".edit").onclick = ()=> openEmployeeEditor(emp);
+        tr.querySelector(".del").onclick = ()=> confirmRemoveEmployee(emp);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openEmployeeEditor(emp){
+      const max = state.company?.max_employees ?? null;
+      const count = state.employees?.length || 0;
+      if(!emp && max && count >= max){
+        alert(`You’ve reached your plan limit (${max} employees). Upgrade your plan to add more.`);
+        return;
+      }
+
+      state.editingEmployee = emp ? { ...emp } : null;
+      setText($("empEditTitle"), emp ? "Edit employee" : "Add employee");
+
+      $("empEName").value = emp?.full_name || "";
+      $("empETitle").value = emp?.job_title || "";
+      $("empECategory").value = emp?.job_category || "";
+
+      setAdminChk(!!emp?.is_admin);
+      clearErr($("empEditMsg"));
+      openModal($("empEditModalBackdrop"));
+    }
+
+    function setAdminChk(on){
+      const box = $("empEAdminChk");
+      const tick = $("empEAdminTick");
+      if(on){
+        box.classList.add("on");
+        tick.classList.remove("hidden");
+      }else{
+        box.classList.remove("on");
+        tick.classList.add("hidden");
+      }
+      box.dataset.on = on ? "1" : "0";
+    }
+
+    async function saveEmployee(){
+      clearErr($("empEditMsg"));
+
+      const full_name = $("empEName").value.trim();
+      const job_title = $("empETitle").value.trim();
+      const job_category = $("empECategory").value.trim();
+      const is_admin = $("empEAdminChk").dataset.on === "1";
+
+      if(!full_name) return showErr($("empEditMsg"), "Please enter the employee name.");
+
+      const company = state.company;
+      if(!company?.id) return showErr($("empEditMsg"), "Company not loaded.");
 
       try{
-        const { error } = await sb.auth.signInWithPassword({ email, password });
-        if(error) throw error;
+        if(state.editingEmployee){
+          const { error } = await sb.from("employees").update({
+            full_name, job_title, job_category, is_admin
+          }).eq("id", state.editingEmployee.id);
 
-        hideOverlay($("loginModal"));
+          if(error) throw new Error(error.message);
+
+        } else {
+          const prefix = companyPrefix(company.company_name || "COM");
+          let code = "";
+          let tries = 0;
+
+          while(tries < 6){
+            code = prefix + randDigits(9);
+            const { data, error } = await sb.from("employees").select("id").eq("employee_code", code).limit(1);
+            if(error) throw new Error(error.message);
+            if(!data || !data.length) break;
+            tries++;
+          }
+          if(!code) throw new Error("Could not generate a unique employee ID.");
+
+          const row = {
+            company_id: company.id,
+            company_code: company.company_code,
+            full_name,
+            job_title,
+            job_category,
+            employee_code: code,
+            is_admin
+          };
+
+          const { error: insErr } = await sb.from("employees").insert(row);
+          if(insErr) throw new Error(insErr.message);
+        }
+
+        closeModal($("empEditModalBackdrop"));
         await loadAccount();
         showDashboard();
+
       }catch(e){
-        $("liBad").classList.remove("hidden");
-      }finally{
-        $("loginBtn").disabled = false;
-        $("loginBtn").classList.remove("opacity-50");
+        showErr($("empEditMsg"), String(e.message || "Save failed."));
       }
     }
 
-    async function resetPassword(){
-      const email = $("liEmail").value.trim().toLowerCase();
-      if(!email){ $("liMsg").textContent = "Enter your email first."; return; }
-      const redirectTo = location.origin + "/#reset";
-      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
-      $("liMsg").textContent = error ? error.message : "Password reset email sent.";
-    }
+    function confirmRemoveEmployee(emp){
+      const cname = state.company?.company_name || "this company";
+      const endsWithS = cname.trim().toLowerCase().endsWith("s");
+      const possessive = endsWithS ? `${cname}'` : `${cname}'s`;
 
-    // ---------- signup: IMPORTANT behaviour ----------
-    // We ONLY create account AFTER email code is verified AND payment Accept is clicked.
-    async function startSignup(){
-      $("suMsg").textContent = "";
+      const msg = `Are you sure you would like to remove ${emp.full_name} from ${possessive} SmartDatabase? This action cannot be undone.`;
+      setText($("confirmText"), msg);
 
-      if(!state.size){
-        $("suMsg").textContent = "Select a company size first.";
-        return;
-      }
+      state.confirmAction = async () => {
+        try{
+          const { error } = await sb.from("employees").delete().eq("id", emp.id);
+          if(error) throw new Error(error.message);
 
-      // 250+ is contact flow, not signup
-      if(state.size.id === "s250p"){
-        $("suMsg").textContent = "For 250+ people, use Contact Us from the checkout bar.";
-        return;
-      }
-
-      const company_name = $("suCompany").value.trim();
-      const email = $("suEmail").value.trim().toLowerCase();
-      const password = $("suPass").value;
-
-      if(!company_name){ $("suMsg").textContent = "Enter your company name."; return; }
-      if(!email){ $("suMsg").textContent = "Enter your email."; return; }
-      if(!password || password.length < 8){ $("suMsg").textContent = "Password must be at least 8 characters."; return; }
-
-      // store pending (NOT creating account yet)
-      state.pending = {
-        company_name, email, password,
-        company_size_id: state.size.id,
-        company_size_label: state.size.label,
-        company_size_price: state.size.price,
-        module_ids: [...state.modules]
+          closeModal($("confirmModalBackdrop"));
+          await loadAccount();
+          showDashboard();
+        }catch(e){
+          alert("Remove failed: " + (e.message || e));
+        }
       };
 
-      $("sendCodeBtn").disabled = true;
-      $("sendCodeBtn").classList.add("opacity-50");
-
-      try{
-        await apiPost("/api/send-code", { email, purpose:"owner_signup" });
-        $("codeBox").classList.remove("hidden");
-        $("suMsg").textContent = "Code sent. Check your inbox (and junk).";
-      }catch(e){
-        $("suMsg").textContent = e.message || "Failed to send code.";
-      }finally{
-        $("sendCodeBtn").disabled = false;
-        $("sendCodeBtn").classList.remove("opacity-50");
-      }
+      openModal($("confirmModalBackdrop"));
     }
 
-    function goToPayment(){
-      $("suMsg").textContent = "";
-      if(!state.pending){ $("suMsg").textContent = "Press Continue first."; return; }
-
-      const code = $("suCode").value.trim();
-      if(!code || code.length !== 6){
-        $("suMsg").textContent = "Enter the 6-digit code.";
-        return;
-      }
-
-      // Payment modal (testing)
-      hideOverlay($("signupModal"));
-      $("payMsg").textContent = "";
-      updateTotals();
-      showOverlay($("payModal"));
+    /******************************************************************
+      COMPANY SETTINGS
+    ******************************************************************/
+    function openSettings(){
+      clearErr($("setMsg"));
+      $("setName").value = state.company?.company_name || "";
+      $("setAddr").value = state.company?.company_address || "";
+      $("setPrimary").value = state.company?.primary_color || "";
+      $("setSecondary").value = state.company?.secondary_color || "";
+      $("setText").value = state.company?.text_color || "";
+      openModal($("settingsModalBackdrop"));
     }
 
-    async function acceptPayment(){
-      $("payMsg").textContent = "";
-      const p = state.pending;
-      const code = $("suCode").value.trim();
-
-      if(!p){ $("payMsg").textContent = "No pending signup found."; return; }
-      if(!code || code.length !== 6){ $("payMsg").textContent = "Verification code missing."; return; }
-
-      $("payAccept").disabled = true;
-      $("payAccept").classList.add("opacity-50");
+    async function saveSettings(){
+      clearErr($("setMsg"));
+      const patch = {
+        company_name: $("setName").value.trim(),
+        company_address: $("setAddr").value.trim(),
+        primary_color: $("setPrimary").value.trim() || null,
+        secondary_color: $("setSecondary").value.trim() || null,
+        text_color: $("setText").value.trim() || null
+      };
+      if(!patch.company_name) return showErr($("setMsg"), "Company name is required.");
+      if(!patch.company_address) return showErr($("setMsg"), "Company address is required.");
 
       try{
-        // Verify code + create user/company/subscription (server must do creation)
-        await apiPost("/api/verify-code", {
-          purpose: "owner_signup",
-          email: p.email,
-          code,
-          password: p.password,
-          company_name: p.company_name,
-          company_size_id: p.company_size_id,
-          company_size_label: p.company_size_label,
-          company_size_price: p.company_size_price,
-          module_ids: p.module_ids
-        });
-
-        // Now sign in (client)
-        const { error } = await sb.auth.signInWithPassword({ email: p.email, password: p.password });
-        if(error) throw new Error("Created, but login failed: " + error.message);
-
-        state.pending = null;
-        hideOverlay($("payModal"));
+        const { error } = await sb.from("companies").update(patch).eq("id", state.company.id);
+        if(error){
+          if(error.message.toLowerCase().includes("column") && error.message.toLowerCase().includes("does not exist")){
+            throw new Error("Your companies table is missing one or more colour columns. Add: primary_color, secondary_color, text_color.");
+          }
+          throw new Error(error.message);
+        }
+        closeModal($("settingsModalBackdrop"));
         await loadAccount();
         showDashboard();
       }catch(e){
-        $("payMsg").textContent = e.message || "Create user failed.";
-      }finally{
-        $("payAccept").disabled = false;
-        $("payAccept").classList.remove("opacity-50");
+        showErr($("setMsg"), String(e.message || "Save failed."));
       }
     }
 
-    function declinePayment(){
-      $("payMsg").textContent = "Payment declined (testing). Nothing has been created.";
+    /******************************************************************
+      BUY MORE SYSTEMS
+    ******************************************************************/
+    function buyMore(){
+      hide($("dashboard"));
+      show($("main"));
+      window.location.hash = "#packages";
+      $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
     }
 
-    // ---------- checkout button ----------
-    function checkout(){
-      if(!state.size){
-        scrollToEl($("packages"));
-        return;
-      }
+    /******************************************************************
+      EVENTS WIRING
+    ******************************************************************/
+    function wire(){
+      $("heroBuild").onclick = ()=> $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
+      $("heroEmployee").onclick = ()=> { openModal($("empModalBackdrop")); };
+      $("heroDown").onclick = ()=> $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
 
-      // 250+ contact flow
-      if(state.size.id === "s250p"){
-        const n = Number($("bigSize").value || 0);
-        if(!n){
-          alert("Please enter an approximate company size first.");
+      $("navHome").onclick = ()=> { hide($("dashboard")); show($("main")); window.scrollTo({ top:0, behavior:"smooth" }); };
+      $("navLogin").onclick = ()=> openModal($("loginModalBackdrop"));
+
+      document.querySelectorAll("[data-size]").forEach(btn=>{
+        btn.addEventListener("click", ()=> setCompanySize(btn.dataset.size));
+      });
+
+      $("plusCount").addEventListener("input", ()=> hide($("plusWarn")));
+      $("plusNotes").addEventListener("input", ()=>{ state.plusNotes = $("plusNotes").value; });
+
+      $("checkoutBtn").onclick = async ()=>{
+        if(!state.size){
+          alert("Select a company size first.");
           return;
         }
-        if(n < 250){
-          const ok = confirm("That number looks below 250. Are you sure you want the 250+ package?");
-          if(!ok) return;
+
+        if(state.size.id === "s250plus"){
+          const info = buildContactEmail();
+          if(!info) return;
+
+          if(info.confirm){
+            const ok = confirm("That number is under 250. Are you sure you want the 250+ package?");
+            if(!ok) return;
+
+            const selected = Array.from(state.selectedModules).map(id => MODULES.find(m=>m.id===id)?.name).filter(Boolean);
+            const subject = "250+ Person Company - Wanting to Sign Up";
+            const approx = Number($("plusCount").value || 0);
+            const notes = ($("plusNotes").value || "").trim();
+            const body = [
+              "Hello SmartCore Technology,",
+              "",
+              "We would like to discuss a SmartCore subscription for a 250+ person organisation.",
+              "",
+              `Approximate headcount: ${approx}`,
+              "",
+              "Requested systems:",
+              selected.length ? selected.map(s=>`- ${s}`).join("\n") : "- (none selected yet)",
+              "",
+              notes ? `Additional notes:\n${notes}\n` : "",
+              "Please let us know the next steps and any information you need from us.",
+              "",
+              "Kind regards,",
+              "(Your name)"
+            ].join("\n");
+            window.location.href = `mailto:support@smartcoretechnology.co.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            return;
+          }
+
+          window.location.href = info.mailto;
+          return;
         }
-        window.location.href = buildMailto();
-        return;
-      }
 
-      // open signup modal
-      $("codeBox").classList.add("hidden");
-      $("suCode").value = "";
-      $("suMsg").textContent = "";
-      showOverlay($("signupModal"));
+        openModal($("signupModalBackdrop"));
+      };
+
+      $("mmClose").onclick = ()=> closeModal($("moduleModalBackdrop"));
+      $("moduleModalBackdrop").addEventListener("click", (e)=>{ if(e.target === $("moduleModalBackdrop")) closeModal($("moduleModalBackdrop")); });
+
+      $("suClose").onclick = ()=> closeModal($("signupModalBackdrop"));
+      $("suContinue").onclick = ownerSendCode;
+      $("suGoLogin").onclick = ()=>{ closeModal($("signupModalBackdrop")); openModal($("loginModalBackdrop")); };
+      $("suEye").onclick = ()=>{ const p = $("suPassword"); p.type = (p.type === "password") ? "text" : "password"; };
+
+      $("vClose").onclick = ()=> closeModal($("verifyModalBackdrop"));
+      $("vVerify").onclick = ownerVerifyAndCreate;
+      $("vResend").onclick = resendOwnerCode;
+
+      $("payClose").onclick = ()=> closeModal($("payModalBackdrop"));
+      $("payAccept").onclick = paymentAccept;
+      $("payDecline").onclick = paymentDecline;
+
+      $("liClose").onclick = ()=> closeModal($("loginModalBackdrop"));
+      $("liEye").onclick = ()=>{ const p = $("liPassword"); p.type = (p.type === "password") ? "text" : "password"; };
+      $("liLogin").onclick = login;
+      $("liReset").onclick = resetPassword;
+      $("liNoAcc").onclick = ()=>{ closeModal($("loginModalBackdrop")); openModal($("noAccModalBackdrop")); };
+
+      $("noAccClose").onclick = ()=> closeModal($("noAccModalBackdrop"));
+      $("noAccEmployee").onclick = ()=>{ closeModal($("noAccModalBackdrop")); openModal($("empModalBackdrop")); };
+      $("noAccBuild").onclick = ()=>{ closeModal($("noAccModalBackdrop")); $("packages").scrollIntoView({ behavior:"smooth", block:"start" }); };
+
+      $("empClose").onclick = ()=> closeModal($("empModalBackdrop"));
+      $("empSend").onclick = employeeSendCode;
+      $("empVerify").onclick = employeeVerifyAndCreate;
+      $("empResend").onclick = employeeResend;
+      $("empEye").onclick = ()=>{ const p = $("empPassword"); p.type = (p.type === "password") ? "text" : "password"; };
+
+      $("dashSignOut").onclick = signOut;
+      $("dashBuyMore").onclick = buyMore;
+      $("dashSettingsBtn").onclick = openSettings;
+
+      $("setClose").onclick = ()=> closeModal($("settingsModalBackdrop"));
+      $("setSave").onclick = saveSettings;
+
+      $("empAddBtn").onclick = ()=> openEmployeeEditor(null);
+      $("empEditClose").onclick = ()=> closeModal($("empEditModalBackdrop"));
+      $("empESave").onclick = saveEmployee;
+      $("empEAdminWrap").onclick = ()=>{ const cur = $("empEAdminChk").dataset.on === "1"; setAdminChk(!cur); };
+
+      $("confirmClose").onclick = ()=> closeModal($("confirmModalBackdrop"));
+      $("confirmNo").onclick = ()=> closeModal($("confirmModalBackdrop"));
+      $("confirmYes").onclick = async ()=>{ if(typeof state.confirmAction === "function") await state.confirmAction(); };
+
+      [
+        $("signupModalBackdrop"),
+        $("verifyModalBackdrop"),
+        $("payModalBackdrop"),
+        $("loginModalBackdrop"),
+        $("noAccModalBackdrop"),
+        $("empModalBackdrop"),
+        $("settingsModalBackdrop"),
+        $("empEditModalBackdrop"),
+        $("confirmModalBackdrop")
+      ].forEach(b=>{
+        b.addEventListener("click", (e)=>{ if(e.target === b) closeModal(b); });
+      });
+
+      window.addEventListener("mousemove", bubbleParallax, { passive:true });
+      window.addEventListener("resize", ()=> buildBubbles(), { passive:true });
     }
 
-    // ---------- nav hide on scroll past hero ----------
-    let lastY = 0;
-    function navAutoHide(){
-      const nav = $("navWrap");
-      const y = window.scrollY || 0;
-      const heroH = $("hero").offsetHeight || 600;
-      const past = y > heroH * 0.65;
+    /******************************************************************
+      INITIALIZE
+    ******************************************************************/
+    async function init(){
+      buildBubbles();
+      initAnim();
+      initNavHide();
+      wire();
 
-      if(!past){
-        nav.classList.remove("navHidden");
-        lastY = y;
-        return;
-      }
-      if(y > lastY + 8) nav.classList.add("navHidden");
-      if(y < lastY - 8) nav.classList.remove("navHidden");
-      lastY = y;
-    }
-
-    // ---------- eye buttons ----------
-    function setupEye(btn, input){
-      btn.addEventListener("click", ()=>{
-        input.type = (input.type === "password") ? "text" : "password";
-      });
-    }
-
-    // ---------- init ----------
-    document.addEventListener("DOMContentLoaded", async ()=>{
-      $("year").textContent = new Date().getFullYear();
-
-      // reveal
-      setupReveal();
-
-      // hero icons (desktop)
-      buildHeroIcons();
-      heroMousePush();
-      window.addEventListener("resize", buildHeroIcons);
-
-      // scroll buttons
-      $("btnPackages").addEventListener("click", ()=> scrollToEl($("packages")));
-      $("btnArrow").addEventListener("click", ()=> scrollToEl($("packages")));
-
-      // size selection
-      document.querySelectorAll("[data-size]").forEach(btn=>{
-        btn.addEventListener("click", ()=> selectSize(btn.dataset.size));
-      });
-
-      // big size warning
-      $("bigSize").addEventListener("input", ()=>{
-        const v = Number($("bigSize").value || 0);
-        state.bigSize = v || null;
-        $("bigWarn").textContent = (v && v < 250)
-          ? "That number looks below 250. If you meant 250+, adjust it or choose the 101–250 package."
-          : "";
-      });
-
-      // render modules once (hidden until size)
       renderModules();
-      updateTotals();
+      updateTotal();
 
-      // summary / checkout
-      $("checkoutBtn").addEventListener("click", checkout);
-
-      // module modal close
-      $("mmClose").addEventListener("click", ()=> hideOverlay($("moduleModal")));
-      $("moduleModal").addEventListener("click", (e)=>{ if(e.target === $("moduleModal")) hideOverlay($("moduleModal")); });
-
-      // login modal
-      $("navLogin").addEventListener("click", ()=> showOverlay($("loginModal")));
-      $("loginClose").addEventListener("click", ()=> hideOverlay($("loginModal")));
-      $("loginModal").addEventListener("click", (e)=>{ if(e.target === $("loginModal")) hideOverlay($("loginModal")); });
-
-      $("loginBtn").addEventListener("click", login);
-      $("liBad").addEventListener("click", resetPassword);
-
-      $("noAccountBtn").addEventListener("click", ()=>{
-        alert("If your company is already set up on SmartCore, ask your admin for the company code and sign up as an employee.\n\nIf you're new, build your plan, select modules, and create a company account to get started.");
-      });
-
-      // signup modal
-      $("suClose").addEventListener("click", ()=> hideOverlay($("signupModal")));
-      $("signupModal").addEventListener("click", (e)=>{ if(e.target === $("signupModal")) hideOverlay($("signupModal")); });
-      $("sendCodeBtn").addEventListener("click", startSignup);
-      $("goPayBtn").addEventListener("click", goToPayment);
-
-      // pay modal
-      $("payClose").addEventListener("click", ()=> hideOverlay($("payModal")));
-      $("payModal").addEventListener("click", (e)=>{ if(e.target === $("payModal")) hideOverlay($("payModal")); });
-      $("payAccept").addEventListener("click", acceptPayment);
-      $("payDecline").addEventListener("click", declinePayment);
-
-      // dashboard buttons
-      $("dashSignOut").addEventListener("click", signOut);
-      $("dashHome").addEventListener("click", showHome);
-      $("dashBuyMore").addEventListener("click", ()=>{ showHome(); scrollToEl($("packages")); });
-
-      // eye setup
-      setupEye($("liEye"), $("liPass"));
-      setupEye($("suEye"), $("suPass"));
-
-      // nav hide
-      window.addEventListener("scroll", navAutoHide, { passive:true });
-
-      // Restore session -> dashboard
-      try{
-        await loadAccount();
-        if(state.session?.user){
-          showDashboard();
-        }
-      }catch(e){
-        console.warn(e);
+      await loadAccount();
+      if(state.session?.user){
+        showDashboard();
       }
+
+      if(window.location.hash === "#dashboard" && state.session?.user){
+        showDashboard();
+      }
+      if(window.location.hash === "#packages"){
+        $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
+      }
+    }
+
+    init().catch(err=>{
+      console.error(err);
+      alert("Init error: " + (err.message || err));
     });
   </script>
 
