@@ -1537,84 +1537,82 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     async function ownerVerifyAndCreate(){
-      clearErr($("vMsg"));
-      if(!state.pendingSignup){
-        showErr($("vMsg"), "Please start again from Create your company account.");
-        return;
+  clearErr($("vMsg"));
+  if(!state.pendingSignup){
+    showErr($("vMsg"), "Please start again from Create your company account.");
+    return;
+  }
+
+  const code = $("vCode").value.trim();
+  if(!code || code.length !== 6){
+    showErr($("vMsg"), "Please enter the 6-digit code.");
+    return;
+  }
+
+  $("vVerify").disabled = true;
+  $("vVerify").classList.add("opacity-60");
+
+  const email = state.pendingSignup.email;
+  const password = state.pendingSignup.password;
+
+  try{
+    // 1) Verify your custom code (your backend)
+    await apiPost("/api/verify-code", {
+      purpose: "owner_signup",
+      email,
+      code,
+      company_name: state.pendingSignup.company_name,
+      company_size_id: state.pendingSignup.company_size_id,
+      company_size_label: state.pendingSignup.company_size_label,
+      company_size_price: state.pendingSignup.company_size_price,
+      max_employees: state.pendingSignup.max_employees,
+      module_ids: state.pendingSignup.module_ids
+    });
+
+    // 2) CREATE USER FIRST (signup)
+    // If email confirmations are ON, session may be null. That's expected.
+    const { data: su, error: suErr } = await sb.auth.signUp({
+      email,
+      password,
+      options: { data: { company_name: state.pendingSignup.company_name } }
+    });
+
+    // If already registered, signUp will error -> sign in instead
+    if (suErr) {
+      const msg = (suErr.message || "").toLowerCase();
+      if (msg.includes("already registered") || msg.includes("user already")) {
+        const { data: si, error: siErr } = await sb.auth.signInWithPassword({ email, password });
+        if (siErr) throw new Error(siErr.message);
+      } else {
+        throw new Error(suErr.message);
       }
-
-      const code = $("vCode").value.trim();
-      if(!code || code.length !== 6){
-        showErr($("vMsg"), "Please enter the 6-digit code.");
-        return;
-      }
-
-      $("vVerify").disabled = true;
-      $("vVerify").classList.add("opacity-60");
-
-      try{
-        // 1) Verify your 6-digit code (your backend can store/validate)
-        // 2) Then ensure an Auth user exists and we can sign in
-        // NOTE: If your backend already creates the user, great — signIn will work.
-        await apiPost("/api/verify-code", {
-          purpose: "owner_signup",
-          email: state.pendingSignup.email,
-          code,
-          company_name: state.pendingSignup.company_name,
-          company_size_id: state.pendingSignup.company_size_id,
-          company_size_label: state.pendingSignup.company_size_label,
-          company_size_price: state.pendingSignup.company_size_price,
-          max_employees: state.pendingSignup.max_employees,
-          module_ids: state.pendingSignup.module_ids
-        });
-
-        // Try login. If user doesn’t exist yet, fall back to signUp (after code verified).
-        let signedIn = false;
-        const email = state.pendingSignup.email;
-        const password = state.pendingSignup.password;
-
-        const { data: signInData, error: signInErr } = await sb.auth.signInWithPassword({ email, password });
-        if(!signInErr && signInData?.session){
-          signedIn = true;
-        }
-
-        if(!signedIn){
-          // Fallback: create auth user now (AFTER code is verified)
-          const { data: su, error: suErr } = await sb.auth.signUp({
-            email,
-            password,
-            options: { data: { company_name: state.pendingSignup.company_name } }
-          });
-
-          if(suErr){
-            // If already registered, try sign in again
-            const { data: si2, error: si2Err } = await sb.auth.signInWithPassword({ email, password });
-            if(si2Err) throw new Error(si2Err.message || "Invalid login credentials.");
-          } else {
-            // If email confirmations are ON in Supabase, session may be null.
-            if(!su.session){
-              // Don’t brick the UI: show clear message
-              throw new Error("Account created, but email confirmation is required in Supabase Auth settings. Either disable confirmations for now, or confirm the email then log in.");
-            }
-          }
-        }
-
-        closeModal($("verifyModalBackdrop"));
-
-        // Payment placeholder
-        const total = computeTotal();
-        setText($("payTotal"), `${money(total)} / month`);
-        setText($("paySummary"), buildPaySummaryText());
-        clearErr($("payMsg"));
-        openModal($("payModalBackdrop"));
-
-      }catch(e){
-        showErr($("vMsg"), String(e.message || "Verification failed."));
-      }finally{
-        $("vVerify").disabled = false;
-        $("vVerify").classList.remove("opacity-60");
+    } else {
+      // If Supabase email confirmations are enabled, you won't get a session here
+      if (!su.session) {
+        // Don't try to sign in, it will often return "invalid login credentials"
+        // because user isn't confirmed yet.
+        throw new Error(
+          "Your account was created. Please check your inbox to confirm your email, then log in."
+        );
       }
     }
+
+    closeModal($("verifyModalBackdrop"));
+
+    // Payment placeholder
+    const total = computeTotal();
+    setText($("payTotal"), `${money(total)} / month`);
+    setText($("paySummary"), buildPaySummaryText());
+    clearErr($("payMsg"));
+    openModal($("payModalBackdrop"));
+
+  }catch(e){
+    showErr($("vMsg"), String(e.message || "Verification failed."));
+  }finally{
+    $("vVerify").disabled = false;
+    $("vVerify").classList.remove("opacity-60");
+  }
+}
 
     async function resendOwnerCode(){
       clearErr($("vMsg"));
@@ -2572,3 +2570,4 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
 </body>
 </html>
+
