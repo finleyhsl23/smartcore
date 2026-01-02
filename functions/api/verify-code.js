@@ -73,7 +73,8 @@ export async function onRequestPost({ request, env }) {
     if (purpose === "owner_signup") {
       if (!company_name) return json({ ok: false, error: "Missing company_name" }, 400);
       if (!company_size) return json({ ok: false, error: "Missing company_size" }, 400);
-      if (!full_name_from_body) return json({ ok: false, error: "Missing full_name" }, 400);
+      let full_name = String(body.full_name || "").trim();
+if (!full_name) full_name = "Owner";
     }
 
     if (purpose === "employee_signup") {
@@ -282,3 +283,4 @@ async function makeCompanyCode(companyName) {
   const n = String(Math.floor(100000 + Math.random() * 900000));
   return `${prefix}${n}`;
 }
+
