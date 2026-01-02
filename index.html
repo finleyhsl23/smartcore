@@ -1536,7 +1536,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       }
     }
 
-    async function ownerVerifyAndCreate(){
+    async function ownerVerifyAndCreate() {
   clearErr($("vMsg"));
 
   const code = $("vCode").value.trim();
@@ -1545,11 +1545,20 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     return;
   }
 
-  // ✅ These must be stored from the signup screen
+  // Pending signup details (must have been set in ownerSendCode)
   const email = state.pendingSignup?.email;
   const password = state.pendingSignup?.password;
   const company_name = state.pendingSignup?.company_name;
-  const company_size = state.pendingSignup?.company_size; // or company_size_id/label depending on how you store it
+
+  // Your backend verify-code.js expects: company_size (text)
+  // If you stored size id/label differently, we fall back safely.
+  const company_size =
+    state.pendingSignup?.company_size ||
+    state.pendingSignup?.company_size_label ||
+    state.pendingSignup?.company_size_id ||
+    state.size?.id ||
+    "";
+
   const module_ids = state.pendingSignup?.module_ids || [];
 
   if (!email || !password || !company_name) {
@@ -1557,13 +1566,16 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     return;
   }
 
+  $("vVerify").disabled = true;
+  $("vVerify").classList.add("opacity-60");
+
   try {
     // 1) VERIFY (checks code, returns verify_token)
     const verifyRes = await apiPost("/api/verify-code", {
       phase: "verify",
       purpose: "owner_signup",
       email,
-      code
+      code,
     });
 
     if (!verifyRes?.ok || !verifyRes?.verify_token) {
@@ -1578,42 +1590,40 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       code,
       verify_token: verifyRes.verify_token,
 
-      // ✅ MUST include password here
+      // required by backend
       password,
-
-      // If you don’t want to collect full_name yet, send a placeholder
       full_name: "Owner",
-
       company_name,
-      company_size,       // match your backend expectation
-      module_ids
+      company_size,
+      module_ids,
+
+      // optional extras (won’t hurt if backend ignores)
+      company_size_label: state.pendingSignup?.company_size_label || state.size?.label || company_size,
+      company_size_price: Number(state.pendingSignup?.company_size_price ?? state.size?.price ?? 0),
+      modules_total: Number(state.pendingSignup?.modules_total ?? 0),
+      total_monthly: Number(state.pendingSignup?.total_monthly ?? computeTotal?.() ?? 0),
     });
 
-    if (!finalRes?.ok) throw new Error(finalRes?.error || "Finalise failed.");
+    if (!finalRes?.ok) {
+      throw new Error(finalRes?.error || "Finalise failed.");
+    }
 
-    // ✅ Now the user exists, so login will work
+    // 3) Now user exists -> login will work
     const { error } = await sb.auth.signInWithPassword({ email, password });
     if (error) throw new Error(error.message);
 
+    // 4) Move to payment screen
     closeModal($("verifyModalBackdrop"));
-    openModal($("payModalBackdrop")); // or your next step
 
-  } catch (e) {
-    showErr($("vMsg"), String(e.message || e));
-  }
-}
-
-
-    // Payment placeholder
     const total = computeTotal();
     setText($("payTotal"), `${money(total)} / month`);
     setText($("paySummary"), buildPaySummaryText());
     clearErr($("payMsg"));
     openModal($("payModalBackdrop"));
 
-  }catch(e){
-    showErr($("vMsg"), String(e.message || "Verification failed."));
-  }finally{
+  } catch (e) {
+    showErr($("vMsg"), String(e?.message || e));
+  } finally {
     $("vVerify").disabled = false;
     $("vVerify").classList.remove("opacity-60");
   }
@@ -2575,5 +2585,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
 </body>
 </html>
+
 
 
