@@ -18,9 +18,8 @@
 
   <style>
     :root{
-      --bg0:#020617;
-      --bg1:#06153a;
-      --bg2:#020923;
+      --bg0:#020617;      /* near-black */
+      --bg1:#06153a;      /* deep navy */
       --panelA: rgba(8, 12, 28, .62);
       --panelB: rgba(8, 12, 28, .45);
       --stroke: rgba(255,255,255,.12);
@@ -49,6 +48,7 @@
       overflow-x:hidden;
     }
 
+    /* Glass */
     .glass{
       background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
       border:1px solid var(--stroke);
@@ -66,6 +66,7 @@
       box-shadow: var(--shadow2);
     }
 
+    /* Subtle animation */
     .fadeUp{
       opacity:0;
       transform: translateY(10px);
@@ -76,6 +77,7 @@
       transform: translateY(0);
     }
 
+    /* Nav hide animation */
     .navHide{
       transform: translateY(-120%);
       transition: transform .28s ease;
@@ -85,6 +87,7 @@
       transition: transform .28s ease;
     }
 
+    /* Hero */
     .hero{
       min-height: 100vh;
       position: relative;
@@ -95,6 +98,7 @@
       overflow:hidden;
     }
 
+    /* Icon bubbles */
     .iconField{
       position:absolute;
       inset:0;
@@ -124,6 +128,7 @@
       opacity:.9;
     }
 
+    /* Modal */
     .modalBackdrop{
       position:fixed;
       inset:0;
@@ -144,6 +149,7 @@
     }
     .noScroll{overflow:hidden;}
 
+    /* Form inputs */
     .inp{
       width:100%;
       border-radius: 14px;
@@ -159,6 +165,7 @@
       box-shadow: 0 0 0 3px rgba(120,170,255,.10);
     }
 
+    /* Custom file */
     input[type="file"]{display:none;}
     .fileBtn{
       display:inline-flex;
@@ -174,6 +181,7 @@
     }
     .fileBtn:hover{background: rgba(255,255,255,.08);}
 
+    /* Custom checkbox */
     .chkWrap{display:flex; align-items:center; gap:10px; user-select:none; cursor:pointer;}
     .chk{
       width:18px; height:18px; border-radius:6px;
@@ -187,18 +195,21 @@
       border-color: rgba(120,170,255,.38);
     }
 
+    /* Eye hover: subtle (no “drop” effect) */
     .eyeBtn{
       border:1px solid var(--stroke2);
       background: rgba(255,255,255,.04);
       border-radius: 12px;
       padding: 10px 12px;
-      transition: transform .12s ease, background .12s ease;
+      transition: transform .10s ease, background .10s ease;
+      transform-origin:center;
     }
     .eyeBtn:hover{
       background: rgba(255,255,255,.07);
-      transform: scale(0.98);
+      transform: scale(0.96);
     }
 
+    /* Card selected */
     .selected{
       outline: 2px solid rgba(120,170,255,.30);
       background: rgba(120,170,255,.10) !important;
@@ -216,8 +227,8 @@
   </style>
 
   <script>
-    // Set these in HTML or keep here.
-    // IMPORTANT: don't overwrite if already set elsewhere.
+    // IMPORTANT: keep these EXACTLY as your working Supabase keys
+    // (and make sure the URL string is correctly closed)
     window.__SUPABASE_URL = window.__SUPABASE_URL || "https://hjdpcfhozhoyeqevnupm.supabase.co";
     window.__SUPABASE_ANON = window.__SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZHBjZmhvemhveWVxZXZudXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MTk3MzYsImV4cCI6MjA4MjQ5NTczNn0.BXosJO4NmEZOe73GXSGPa3z-i_4ZzF9zBAMBIf6Mkts";
   </script>
@@ -448,7 +459,7 @@
     </footer>
   </main>
 
-  <!-- STICKY SUMMARY (only after company size selected) -->
+  <!-- STICKY SUMMARY -->
   <div id="summaryBar" class="fixed bottom-4 left-0 right-0 z-30 hidden">
     <div class="max-w-6xl mx-auto px-4">
       <div class="glass2 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -1004,11 +1015,18 @@
     function showErr(el, msg){
       el.textContent = msg;
       el.classList.remove("hidden");
+      el.classList.remove("text-green-300");
+      el.classList.add("text-red-300");
+    }
+    function showOk(el, msg){
+      el.textContent = msg;
+      el.classList.remove("hidden");
+      el.classList.remove("text-red-300");
+      el.classList.add("text-green-300");
     }
     function clearErr(el){
       el.textContent = "";
       el.classList.add("hidden");
-      // also reset any green class we might have applied
       el.classList.remove("text-green-300");
       el.classList.add("text-red-300");
     }
@@ -1022,18 +1040,18 @@
       const clean = (name||"").replace(/[^a-zA-Z]/g,"").toUpperCase();
       return (clean.slice(0,3) || "COM").padEnd(3,"X");
     }
-
     function randDigits(len){
       let out = "";
       for(let i=0;i<len;i++) out += Math.floor(Math.random()*10);
       return out;
     }
 
+    // Exact-match-friendly message
     const EMP_NOT_FOUND_MSG =
       "We couldn’t find your details linked to this company. Please contact your system admin and ask them to confirm your name has been added exactly as shown.";
 
     /******************************************************************
-      SUPABASE (single init)
+      SUPABASE (single init, avoids “already declared”)
     ******************************************************************/
     let sb = window.__SB_CLIENT;
     if (!sb){
@@ -1042,7 +1060,41 @@
     }
 
     /******************************************************************
-      DATA: Company sizes + modules
+      DB COLUMN MAP (matches your screenshots)
+      companies: company_name, address, logo_url, company_code, company_size, max_employees, primary_color, secondary_color, text_color, owner_user_id
+      profiles: user_id, email, company_id, company_name, full_name, job_title, job_category, role, is_admin (TEXT in your table)
+      employees: company_id, employee_code, full_name, job_title, job_category (+ optional is_admin if you add it later)
+      subscriptions: user_id, company_size_id, company_size_label, company_size_price, selected_modules (jsonb), modules_total, total_monthly, currency, status, selected_modules_ids
+    ******************************************************************/
+    const DB = {
+      companies: {
+        id: "id",
+        name: "company_name",
+        address: "address",
+        code: "company_code",
+        logo: "logo_url",
+        size: "company_size",
+        maxEmp: "max_employees",
+        primary: "primary_color",
+        secondary: "secondary_color",
+        text: "text_color",
+        owner: "owner_user_id",
+      },
+      profiles: {
+        userId: "user_id",
+        email: "email",
+        companyId: "company_id",
+        companyName: "company_name",
+        fullName: "full_name",
+        jobTitle: "job_title",
+        jobCat: "job_category",
+        role: "role",
+        isAdmin: "is_admin", // in your table this is TEXT
+      }
+    };
+
+    /******************************************************************
+      DATA
     ******************************************************************/
     const COMPANY_SIZES = [
       { id:"s25", label:"Up to 25 People", price:39, maxEmployees:25 },
@@ -1054,56 +1106,64 @@
     const MODULES = [
       { id:"presence_fire", name:"Presence & Fire Safety", price:10,
         summary:"A real-time presence system that shows exactly who is on site at any moment.",
-        full:`A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.
+        full:
+`A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.
 
 Designed to be simple, fast, and reliable when it matters most, with clear records for audits and incident reviews.`,
         bullets:["Live on-site list for staff and visitors","Instant evacuation roll call","Fire drill & incident reporting support","Clear, auditable sign-in history","Fast kiosk-friendly workflows"]
       },
       { id:"policies_handbook", name:"Policies & Staff Handbook", price:7,
         summary:"A central location for policies and staff handbooks with acknowledgement tracking.",
-        full:`A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document. Managers can update policies, request re-acknowledgement, and view clear records at any time.
+        full:
+`A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document. Managers can update policies, request re-acknowledgement, and view clear records at any time.
 
 Helps organisations demonstrate that information has been issued and acknowledged without relying on paper or email chains.`,
         bullets:["Policy library with versioning","Read & acknowledge tracking","Manager visibility and reporting","Re-acknowledgement requests","Simple exports for audits"]
       },
       { id:"holiday_booking", name:"Holiday Booking", price:8,
         summary:"A straightforward holiday request and approval system with a clean team view.",
-        full:`A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place.
+        full:
+`A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place.
 
 Intentionally simple and focused, with no payroll or salary management.`,
         bullets:["Clean request → approve/decline flow","Team calendar view of absences","Clear audit history of decisions","Designed to stay simple","No payroll complexity"]
       },
       { id:"accident_injury", name:"Accident & Injury Book", price:3,
         summary:"Digital accident and injury reporting that replaces paper books and stays organised.",
-        full:`A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required.
+        full:
+`A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required.
 
 Keeps incident records organised, secure, and easy to access if they are ever needed.`,
         bullets:["Quick incident logging","Photos and witness details","Secure searchable records","Export when required","Better organisation than paper"]
       },
       { id:"training_compliance", name:"Training & Compliance", price:9,
         summary:"Tracks training expiry dates, compliance requirements and scheduled checks.",
-        full:`Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance.
+        full:
+`Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance.
 
 Designed to support consistency and oversight without adding unnecessary complexity.`,
         bullets:["Expiry date tracking","Automated reminders","Compliance calendar view","Simple oversight for managers","Supports consistent standards"]
       },
       { id:"onboarding_offboarding", name:"Onboarding & Offboarding", price:8,
         summary:"Structured checklists for starters and leavers, keeping transitions consistent.",
-        full:`Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments. From access setup to equipment returns, nothing is forgotten.
+        full:
+`Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments. From access setup to equipment returns, nothing is forgotten.
 
 Provides a clear record of what was completed and when, supporting smoother staff transitions.`,
         bullets:["Starter & leaver checklists","Clear ownership of tasks","Audit trail of completion","Avoid missed steps","Consistent transitions"]
       },
       { id:"expenses_upload", name:"Expenses Upload", price:6,
         summary:"Upload receipts digitally with notes and categories, then export for accounts.",
-        full:`Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported for accounting or payroll systems.
+        full:
+`Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported for accounting or payroll systems.
 
 Keeps expense handling simple, organised, and traceable.`,
         bullets:["Receipt uploads with notes","Simple categories","Review & approval flow","Exports for accounts/payroll","No paper chasing"]
       },
       { id:"wellbeing_check", name:"Wellbeing Check", price:4,
         summary:"A lightweight wellbeing check-in with a simple, privacy-respecting pulse view.",
-        full:`A lightweight wellbeing check-in that allows staff to quickly select one of three options:
+        full:
+`A lightweight wellbeing check-in that allows staff to quickly select one of three options:
 
 🙂 Positive (green)
 😐 Neutral (amber)
@@ -1118,18 +1178,14 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
     /******************************************************************
       STATE
-      FIX ADDED: profileKey (profiles table might use user_id instead of id)
     ******************************************************************/
     const state = {
       size: null,
       selectedModules: new Set(),
-      plusApprox: null,
-      plusNotes: "",
       pendingSignup: null,
       pendingEmployee: null,
       session: null,
       profile: null,
-      profileKey: "id",     // <-- FIX: will auto-switch to "user_id" if needed
       company: null,
       subscription: null,
       employees: [],
@@ -1139,7 +1195,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     };
 
     /******************************************************************
-      ICONS (desktop only)
+      ICON BUBBLES (desktop only)
     ******************************************************************/
     const iconField = $("iconField");
     const iconSVGs = [
@@ -1147,11 +1203,11 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       `<svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6Z" stroke="white" stroke-opacity=".92" stroke-width="2"/><path d="M19.4 15a8 8 0 10-14.8 0" stroke="white" stroke-opacity=".55" stroke-width="2"/></svg>`,
       `<svg viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7V7Z" stroke="white" stroke-opacity=".92" stroke-width="2"/><path d="M4 10V4h6" stroke="white" stroke-opacity=".6" stroke-width="2"/><path d="M20 14v6h-6" stroke="white" stroke-opacity=".6" stroke-width="2"/></svg>`,
       `<svg viewBox="0 0 24 24" fill="none"><path d="M8 12h8" stroke="white" stroke-opacity=".92" stroke-width="2" stroke-linecap="round"/><path d="M12 8v8" stroke="white" stroke-opacity=".92" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M4 12h16" stroke="white" stroke-opacity=".8" stroke-width="2"/><path d="M12 4v16" stroke="white" stroke-opacity=".8" stroke-width="2"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M6 19h12M9 19V9l3-4 3 4v10" stroke="white" stroke-opacity=".85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M6 19h12M9 19V9l3-4 3 4v10" stroke="white" stroke-opacity=".85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M4 12h16" stroke="white" stroke-opacity=".8" stroke-width="2"/><path d="M12 4v16" stroke="white" stroke-opacity=".8" stroke-width="2"/></svg>`
     ];
-
     const bubbles = [];
+
     function buildBubbles(){
       iconField.innerHTML = "";
       bubbles.length = 0;
@@ -1210,9 +1266,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       });
     }
 
-    /******************************************************************
-      NAV hide/show
-    ******************************************************************/
     function initNavHide(){
       const nav = $("nav");
       const hero = $("hero");
@@ -1230,7 +1283,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     /******************************************************************
-      MODULE RENDER
+      MODULES UI
     ******************************************************************/
     function renderModules(){
       const grid = $("modulesGrid");
@@ -1238,7 +1291,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
       MODULES.forEach(m => {
         const selected = state.selectedModules.has(m.id);
-
         const card = document.createElement("div");
         card.className = "glass2 p-4 flex flex-col gap-3 hover:bg-white/6 transition cursor-pointer";
         if (selected) card.classList.add("selected");
@@ -1301,12 +1353,11 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       });
 
       $("mmVideo").src = "https://www.youtube.com/embed/S2kymv60ndQ";
-
       openModal($("moduleModalBackdrop"));
     }
 
     /******************************************************************
-      COMPANY SIZE SELECTION
+      COMPANY SIZE
     ******************************************************************/
     function setCompanySize(sizeId){
       const size = COMPANY_SIZES.find(s=>s.id===sizeId);
@@ -1327,8 +1378,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           $("plusCount").value = "";
           $("plusNotes").value = "";
           hide($("plusWarn"));
-          state.plusApprox = null;
-          state.plusNotes = "";
         }
       } else {
         hide($("modulesWrap"));
@@ -1338,6 +1387,16 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
       renderModules();
       updateTotal();
+    }
+
+    function computeTotal(){
+      const base = state.size?.price || 0;
+      let mods = 0;
+      state.selectedModules.forEach(id=>{
+        const m = MODULES.find(x=>x.id===id);
+        mods += (m?.price || 0);
+      });
+      return base + mods;
     }
 
     function updateTotal(){
@@ -1350,15 +1409,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
         return;
       }
 
-      let modulesTotal = 0;
-      state.selectedModules.forEach(id=>{
-        const m = MODULES.find(x=>x.id===id);
-        modulesTotal += (m?.price || 0);
-      });
-
-      const base = state.size.price || 0;
-      const total = base + modulesTotal;
-
+      const total = computeTotal();
       setText(totalEl, `${money(total)} / month`);
       setText(mini, `${state.size.label} + ${state.selectedModules.size} module(s)`);
 
@@ -1366,7 +1417,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     /******************************************************************
-      CONTACT EMAIL FOR 250+
+      250+ CONTACT EMAIL
     ******************************************************************/
     function buildContactEmail(){
       const approx = Number($("plusCount").value || 0);
@@ -1427,6 +1478,8 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
     /******************************************************************
       SIGNUP FLOW (OWNER)
+      FIX: after verify, we now ensure the auth user actually exists
+      and we can start a session (prevents “invalid login credentials”)
     ******************************************************************/
     async function ownerSendCode(){
       clearErr($("suMsg"));
@@ -1465,13 +1518,11 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
       try{
         await apiPost("/api/send-code", { email, purpose:"owner_signup" });
-
         closeModal($("signupModalBackdrop"));
         setText($("vEmail"), email);
         $("vCode").value = "";
         clearErr($("vMsg"));
         openModal($("verifyModalBackdrop"));
-
       }catch(e){
         const msg = String(e.message || "");
         if(msg.toLowerCase().includes("already") || msg.toLowerCase().includes("registered")){
@@ -1502,11 +1553,12 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       $("vVerify").classList.add("opacity-60");
 
       try{
-        const payload = {
+        // 1) Verify your 6-digit code (your backend can store/validate)
+        // 2) Then ensure an Auth user exists and we can sign in
+        // NOTE: If your backend already creates the user, great — signIn will work.
+        await apiPost("/api/verify-code", {
           purpose: "owner_signup",
           email: state.pendingSignup.email,
-          password: state.pendingSignup.password,
-          full_name: "",
           code,
           company_name: state.pendingSignup.company_name,
           company_size_id: state.pendingSignup.company_size_id,
@@ -1514,22 +1566,42 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           company_size_price: state.pendingSignup.company_size_price,
           max_employees: state.pendingSignup.max_employees,
           module_ids: state.pendingSignup.module_ids
-        };
+        });
 
-        const res = await apiPost("/api/verify-code", payload);
+        // Try login. If user doesn’t exist yet, fall back to signUp (after code verified).
+        let signedIn = false;
+        const email = state.pendingSignup.email;
+        const password = state.pendingSignup.password;
 
-        if(res.session){
-          await sb.auth.setSession(res.session);
-        } else {
-          const { error } = await sb.auth.signInWithPassword({
-            email: state.pendingSignup.email,
-            password: state.pendingSignup.password
+        const { data: signInData, error: signInErr } = await sb.auth.signInWithPassword({ email, password });
+        if(!signInErr && signInData?.session){
+          signedIn = true;
+        }
+
+        if(!signedIn){
+          // Fallback: create auth user now (AFTER code is verified)
+          const { data: su, error: suErr } = await sb.auth.signUp({
+            email,
+            password,
+            options: { data: { company_name: state.pendingSignup.company_name } }
           });
-          if(error) throw new Error(error.message);
+
+          if(suErr){
+            // If already registered, try sign in again
+            const { data: si2, error: si2Err } = await sb.auth.signInWithPassword({ email, password });
+            if(si2Err) throw new Error(si2Err.message || "Invalid login credentials.");
+          } else {
+            // If email confirmations are ON in Supabase, session may be null.
+            if(!su.session){
+              // Don’t brick the UI: show clear message
+              throw new Error("Account created, but email confirmation is required in Supabase Auth settings. Either disable confirmations for now, or confirm the email then log in.");
+            }
+          }
         }
 
         closeModal($("verifyModalBackdrop"));
 
+        // Payment placeholder
         const total = computeTotal();
         setText($("payTotal"), `${money(total)} / month`);
         setText($("paySummary"), buildPaySummaryText());
@@ -1549,24 +1621,10 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       if(!state.pendingSignup) return showErr($("vMsg"), "Start signup again first.");
       try{
         await apiPost("/api/send-code", { email: state.pendingSignup.email, purpose:"owner_signup" });
-        $("vMsg").textContent = "New code sent. Please check your inbox.";
-        $("vMsg").classList.remove("hidden");
-        $("vMsg").classList.remove("text-red-300");
-        $("vMsg").classList.add("text-green-300");
-        setTimeout(()=> clearErr($("vMsg")), 2500);
+        showOk($("vMsg"), "New code sent. Please check your inbox.");
       }catch(e){
         showErr($("vMsg"), String(e.message || "Failed to resend code."));
       }
-    }
-
-    function computeTotal(){
-      const base = state.size?.price || 0;
-      let mods = 0;
-      state.selectedModules.forEach(id=>{
-        const m = MODULES.find(x=>x.id===id);
-        mods += (m?.price || 0);
-      });
-      return base + mods;
     }
 
     function buildPaySummaryText(){
@@ -1576,6 +1634,10 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       return `Plan: ${sizeLabel}. Modules: ${mText}.`;
     }
 
+    /******************************************************************
+      PAYMENT (Accept/Decline)
+      FIX: subscriptions table columns match your screenshot
+    ******************************************************************/
     async function paymentAccept(){
       clearErr($("payMsg"));
 
@@ -1584,10 +1646,8 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
         if(uerr) throw new Error(uerr.message);
         if(!user) throw new Error("Not signed in.");
 
-        // Load company/profile from DB (this is where your error happened)
+        // Ensure account objects loaded (company/profile) but don't hard fail if backend hasn't created rows yet
         await loadAccount();
-
-        if(!state.company?.id) throw new Error("Company not found for your account.");
 
         const total = computeTotal();
         const moduleTotal = Array.from(state.selectedModules).reduce((sum, id)=>{
@@ -1595,13 +1655,21 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           return sum + (m?.price || 0);
         }, 0);
 
+        const selectedModules = Array.from(state.selectedModules).map(id=>{
+          const m = MODULES.find(x=>x.id===id);
+          return m ? ({ id: m.id, name: m.name, price: m.price }) : null;
+        }).filter(Boolean);
+
         const subRow = {
-          company_id: state.company.id,
+          user_id: user.id,
+          company_size_id: state.size?.id || null,
           company_size_label: state.size?.label || null,
           company_size_price: state.size?.price || 0,
-          module_ids: Array.from(state.selectedModules),
-          module_total: moduleTotal,
-          total: total,
+          selected_modules: selectedModules,                 // jsonb
+          selected_modules_ids: Array.from(state.selectedModules), // jsonb (as array)
+          modules_total: moduleTotal,
+          total_monthly: total,
+          currency: "GBP",
           status: "active"
         };
 
@@ -1609,6 +1677,9 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
         if(insErr) throw new Error("Subscription save failed: " + insErr.message);
 
         closeModal($("payModalBackdrop"));
+
+        // Reload + show dashboard
+        await loadAccount();
         showDashboard();
 
       }catch(e){
@@ -1618,9 +1689,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
     async function paymentDecline(){
       closeModal($("payModalBackdrop"));
-      state.pendingSignup = null;
       alert("Payment declined (testing). No subscription has been saved.");
-      window.location.hash = "#home";
     }
 
     /******************************************************************
@@ -1640,7 +1709,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       $("liLogin").classList.add("opacity-60");
 
       try{
-        const { error } = await sb.auth.signInWithPassword({ email, password });
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if(error){
           $("liWrong").classList.remove("hidden");
           throw new Error(error.message);
@@ -1666,10 +1735,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       try{
         const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + "/#reset" });
         if(error) throw new Error(error.message);
-        $("liMsg").textContent = "Password reset email sent. Please check your inbox.";
-        $("liMsg").classList.remove("hidden");
-        $("liMsg").classList.remove("text-red-300");
-        $("liMsg").classList.add("text-green-300");
+        showOk($("liMsg"), "Password reset email sent. Please check your inbox.");
       }catch(e){
         showErr($("liMsg"), String(e.message || "Failed to send reset email."));
       }
@@ -1684,12 +1750,13 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       state.employees = [];
       hide($("dashboard"));
       show($("main"));
-      window.location.hash = "#home";
       window.scrollTo({ top:0, behavior:"smooth" });
     }
 
     /******************************************************************
       EMPLOYEE SIGNUP
+      FIX: employees table does NOT have company_code column.
+      So: company_code -> find company.id -> then employees where company_id + exact name (case-insensitive in JS)
     ******************************************************************/
     async function employeeSendCode(){
       clearErr($("empMsg"));
@@ -1706,15 +1773,26 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       if(!password || password.length < 8) return showErr($("empMsg"), "Password must be at least 8 characters.");
 
       try{
-        const { data, error } = await sb
-          .from("employees")
-          .select("id, full_name, company_id")
-          .eq("company_code", company_code)
-          .ilike("full_name", full_name)
-          .limit(1);
+        const { data: comp, error: cErr } = await sb
+          .from("companies")
+          .select("id, company_name, company_code")
+          .eq(DB.companies.code, company_code)
+          .maybeSingle();
 
-        if(error) throw new Error(error.message);
-        if(!data || !data.length){
+        if(cErr) throw new Error(cErr.message);
+        if(!comp) return showErr($("empMsg"), EMP_NOT_FOUND_MSG);
+
+        const { data: emps, error: eErr } = await sb
+          .from("employees")
+          .select("id, full_name")
+          .eq("company_id", comp.id);
+
+        if(eErr) throw new Error(eErr.message);
+
+        const needle = full_name.replace(/\s+/g," ").trim().toLowerCase();
+        const match = (emps || []).find(x => (x.full_name||"").replace(/\s+/g," ").trim().toLowerCase() === needle);
+
+        if(!match){
           showErr($("empMsg"), EMP_NOT_FOUND_MSG);
           return;
         }
@@ -1740,22 +1818,28 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       if(!code || code.length !== 6) return showErr($("empVerifyMsg"), "Enter the 6-digit code.");
 
       try{
-        const payload = {
+        await apiPost("/api/verify-code", {
           purpose: "employee_signup",
           email: state.pendingEmployee.email,
-          password: state.pendingEmployee.password,
-          full_name: state.pendingEmployee.full_name,
           code,
-          company_code: state.pendingEmployee.company_code
-        };
-
-        await apiPost("/api/verify-code", payload);
-
-        const { error } = await sb.auth.signInWithPassword({
-          email: state.pendingEmployee.email,
-          password: state.pendingEmployee.password
+          company_code: state.pendingEmployee.company_code,
+          full_name: state.pendingEmployee.full_name
         });
-        if(error) throw new Error(error.message);
+
+        // Ensure auth user exists + log in (same fallback idea)
+        const email = state.pendingEmployee.email;
+        const password = state.pendingEmployee.password;
+
+        const { data: si, error: siErr } = await sb.auth.signInWithPassword({ email, password });
+        if(siErr){
+          const { data: su, error: suErr } = await sb.auth.signUp({ email, password });
+          if(suErr){
+            const { error: si2Err } = await sb.auth.signInWithPassword({ email, password });
+            if(si2Err) throw new Error(si2Err.message || "Invalid login credentials.");
+          } else if(!su.session){
+            throw new Error("Account created, but email confirmation is required in Supabase Auth settings. Confirm email then log in.");
+          }
+        }
 
         closeModal($("empModalBackdrop"));
         await loadAccount();
@@ -1771,143 +1855,74 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       if(!state.pendingEmployee) return showErr($("empVerifyMsg"), "Start again first.");
       try{
         await apiPost("/api/send-code", { email: state.pendingEmployee.email, purpose:"employee_signup", company_code: state.pendingEmployee.company_code });
-        $("empVerifyMsg").textContent = "New code sent. Please check your inbox.";
-        $("empVerifyMsg").classList.remove("hidden");
-        $("empVerifyMsg").classList.remove("text-red-300");
-        $("empVerifyMsg").classList.add("text-green-300");
-        setTimeout(()=> clearErr($("empVerifyMsg")), 2500);
+        showOk($("empVerifyMsg"), "New code sent. Please check your inbox.");
       }catch(e){
         showErr($("empVerifyMsg"), String(e.message || "Failed to resend code."));
       }
     }
 
     /******************************************************************
-      FIX: profiles table key detection (id vs user_id)
-      Your error: "Profile load failed: column profiles.id does not exist"
-      -> this automatically retries with profiles.user_id
-    ******************************************************************/
-    async function fetchProfileByUid(uid){
-      // Try common patterns in order:
-      // 1) profiles.id (UUID == auth uid)
-      // 2) profiles.user_id (UUID == auth uid)
-      // 3) profiles.uid (UUID == auth uid)
-      const candidates = ["id", "user_id", "uid"];
-
-      for (const key of candidates){
-        const { data, error } = await sb.from("profiles").select("*").eq(key, uid).maybeSingle();
-        if (!error){
-          state.profileKey = key;
-          return data || null;
-        }
-
-        const msg = (error?.message || "").toLowerCase();
-        // If column doesn't exist, try next candidate
-        if (msg.includes("column") && msg.includes("does not exist")) continue;
-
-        // If it's a different error, throw it
-        throw new Error("Profile load failed: " + error.message);
-      }
-
-      // If none of the keys exist, give a clear message
-      throw new Error("Profile load failed: your profiles table has no id/user_id/uid column to match auth users.");
-    }
-
-    /******************************************************************
       ACCOUNT LOADING + DASHBOARD
+      FIX: profiles primary key is user_id, NOT id
     ******************************************************************/
     async function loadAccount(){
-  // session
-  const { data: { session } } = await sb.auth.getSession();
-  state.session = session || null;
+      const { data: { session } } = await sb.auth.getSession();
+      state.session = session || null;
 
-  if(!state.session?.user){
-    state.profile = null;
-    state.company = null;
-    state.subscription = null;
-    state.employees = [];
-    return;
-  }
+      if(!state.session?.user){
+        state.profile = null;
+        state.company = null;
+        state.subscription = null;
+        state.employees = [];
+        return;
+      }
 
-  const uid = state.session.user.id;
+      const uid = state.session.user.id;
 
-  // ✅ IMPORTANT:
-  // Your profiles table does NOT have "id".
-  // Most setups use: profiles.user_id -> auth.users.id
-  // So we query profiles.user_id instead of profiles.id
-  const PROFILE_USER_COL = "user_id";
+      // profile by user_id (NOT id)
+      const { data: prof, error: pErr } = await sb
+        .from("profiles")
+        .select("*")
+        .eq(DB.profiles.userId, uid)
+        .maybeSingle();
 
-  const { data: prof, error: pErr } = await sb
-    .from("profiles")
-    .select("*")
-    .eq(PROFILE_USER_COL, uid)
-    .maybeSingle();
+      if(pErr) throw new Error("Profile load failed: " + pErr.message);
+      state.profile = prof || null;
 
-  if(pErr) throw new Error("Profile load failed: " + pErr.message);
-  state.profile = prof || null;
-
-  // company (by profile.company_id or ownership)
-  let comp = null;
-
-  if(state.profile?.company_id){
-    const { data, error } = await sb
-      .from("companies")
-      .select("*")
-      .eq("id", state.profile.company_id)
-      .maybeSingle();
-
-    if(error) throw new Error("Company load failed: " + error.message);
-    comp = data;
-  } else {
-    // fallback: owner_user_id
-    const { data, error } = await sb
-      .from("companies")
-      .select("*")
-      .eq("owner_user_id", uid)
-      .maybeSingle();
-
-    if(error) throw new Error("Company load failed: " + error.message);
-    comp = data;
-  }
-
-  state.company = comp || null;
-
-  // subscription (latest)
-  if(state.company?.id){
-    const { data: sub, error: sErr } = await sb
-      .from("subscriptions")
-      .select("*")
-      .eq("company_id", state.company.id)
-      .order("created_at", { ascending:false })
-      .limit(1)
-      .maybeSingle();
-
-    state.subscription = sErr ? null : (sub || null);
-
-    // employees
-    const { data: emps, error: eErr } = await sb
-      .from("employees")
-      .select("*")
-      .eq("company_id", state.company.id)
-      .order("created_at", { ascending:true });
-
-    state.employees = eErr ? [] : (emps || []);
-  } else {
-    state.subscription = null;
-    state.employees = [];
-  }
-}
-
-      if(state.company?.id){
-        const { data: sub, error: sErr } = await sb
-          .from("subscriptions")
+      // company by profile.company_id or owner_user_id
+      let comp = null;
+      if(state.profile?.[DB.profiles.companyId]){
+        const { data, error } = await sb
+          .from("companies")
           .select("*")
-          .eq("company_id", state.company.id)
-          .order("created_at", { ascending:false })
-          .limit(1)
+          .eq("id", state.profile[DB.profiles.companyId])
           .maybeSingle();
+        if(error) throw new Error("Company load failed: " + error.message);
+        comp = data;
+      } else {
+        const { data, error } = await sb
+          .from("companies")
+          .select("*")
+          .eq(DB.companies.owner, uid)
+          .maybeSingle();
+        if(error) throw new Error("Company load failed: " + error.message);
+        comp = data;
+      }
+      state.company = comp || null;
 
-        state.subscription = sErr ? null : (sub || null);
+      // subscription by user_id (your table has user_id, not company_id)
+      const { data: sub, error: sErr } = await sb
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", uid)
+        .order("created_at", { ascending:false })
+        .limit(1)
+        .maybeSingle();
 
+      state.subscription = sErr ? null : (sub || null);
+
+      // employees by company_id
+      if(state.company?.id){
         const { data: emps, error: eErr } = await sb
           .from("employees")
           .select("*")
@@ -1916,7 +1931,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
         state.employees = eErr ? [] : (emps || []);
       } else {
-        state.subscription = null;
         state.employees = [];
       }
     }
@@ -1925,19 +1939,17 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       hide($("main"));
       show($("dashboard"));
 
-      const compName = state.company?.company_name || "(not set)";
-      const compAddr = state.company?.company_address || "(not set)";
-      const compCode = state.company?.company_code || "(not set)";
-      const plan = state.subscription?.company_size_label || state.company?.company_size_label || "(not set)";
-      const max = state.company?.max_employees ?? state.subscription?.max_employees ?? null;
+      const c = state.company || {};
+      const plan = state.subscription?.company_size_label || c[DB.companies.size] || "(not set)";
+      const max = c[DB.companies.maxEmp] ?? null;
 
-      setText($("dashCompanyName"), compName);
-      setText($("dashCompanyAddress"), compAddr);
-      setText($("dashCompanyCode"), compCode);
+      setText($("dashCompanyName"), c[DB.companies.name] || "(not set)");
+      setText($("dashCompanyAddress"), c[DB.companies.address] || "(not set)");
+      setText($("dashCompanyCode"), c[DB.companies.code] || "(not set)");
       setText($("dashPlan"), plan);
       setText($("dashMaxEmp"), (max ? String(max) : "Unlimited"));
 
-      const total = state.subscription?.total ?? null;
+      const total = state.subscription?.total_monthly ?? null;
       setText($("dashTotal"), total ? `${money(total)} / month` : "");
 
       setText($("dashSub"), "Manage your company, systems, and employees.");
@@ -1955,7 +1967,13 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       const wrap = $("dashSystems");
       wrap.innerHTML = "";
 
-      const ownedIds = Array.isArray(state.subscription?.module_ids) ? state.subscription.module_ids : [];
+      // Your subs table stores selected_modules_ids (jsonb) OR selected_modules
+      const ownedIds = Array.isArray(state.subscription?.selected_modules_ids)
+        ? state.subscription.selected_modules_ids
+        : (Array.isArray(state.subscription?.selected_modules)
+            ? state.subscription.selected_modules.map(x=>x?.id).filter(Boolean)
+            : []);
+
       const owned = MODULES.filter(m => ownedIds.includes(m.id));
 
       if(!owned.length){
@@ -1984,15 +2002,17 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
     /******************************************************************
       ONBOARDING WIZARD
+      FIX: companies columns are company_name, address, logo_url
+      profiles columns are user_id, full_name, job_title, job_category, role, is_admin (text)
     ******************************************************************/
     function computeOnboardingStep(){
       const c = state.company || {};
       const p = state.profile || {};
 
-      if(!c.company_name) { state.onboardingStep = 1; return; }
-      if(!c.company_address) { state.onboardingStep = 2; return; }
-      if(!c.company_logo_url) { state.onboardingStep = 3; return; }
-      if(!p.full_name || !p.job_title || !p.job_category) { state.onboardingStep = 4; return; }
+      if(!c[DB.companies.name]) { state.onboardingStep = 1; return; }
+      if(!c[DB.companies.address]) { state.onboardingStep = 2; return; }
+      if(!c[DB.companies.logo]) { state.onboardingStep = 3; return; }
+      if(!p[DB.profiles.fullName] || !p[DB.profiles.jobTitle] || !p[DB.profiles.jobCat]) { state.onboardingStep = 4; return; }
       if(!state.employees || state.employees.length < 1) { state.onboardingStep = 5; return; }
 
       state.onboardingStep = 6;
@@ -2019,7 +2039,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           <div class="font-semibold">Company name</div>
           <div class="mt-2 text-sm opacity-75">Enter your full company name.</div>
           <div class="mt-3">
-            <input id="onbCompanyName" class="inp" placeholder="Full company name" value="${(state.company?.company_name||"")}" />
+            <input id="onbCompanyName" class="inp" placeholder="Full company name" value="${(state.company?.[DB.companies.name]||"")}" />
           </div>
           <div class="mt-4">
             <button id="onbNext1" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
@@ -2029,7 +2049,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
         $("onbNext1").onclick = async ()=>{
           const v = $("onbCompanyName").value.trim();
           if(!v) return showErr($("onbMsg"), "Please enter your company name.");
-          await updateCompany({ company_name: v });
+          await updateCompany({ [DB.companies.name]: v });
         };
         return;
       }
@@ -2039,7 +2059,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           <div class="font-semibold">Company address</div>
           <div class="mt-2 text-sm opacity-75">Enter the full company address.</div>
           <div class="mt-3">
-            <input id="onbCompanyAddr" class="inp" placeholder="Full company address" value="${(state.company?.company_address||"")}" />
+            <input id="onbCompanyAddr" class="inp" placeholder="Full company address" value="${(state.company?.[DB.companies.address]||"")}" />
           </div>
           <div class="mt-4">
             <button id="onbNext2" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
@@ -2049,7 +2069,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
         $("onbNext2").onclick = async ()=>{
           const v = $("onbCompanyAddr").value.trim();
           if(!v) return showErr($("onbMsg"), "Please enter your company address.");
-          await updateCompany({ company_address: v });
+          await updateCompany({ [DB.companies.address]: v });
         };
         return;
       }
@@ -2090,15 +2110,15 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="sm:col-span-2">
               <label class="text-xs opacity-70">Full name</label>
-              <input id="onbFullName" class="inp mt-1" placeholder="e.g. Finley Hassall" value="${(state.profile?.full_name||"")}" />
+              <input id="onbFullName" class="inp mt-1" placeholder="e.g. Finley Hassall" value="${(state.profile?.[DB.profiles.fullName]||"")}" />
             </div>
             <div>
               <label class="text-xs opacity-70">Job title</label>
-              <input id="onbJobTitle" class="inp mt-1" placeholder="e.g. Founder" value="${(state.profile?.job_title||"")}" />
+              <input id="onbJobTitle" class="inp mt-1" placeholder="e.g. Founder" value="${(state.profile?.[DB.profiles.jobTitle]||"")}" />
             </div>
             <div>
               <label class="text-xs opacity-70">Job category</label>
-              <input id="onbJobCategory" class="inp mt-1" placeholder="e.g. Senior management team" value="${(state.profile?.job_category||"")}" />
+              <input id="onbJobCategory" class="inp mt-1" placeholder="e.g. Senior management team" value="${(state.profile?.[DB.profiles.jobCat]||"")}" />
             </div>
 
             <div class="sm:col-span-2 mt-1">
@@ -2128,7 +2148,15 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           if(!full_name) return showErr($("onbMsg"), "Please enter your full name.");
           if(!job_title) return showErr($("onbMsg"), "Please enter your job title.");
           if(!job_category) return showErr($("onbMsg"), "Please enter your job category.");
-          await updateProfile({ full_name, job_title, job_category, role: "owner", is_admin: true });
+
+          // is_admin is TEXT in your table: store "true"/"false"
+          await updateProfile({
+            [DB.profiles.fullName]: full_name,
+            [DB.profiles.jobTitle]: job_title,
+            [DB.profiles.jobCat]: job_category,
+            [DB.profiles.role]: "owner",
+            [DB.profiles.isAdmin]: "true"
+          });
         };
         return;
       }
@@ -2154,32 +2182,22 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     async function updateCompany(patch){
       const c = state.company;
       if(!c?.id) return;
-
       const { error } = await sb.from("companies").update(patch).eq("id", c.id);
+      if(error) return showErr($("onbMsg"), error.message);
+      await loadAccount();
+      showDashboard();
+    }
+
+    async function updateProfile(patch){
+      const uid = state.session?.user?.id;
+      if(!uid) return;
+
+      const { error } = await sb.from("profiles").update(patch).eq(DB.profiles.userId, uid);
       if(error) return showErr($("onbMsg"), error.message);
 
       await loadAccount();
       showDashboard();
     }
-
-    // FIXED: updateProfile uses detected key (id vs user_id vs uid)
-    async function updateProfile(patch){
-  const uid = state.session?.user?.id;
-  if(!uid) return;
-
-  const PROFILE_USER_COL = "user_id";
-
-  const { error } = await sb
-    .from("profiles")
-    .update(patch)
-    .eq(PROFILE_USER_COL, uid);
-
-  if(error) return showErr($("onbMsg"), error.message);
-
-  await loadAccount();
-  showDashboard();
-}
-
 
     async function uploadCompanyLogo(file){
       try{
@@ -2196,7 +2214,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
         const url = pub?.data?.publicUrl;
         if(!url) throw new Error("Could not get logo URL.");
 
-        await updateCompany({ company_logo_url: url });
+        await updateCompany({ [DB.companies.logo]: url });
 
       }catch(e){
         showErr($("onbMsg"), String(e.message || "Logo upload failed."));
@@ -2205,12 +2223,15 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
     /******************************************************************
       EMPLOYEE CRUD
+      NOTE: your employees table currently DOES NOT have is_admin.
+      We keep the UI, but writes are “safe”:
+      - try with is_admin, if column missing -> retry without
     ******************************************************************/
     function renderEmployees(){
       const tbody = $("empTable");
       tbody.innerHTML = "";
 
-      const max = state.company?.max_employees ?? null;
+      const max = Number(state.company?.[DB.companies.maxEmp] || 0) || null;
       const count = state.employees?.length || 0;
 
       if(max && count >= max){
@@ -2220,17 +2241,16 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       }
 
       (state.employees || []).forEach(emp=>{
+        const isAdmin = (emp.is_admin === true || emp.is_admin === "true"); // handles if you add column later
         const tr = document.createElement("tr");
         tr.className = "border-t border-white/5";
         tr.innerHTML = `
-          <td class="py-3 pr-3">
-            <div class="font-medium">${emp.full_name || ""}</div>
-          </td>
+          <td class="py-3 pr-3"><div class="font-medium">${emp.full_name || ""}</div></td>
           <td class="py-3 pr-3">${emp.job_title || ""}</td>
           <td class="py-3 pr-3">${emp.job_category || ""}</td>
           <td class="py-3 pr-3 font-mono text-xs opacity-80">${emp.employee_code || ""}</td>
           <td class="py-3 pr-3">
-            ${emp.is_admin ? `<span class="px-2 py-1 rounded-lg bg-[rgba(120,170,255,.14)] border border-[rgba(120,170,255,.20)] text-xs">Admin</span>` : `<span class="text-xs opacity-60">—</span>`}
+            ${isAdmin ? `<span class="px-2 py-1 rounded-lg bg-[rgba(120,170,255,.14)] border border-[rgba(120,170,255,.20)] text-xs">Admin</span>` : `<span class="text-xs opacity-60">—</span>`}
           </td>
           <td class="py-3 pr-1 text-right">
             <div class="inline-flex gap-2">
@@ -2246,7 +2266,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     function openEmployeeEditor(emp){
-      const max = state.company?.max_employees ?? null;
+      const max = Number(state.company?.[DB.companies.maxEmp] || 0) || null;
       const count = state.employees?.length || 0;
       if(!emp && max && count >= max){
         alert(`You’ve reached your plan limit (${max} employees). Upgrade your plan to add more.`);
@@ -2260,7 +2280,9 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       $("empETitle").value = emp?.job_title || "";
       $("empECategory").value = emp?.job_category || "";
 
-      setAdminChk(!!emp?.is_admin);
+      const isOn = (emp?.is_admin === true || emp?.is_admin === "true");
+      setAdminChk(!!isOn);
+
       clearErr($("empEditMsg"));
       openModal($("empEditModalBackdrop"));
     }
@@ -2287,20 +2309,25 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       const is_admin = $("empEAdminChk").dataset.on === "1";
 
       if(!full_name) return showErr($("empEditMsg"), "Please enter the employee name.");
-
       const company = state.company;
       if(!company?.id) return showErr($("empEditMsg"), "Company not loaded.");
 
       try{
         if(state.editingEmployee){
-          const { error } = await sb.from("employees").update({
-            full_name, job_title, job_category, is_admin
-          }).eq("id", state.editingEmployee.id);
+          // update
+          const patchA = { full_name, job_title, job_category, is_admin };
+          let { error } = await sb.from("employees").update(patchA).eq("id", state.editingEmployee.id);
 
+          // if is_admin column doesn't exist -> retry without it
+          if(error && (error.message || "").toLowerCase().includes("column") && (error.message || "").toLowerCase().includes("is_admin")){
+            const patchB = { full_name, job_title, job_category };
+            const r2 = await sb.from("employees").update(patchB).eq("id", state.editingEmployee.id);
+            error = r2.error;
+          }
           if(error) throw new Error(error.message);
 
         } else {
-          const prefix = companyPrefix(company.company_name || "COM");
+          const prefix = companyPrefix(company[DB.companies.name] || "COM");
           let code = "";
           let tries = 0;
 
@@ -2313,9 +2340,8 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           }
           if(!code) throw new Error("Could not generate a unique employee ID.");
 
-          const row = {
+          const rowA = {
             company_id: company.id,
-            company_code: company.company_code,
             full_name,
             job_title,
             job_category,
@@ -2323,7 +2349,15 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
             is_admin
           };
 
-          const { error: insErr } = await sb.from("employees").insert(row);
+          let { error: insErr } = await sb.from("employees").insert(rowA);
+
+          // retry if is_admin column missing
+          if(insErr && (insErr.message || "").toLowerCase().includes("column") && (insErr.message || "").toLowerCase().includes("is_admin")){
+            const rowB = { company_id: company.id, full_name, job_title, job_category, employee_code: code };
+            const r2 = await sb.from("employees").insert(rowB);
+            insErr = r2.error;
+          }
+
           if(insErr) throw new Error(insErr.message);
         }
 
@@ -2337,7 +2371,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     function confirmRemoveEmployee(emp){
-      const cname = state.company?.company_name || "this company";
+      const cname = state.company?.[DB.companies.name] || "this company";
       const endsWithS = cname.trim().toLowerCase().endsWith("s");
       const possessive = endsWithS ? `${cname}'` : `${cname}'s`;
 
@@ -2348,7 +2382,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
         try{
           const { error } = await sb.from("employees").delete().eq("id", emp.id);
           if(error) throw new Error(error.message);
-
           closeModal($("confirmModalBackdrop"));
           await loadAccount();
           showDashboard();
@@ -2365,34 +2398,31 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     ******************************************************************/
     function openSettings(){
       clearErr($("setMsg"));
-      $("setName").value = state.company?.company_name || "";
-      $("setAddr").value = state.company?.company_address || "";
-      $("setPrimary").value = state.company?.primary_color || "";
-      $("setSecondary").value = state.company?.secondary_color || "";
-      $("setText").value = state.company?.text_color || "";
+      $("setName").value = state.company?.[DB.companies.name] || "";
+      $("setAddr").value = state.company?.[DB.companies.address] || "";
+      $("setPrimary").value = state.company?.[DB.companies.primary] || "";
+      $("setSecondary").value = state.company?.[DB.companies.secondary] || "";
+      $("setText").value = state.company?.[DB.companies.text] || "";
       openModal($("settingsModalBackdrop"));
     }
 
     async function saveSettings(){
       clearErr($("setMsg"));
+
       const patch = {
-        company_name: $("setName").value.trim(),
-        company_address: $("setAddr").value.trim(),
-        primary_color: $("setPrimary").value.trim() || null,
-        secondary_color: $("setSecondary").value.trim() || null,
-        text_color: $("setText").value.trim() || null
+        [DB.companies.name]: $("setName").value.trim(),
+        [DB.companies.address]: $("setAddr").value.trim(),
+        [DB.companies.primary]: $("setPrimary").value.trim() || null,
+        [DB.companies.secondary]: $("setSecondary").value.trim() || null,
+        [DB.companies.text]: $("setText").value.trim() || null
       };
-      if(!patch.company_name) return showErr($("setMsg"), "Company name is required.");
-      if(!patch.company_address) return showErr($("setMsg"), "Company address is required.");
+
+      if(!patch[DB.companies.name]) return showErr($("setMsg"), "Company name is required.");
+      if(!patch[DB.companies.address]) return showErr($("setMsg"), "Company address is required.");
 
       try{
         const { error } = await sb.from("companies").update(patch).eq("id", state.company.id);
-        if(error){
-          if(error.message.toLowerCase().includes("column") && error.message.toLowerCase().includes("does not exist")){
-            throw new Error("Your companies table is missing one or more colour columns. Add: primary_color, secondary_color, text_color.");
-          }
-          throw new Error(error.message);
-        }
+        if(error) throw new Error(error.message);
         closeModal($("settingsModalBackdrop"));
         await loadAccount();
         showDashboard();
@@ -2401,9 +2431,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       }
     }
 
-    /******************************************************************
-      BUY MORE SYSTEMS
-    ******************************************************************/
     function buyMore(){
       hide($("dashboard"));
       show($("main"));
@@ -2412,7 +2439,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     /******************************************************************
-      EVENTS WIRING
+      EVENTS
     ******************************************************************/
     function wire(){
       $("heroBuild").onclick = ()=> $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
@@ -2427,7 +2454,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       });
 
       $("plusCount").addEventListener("input", ()=> hide($("plusWarn")));
-      $("plusNotes").addEventListener("input", ()=>{ state.plusNotes = $("plusNotes").value; });
 
       $("checkoutBtn").onclick = async ()=>{
         if(!state.size){
@@ -2442,29 +2468,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           if(info.confirm){
             const ok = confirm("That number is under 250. Are you sure you want the 250+ package?");
             if(!ok) return;
-
-            const selected = Array.from(state.selectedModules).map(id => MODULES.find(m=>m.id===id)?.name).filter(Boolean);
-            const subject = "250+ Person Company - Wanting to Sign Up";
-            const approx = Number($("plusCount").value || 0);
-            const notes = ($("plusNotes").value || "").trim();
-            const body = [
-              "Hello SmartCore Technology,",
-              "",
-              "We would like to discuss a SmartCore subscription for a 250+ person organisation.",
-              "",
-              `Approximate headcount: ${approx}`,
-              "",
-              "Requested systems:",
-              selected.length ? selected.map(s=>`- ${s}`).join("\n") : "- (none selected yet)",
-              "",
-              notes ? `Additional notes:\n${notes}\n` : "",
-              "Please let us know the next steps and any information you need from us.",
-              "",
-              "Kind regards,",
-              "(Your name)"
-            ].join("\n");
-            window.location.href = `mailto:support@smartcoretechnology.co.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            return;
           }
 
           window.location.href = info.mailto;
@@ -2516,7 +2519,10 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       $("empAddBtn").onclick = ()=> openEmployeeEditor(null);
       $("empEditClose").onclick = ()=> closeModal($("empEditModalBackdrop"));
       $("empESave").onclick = saveEmployee;
-      $("empEAdminWrap").onclick = ()=>{ const cur = $("empEAdminChk").dataset.on === "1"; setAdminChk(!cur); };
+      $("empEAdminWrap").onclick = ()=>{
+        const cur = $("empEAdminChk").dataset.on === "1";
+        setAdminChk(!cur);
+      };
 
       $("confirmClose").onclick = ()=> closeModal($("confirmModalBackdrop"));
       $("confirmNo").onclick = ()=> closeModal($("confirmModalBackdrop"));
@@ -2541,7 +2547,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     /******************************************************************
-      INITIALIZE
+      INIT
     ******************************************************************/
     async function init(){
       buildBubbles();
@@ -2556,13 +2562,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       if(state.session?.user){
         showDashboard();
       }
-
-      if(window.location.hash === "#dashboard" && state.session?.user){
-        showDashboard();
-      }
-      if(window.location.hash === "#packages"){
-        $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
-      }
     }
 
     init().catch(err=>{
@@ -2573,4 +2572,3 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
 </body>
 </html>
-
