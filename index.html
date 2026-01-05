@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SmartCore Technology</title>
 
-  <!-- Tailwind (CDN ok for now while building) -->
+  <!-- Tailwind (CDN for build phase) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Inter -->
@@ -18,8 +18,9 @@
 
   <style>
     :root{
-      --bg0:#020617;      /* near-black */
-      --bg1:#06153a;      /* deep navy */
+      --bg0:#020617;
+      --bg1:#06153a;
+      --bg2:#020923;
       --panelA: rgba(8, 12, 28, .62);
       --panelB: rgba(8, 12, 28, .45);
       --stroke: rgba(255,255,255,.12);
@@ -35,7 +36,6 @@
       --r2: 16px;
       --blur: 16px;
     }
-
     html,body{height:100%}
     body{
       margin:0;
@@ -66,26 +66,17 @@
       box-shadow: var(--shadow2);
     }
 
-    /* Subtle animation */
+    /* Reveal anim */
     .fadeUp{
       opacity:0;
       transform: translateY(10px);
       transition: opacity .45s ease, transform .45s ease;
     }
-    .fadeUp.in{
-      opacity:1;
-      transform: translateY(0);
-    }
+    .fadeUp.in{ opacity:1; transform: translateY(0); }
 
-    /* Nav hide animation */
-    .navHide{
-      transform: translateY(-120%);
-      transition: transform .28s ease;
-    }
-    .navShow{
-      transform: translateY(0);
-      transition: transform .28s ease;
-    }
+    /* Nav hide */
+    .navHide{ transform: translateY(-120%); transition: transform .28s ease; }
+    .navShow{ transform: translateY(0); transition: transform .28s ease; }
 
     /* Hero */
     .hero{
@@ -122,11 +113,7 @@
       transform: translate3d(var(--tx,0px), var(--ty,0px), 0);
       transition: transform .12s ease;
     }
-    .bubble svg{
-      width:44px;
-      height:44px;
-      opacity:.9;
-    }
+    .bubble svg{ width:44px; height:44px; opacity:.9; }
 
     /* Modal */
     .modalBackdrop{
@@ -147,9 +134,9 @@
       overflow: auto;
       border-radius: 20px;
     }
-    .noScroll{overflow:hidden;}
+    .noScroll{ overflow:hidden; }
 
-    /* Form inputs */
+    /* Inputs */
     .inp{
       width:100%;
       border-radius: 14px;
@@ -159,13 +146,13 @@
       outline:none;
       color: var(--text);
     }
-    .inp::placeholder{color: rgba(234,240,255,.45);}
+    .inp::placeholder{ color: rgba(234,240,255,.45); }
     .inp:focus{
       border-color: rgba(120,170,255,.35);
       box-shadow: 0 0 0 3px rgba(120,170,255,.10);
     }
 
-    /* Custom file */
+    /* File */
     input[type="file"]{display:none;}
     .fileBtn{
       display:inline-flex;
@@ -181,8 +168,8 @@
     }
     .fileBtn:hover{background: rgba(255,255,255,.08);}
 
-    /* Custom checkbox */
-    .chkWrap{display:flex; align-items:center; gap:10px; user-select:none; cursor:pointer;}
+    /* Checkbox */
+    .chkWrap{ display:flex; align-items:center; gap:10px; user-select:none; cursor:pointer; }
     .chk{
       width:18px; height:18px; border-radius:6px;
       border:1px solid rgba(255,255,255,.18);
@@ -195,21 +182,20 @@
       border-color: rgba(120,170,255,.38);
     }
 
-    /* Eye hover: subtle (no “drop” effect) */
+    /* Eye hover subtle */
     .eyeBtn{
       border:1px solid var(--stroke2);
       background: rgba(255,255,255,.04);
       border-radius: 12px;
       padding: 10px 12px;
-      transition: transform .10s ease, background .10s ease;
-      transform-origin:center;
+      transition: transform .12s ease, background .12s ease;
     }
     .eyeBtn:hover{
       background: rgba(255,255,255,.07);
-      transform: scale(0.96);
+      transform: scale(0.98);
     }
 
-    /* Card selected */
+    /* Selected card */
     .selected{
       outline: 2px solid rgba(120,170,255,.30);
       background: rgba(120,170,255,.10) !important;
@@ -223,14 +209,14 @@
       box-shadow: 0 0 0 4px rgba(120,170,255,.14);
     }
 
-    html { scroll-behavior: smooth; }
+    html{ scroll-behavior:smooth; }
   </style>
 
   <script>
-    // IMPORTANT: keep these EXACTLY as your working Supabase keys
-    // (and make sure the URL string is correctly closed)
-    window.__SUPABASE_URL = window.__SUPABASE_URL || "https://hjdpcfhozhoyeqevnupm.supabase.co";
-    window.__SUPABASE_ANON = window.__SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZHBjZmhvemhveWVxZXZudXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MTk3MzYsImV4cCI6MjA4MjQ5NTczNn0.BXosJO4NmEZOe73GXSGPa3z-i_4ZzF9zBAMBIf6Mkts";
+    // Set these via global if you want, but keeping here is fine.
+    // IMPORTANT: Must match your deployed Supabase project.
+    window.__SUPABASE_URL  = window.__SUPABASE_URL  || "https://jmgbbybpsnazkxinnpxp.supabase.co";
+    window.__SUPABASE_ANON = window.__SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptZ2JieWJwc25hemt4aW5ucHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwNjYwNzcsImV4cCI6MjA2NzY0MjA3N30.2_PG1fun3Q2qNaLqxA7f7s2_VIn6BmRO2wcl5_mKSeo";
   </script>
 </head>
 
@@ -318,6 +304,7 @@
 
   <!-- MAIN -->
   <main id="main" class="relative z-10">
+
     <!-- BUILD PLAN -->
     <section id="packages" class="max-w-6xl mx-auto px-4 pb-24">
       <div class="pt-10 sm:pt-16">
@@ -392,11 +379,10 @@
             <h3 class="text-lg font-semibold">System Modules</h3>
             <p class="mt-1 text-sm" style="color: var(--muted);">Select the modules you want to include in your plan.</p>
           </div>
-
           <div id="modulesGrid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
         </div>
 
-        <!-- About -->
+        <!-- ABOUT -->
         <div class="mt-14 fadeUp" data-anim>
           <div class="glass p-6 sm:p-8">
             <h3 class="text-xl sm:text-2xl font-bold tracking-tight">About SmartCore Technology</h3>
@@ -516,7 +502,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Signup entry -->
+  <!-- MODAL: Signup (owner) -->
   <div id="signupModalBackdrop" class="modalBackdrop">
     <div class="modal glass p-5 sm:p-6" style="max-width: 720px;">
       <div class="flex items-start justify-between gap-3">
@@ -549,7 +535,7 @@
               </svg>
             </button>
           </div>
-          <div class="mt-2 text-xs opacity-60">We’ll only create your account after verification.</div>
+          <div id="suPwHint" class="mt-2 text-xs opacity-60">We only create your account after you verify your code and accept payment (testing).</div>
         </div>
       </div>
 
@@ -597,7 +583,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Payment placeholder -->
+  <!-- MODAL: Payment placeholder (IMPORTANT: finalise signup happens on Accept) -->
   <div id="payModalBackdrop" class="modalBackdrop">
     <div class="modal glass p-5 sm:p-6" style="max-width: 720px;">
       <div class="flex items-start justify-between gap-3">
@@ -623,6 +609,11 @@
         <button id="payDecline" class="flex-1 px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium">
           Decline
         </button>
+      </div>
+
+      <div class="mt-4 text-xs opacity-60">
+        On <b>Accept</b>, your account is created in Supabase and your subscription is saved.
+        On <b>Decline</b>, nothing is created.
       </div>
     </div>
   </div>
@@ -676,7 +667,7 @@
     </div>
   </div>
 
-  <!-- MODAL: “Don’t have an account?” -->
+  <!-- MODAL: No account -->
   <div id="noAccModalBackdrop" class="modalBackdrop">
     <div class="modal glass p-5 sm:p-6" style="max-width: 780px;">
       <div class="flex items-start justify-between gap-3">
@@ -711,7 +702,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Employee signup -->
+  <!-- MODAL: Employee signup (UI included; backend must support employee finalise if you want this to fully work) -->
   <div id="empModalBackdrop" class="modalBackdrop">
     <div class="modal glass p-5 sm:p-6" style="max-width: 760px;">
       <div class="flex items-start justify-between gap-3">
@@ -776,6 +767,10 @@
             Resend
           </button>
         </div>
+
+        <div class="mt-3 text-xs opacity-60">
+          Note: employee finalise requires your backend to support <b>purpose: employee_signup</b> in <code>/api/verify-code</code>.
+        </div>
       </div>
     </div>
   </div>
@@ -804,10 +799,9 @@
           <div class="text-sm opacity-80 font-semibold">Company</div>
           <div class="mt-3 space-y-2 text-sm">
             <div><span class="opacity-60">Name:</span> <span id="dashCompanyName" class="font-medium"></span></div>
-            <div><span class="opacity-60">Address:</span> <span id="dashCompanyAddress" class="font-medium"></span></div>
-            <div><span class="opacity-60">Company code:</span> <span id="dashCompanyCode" class="font-medium"></span></div>
+            <div><span class="opacity-60">Code:</span> <span id="dashCompanyCode" class="font-medium"></span></div>
+            <div><span class="opacity-60">Size:</span> <span id="dashCompanySize" class="font-medium"></span></div>
             <div><span class="opacity-60">Plan:</span> <span id="dashPlan" class="font-medium"></span></div>
-            <div><span class="opacity-60">Max employees:</span> <span id="dashMaxEmp" class="font-medium"></span></div>
           </div>
 
           <div class="mt-4">
@@ -828,19 +822,6 @@
 
           <div id="dashSystems" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
         </div>
-      </div>
-
-      <!-- ONBOARDING WIZARD -->
-      <div class="mt-6 glass p-5">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <div class="text-sm opacity-80 font-semibold">Company onboarding</div>
-            <div id="onbHint" class="mt-1 text-sm opacity-70">Complete the steps below to finish setup.</div>
-          </div>
-          <div class="text-xs opacity-60" id="onbStepLabel"></div>
-        </div>
-
-        <div id="onbStepBox" class="mt-4 glass2 p-4"></div>
       </div>
 
       <!-- EMPLOYEES -->
@@ -873,7 +854,6 @@
           </table>
         </div>
       </div>
-
     </div>
   </section>
 
@@ -883,7 +863,7 @@
       <div class="flex items-start justify-between gap-3">
         <div>
           <div class="text-xl sm:text-2xl font-bold">Company settings</div>
-          <div class="mt-1 text-sm opacity-75">Update details and colours. These can be used across SmartCore systems.</div>
+          <div class="mt-1 text-sm opacity-75">Update details and colours.</div>
         </div>
         <button id="setClose" class="px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm">Close</button>
       </div>
@@ -894,20 +874,8 @@
           <input id="setName" class="inp mt-1" />
         </div>
         <div class="sm:col-span-2">
-          <label class="text-xs opacity-70">Company address</label>
-          <input id="setAddr" class="inp mt-1" />
-        </div>
-        <div>
-          <label class="text-xs opacity-70">Primary colour</label>
-          <input id="setPrimary" class="inp mt-1" placeholder="#ff0000" />
-        </div>
-        <div>
-          <label class="text-xs opacity-70">Secondary colour</label>
-          <input id="setSecondary" class="inp mt-1" placeholder="#000000" />
-        </div>
-        <div class="sm:col-span-2">
-          <label class="text-xs opacity-70">Text colour</label>
-          <input id="setText" class="inp mt-1" placeholder="#ffffff" />
+          <label class="text-xs opacity-70">Company size (text)</label>
+          <input id="setSize" class="inp mt-1" placeholder="e.g. 26–100 People" />
         </div>
       </div>
 
@@ -955,7 +923,7 @@
             </div>
             <div>
               <div class="text-sm font-medium">Admin access</div>
-              <div class="text-xs opacity-70">Admins can manage employees and system settings.</div>
+              <div class="text-xs opacity-70">Admins can manage employees.</div>
             </div>
           </div>
         </div>
@@ -1046,12 +1014,8 @@
       return out;
     }
 
-    // Exact-match-friendly message
-    const EMP_NOT_FOUND_MSG =
-      "We couldn’t find your details linked to this company. Please contact your system admin and ask them to confirm your name has been added exactly as shown.";
-
     /******************************************************************
-      SUPABASE (single init, avoids “already declared”)
+      SUPABASE (single init, no redeclare)
     ******************************************************************/
     let sb = window.__SB_CLIENT;
     if (!sb){
@@ -1060,110 +1024,126 @@
     }
 
     /******************************************************************
-      DB COLUMN MAP (matches your screenshots)
-      companies: company_name, address, logo_url, company_code, company_size, max_employees, primary_color, secondary_color, text_color, owner_user_id
-      profiles: user_id, email, company_id, company_name, full_name, job_title, job_category, role, is_admin (TEXT in your table)
-      employees: company_id, employee_code, full_name, job_title, job_category (+ optional is_admin if you add it later)
-      subscriptions: user_id, company_size_id, company_size_label, company_size_price, selected_modules (jsonb), modules_total, total_monthly, currency, status, selected_modules_ids
-    ******************************************************************/
-    const DB = {
-      companies: {
-        id: "id",
-        name: "company_name",
-        address: "address",
-        code: "company_code",
-        logo: "logo_url",
-        size: "company_size",
-        maxEmp: "max_employees",
-        primary: "primary_color",
-        secondary: "secondary_color",
-        text: "text_color",
-        owner: "owner_user_id",
-      },
-      profiles: {
-        userId: "user_id",
-        email: "email",
-        companyId: "company_id",
-        companyName: "company_name",
-        fullName: "full_name",
-        jobTitle: "job_title",
-        jobCat: "job_category",
-        role: "role",
-        isAdmin: "is_admin", // in your table this is TEXT
-      }
-    };
-
-    /******************************************************************
       DATA
     ******************************************************************/
     const COMPANY_SIZES = [
-      { id:"s25", label:"Up to 25 People", price:39, maxEmployees:25 },
-      { id:"s100", label:"26–100 People", price:79, maxEmployees:100 },
-      { id:"s250", label:"101–250 People", price:149, maxEmployees:250 },
-      { id:"s250plus", label:"250+ People", price:0, maxEmployees:null }
+      { id:"s25", label:"Up to 25 People", price:39 },
+      { id:"s100", label:"26–100 People", price:79 },
+      { id:"s250", label:"101–250 People", price:149 },
+      { id:"s250plus", label:"250+ People", price:0 }
     ];
 
     const MODULES = [
-      { id:"presence_fire", name:"Presence & Fire Safety", price:10,
-        summary:"A real-time presence system that shows exactly who is on site at any moment.",
-        full:
-`A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.
+      {
+        id:"presence_fire",
+        name:"Presence & Fire Safety",
+        price:10,
+        full:`A real-time presence system that shows exactly who is on site at any moment. Staff and visitors sign in and out digitally, creating a live evacuation list that can be used immediately during fire drills or real emergencies.
 
 Designed to be simple, fast, and reliable when it matters most, with clear records for audits and incident reviews.`,
-        bullets:["Live on-site list for staff and visitors","Instant evacuation roll call","Fire drill & incident reporting support","Clear, auditable sign-in history","Fast kiosk-friendly workflows"]
+        bullets:[
+          "Live on-site list for staff and visitors",
+          "Instant evacuation roll call",
+          "Fire drill & incident reporting support",
+          "Clear, auditable sign-in history",
+          "Fast kiosk-friendly workflows"
+        ]
       },
-      { id:"policies_handbook", name:"Policies & Staff Handbook", price:7,
-        summary:"A central location for policies and staff handbooks with acknowledgement tracking.",
-        full:
-`A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document. Managers can update policies, request re-acknowledgement, and view clear records at any time.
+      {
+        id:"policies_handbook",
+        name:"Policies & Staff Handbook",
+        price:7,
+        full:`A central location for company policies and staff handbooks, with tracking to show who has read and acknowledged each document. Managers can update policies, request re-acknowledgement, and view clear records at any time.
 
 Helps organisations demonstrate that information has been issued and acknowledged without relying on paper or email chains.`,
-        bullets:["Policy library with versioning","Read & acknowledge tracking","Manager visibility and reporting","Re-acknowledgement requests","Simple exports for audits"]
+        bullets:[
+          "Policy library with versioning",
+          "Read & acknowledge tracking",
+          "Manager visibility and reporting",
+          "Re-acknowledgement requests",
+          "Simple exports for audits"
+        ]
       },
-      { id:"holiday_booking", name:"Holiday Booking", price:8,
-        summary:"A straightforward holiday request and approval system with a clean team view.",
-        full:
-`A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place.
+      {
+        id:"holiday_booking",
+        name:"Holiday Booking",
+        price:8,
+        full:`A straightforward holiday request and approval system that removes unnecessary back-and-forth. Staff submit requests, managers approve or decline, and teams can view upcoming absences in one place.
 
 Intentionally simple and focused, with no payroll or salary management.`,
-        bullets:["Clean request → approve/decline flow","Team calendar view of absences","Clear audit history of decisions","Designed to stay simple","No payroll complexity"]
+        bullets:[
+          "Clean request → approve/decline flow",
+          "Team calendar view of absences",
+          "Clear audit history of decisions",
+          "Designed to stay simple",
+          "No payroll complexity"
+        ]
       },
-      { id:"accident_injury", name:"Accident & Injury Book", price:3,
-        summary:"Digital accident and injury reporting that replaces paper books and stays organised.",
-        full:
-`A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required.
+      {
+        id:"accident_injury",
+        name:"Accident & Injury Book",
+        price:3,
+        full:`A digital accident and injury reporting system that replaces paper accident books. Incidents can be logged quickly with notes, photos, and witness details, and records can be exported when required.
 
 Keeps incident records organised, secure, and easy to access if they are ever needed.`,
-        bullets:["Quick incident logging","Photos and witness details","Secure searchable records","Export when required","Better organisation than paper"]
+        bullets:[
+          "Quick incident logging",
+          "Photos and witness details",
+          "Secure searchable records",
+          "Export when required",
+          "Better organisation than paper"
+        ]
       },
-      { id:"training_compliance", name:"Training & Compliance", price:9,
-        summary:"Tracks training expiry dates, compliance requirements and scheduled checks.",
-        full:
-`Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance.
+      {
+        id:"training_compliance",
+        name:"Training & Compliance",
+        price:9,
+        full:`Tracks training expiry dates, compliance requirements, and scheduled checks across the organisation. Automatic reminders help ensure nothing is missed, from fire drills to equipment inspections and vehicle compliance.
 
 Designed to support consistency and oversight without adding unnecessary complexity.`,
-        bullets:["Expiry date tracking","Automated reminders","Compliance calendar view","Simple oversight for managers","Supports consistent standards"]
+        bullets:[
+          "Expiry date tracking",
+          "Automated reminders",
+          "Compliance calendar view",
+          "Simple oversight for managers",
+          "Supports consistent standards"
+        ]
       },
-      { id:"onboarding_offboarding", name:"Onboarding & Offboarding", price:8,
-        summary:"Structured checklists for starters and leavers, keeping transitions consistent.",
-        full:
-`Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments. From access setup to equipment returns, nothing is forgotten.
+      {
+        id:"onboarding_offboarding",
+        name:"Onboarding & Offboarding",
+        price:8,
+        full:`Structured checklists for new starters and leavers, helping teams complete tasks consistently across departments. From access setup to equipment returns, nothing is forgotten.
 
 Provides a clear record of what was completed and when, supporting smoother staff transitions.`,
-        bullets:["Starter & leaver checklists","Clear ownership of tasks","Audit trail of completion","Avoid missed steps","Consistent transitions"]
+        bullets:[
+          "Starter & leaver checklists",
+          "Clear ownership of tasks",
+          "Audit trail of completion",
+          "Avoid missed steps",
+          "Consistent transitions"
+        ]
       },
-      { id:"expenses_upload", name:"Expenses Upload", price:6,
-        summary:"Upload receipts digitally with notes and categories, then export for accounts.",
-        full:
-`Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported for accounting or payroll systems.
+      {
+        id:"expenses_upload",
+        name:"Expenses Upload",
+        price:6,
+        full:`Allows staff to upload receipts digitally with notes and categories, removing the need to collect paper receipts. Submissions can be reviewed and exported for accounting or payroll systems.
 
 Keeps expense handling simple, organised, and traceable.`,
-        bullets:["Receipt uploads with notes","Simple categories","Review & approval flow","Exports for accounts/payroll","No paper chasing"]
+        bullets:[
+          "Receipt uploads with notes",
+          "Simple categories",
+          "Review & approval flow",
+          "Exports for accounts/payroll",
+          "No paper chasing"
+        ]
       },
-      { id:"wellbeing_check", name:"Wellbeing Check", price:4,
-        summary:"A lightweight wellbeing check-in with a simple, privacy-respecting pulse view.",
-        full:
-`A lightweight wellbeing check-in that allows staff to quickly select one of three options:
+      {
+        id:"wellbeing_check",
+        name:"Wellbeing Check",
+        price:4,
+        full:`A lightweight wellbeing check-in that allows staff to quickly select one of three options:
 
 🙂 Positive (green)
 😐 Neutral (amber)
@@ -1172,7 +1152,13 @@ Keeps expense handling simple, organised, and traceable.`,
 Over time, this provides managers with a simple, high-level view of wellbeing trends across teams, helping highlight when additional attention may be needed.
 
 No medical data, no intrusive questions — just a clear, visual pulse check designed to support awareness while respecting privacy.`,
-        bullets:["Simple 3-state wellbeing pulse","Trend visibility over time","Privacy-respecting (no medical data)","Lightweight and quick to use","Helps surface support needs"]
+        bullets:[
+          "Simple 3-state wellbeing pulse",
+          "Trend visibility over time",
+          "Privacy-respecting (no medical data)",
+          "Lightweight and quick to use",
+          "Helps surface support needs"
+        ]
       }
     ];
 
@@ -1182,20 +1168,28 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     const state = {
       size: null,
       selectedModules: new Set(),
-      pendingSignup: null,
+      plusApprox: null,
+      plusNotes: "",
+      // Owner signup flow state:
+      pendingSignup: null,      // {company_name,email,password,company_size_label,company_size_id,company_size_price,module_ids,verify_token}
+      pendingVerified: null,    // {email,purpose,verify_token,expires_at} from verify phase
+      // Employee flow state:
       pendingEmployee: null,
+      // Session state:
       session: null,
       profile: null,
       company: null,
       subscription: null,
       employees: [],
-      onboardingStep: 1,
       editingEmployee: null,
       confirmAction: null
     };
 
+    const EMP_NOT_FOUND_MSG =
+      "We couldn’t find your details linked to this company. Please contact your system admin and ask them to confirm your name has been added exactly as shown.";
+
     /******************************************************************
-      ICON BUBBLES (desktop only)
+      ICONS (desktop only)
     ******************************************************************/
     const iconField = $("iconField");
     const iconSVGs = [
@@ -1203,8 +1197,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       `<svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6Z" stroke="white" stroke-opacity=".92" stroke-width="2"/><path d="M19.4 15a8 8 0 10-14.8 0" stroke="white" stroke-opacity=".55" stroke-width="2"/></svg>`,
       `<svg viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7V7Z" stroke="white" stroke-opacity=".92" stroke-width="2"/><path d="M4 10V4h6" stroke="white" stroke-opacity=".6" stroke-width="2"/><path d="M20 14v6h-6" stroke="white" stroke-opacity=".6" stroke-width="2"/></svg>`,
       `<svg viewBox="0 0 24 24" fill="none"><path d="M8 12h8" stroke="white" stroke-opacity=".92" stroke-width="2" stroke-linecap="round"/><path d="M12 8v8" stroke="white" stroke-opacity=".92" stroke-width="2" stroke-linecap="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M6 19h12M9 19V9l3-4 3 4v10" stroke="white" stroke-opacity=".85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="none"><path d="M4 12h16" stroke="white" stroke-opacity=".8" stroke-width="2"/><path d="M12 4v16" stroke="white" stroke-opacity=".8" stroke-width="2"/></svg>`
+      `<svg viewBox="0 0 24 24" fill="none"><path d="M6 19h12M9 19V9l3-4 3 4v10" stroke="white" stroke-opacity=".85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
     ];
     const bubbles = [];
 
@@ -1243,10 +1236,8 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
       bubbles.forEach((b, idx) => {
         const strength = 18 + (idx % 3) * 6;
-        const tx = (dx * strength * -1);
-        const ty = (dy * strength * -1);
-        b.style.setProperty("--tx", tx.toFixed(1) + "px");
-        b.style.setProperty("--ty", ty.toFixed(1) + "px");
+        b.style.setProperty("--tx", (dx * strength * -1).toFixed(1) + "px");
+        b.style.setProperty("--ty", (dy * strength * -1).toFixed(1) + "px");
       });
     }
 
@@ -1266,6 +1257,9 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       });
     }
 
+    /******************************************************************
+      NAV hide/show past hero
+    ******************************************************************/
     function initNavHide(){
       const nav = $("nav");
       const hero = $("hero");
@@ -1283,7 +1277,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     /******************************************************************
-      MODULES UI
+      MODULES RENDER
     ******************************************************************/
     function renderModules(){
       const grid = $("modulesGrid");
@@ -1291,6 +1285,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
       MODULES.forEach(m => {
         const selected = state.selectedModules.has(m.id);
+
         const card = document.createElement("div");
         card.className = "glass2 p-4 flex flex-col gap-3 hover:bg-white/6 transition cursor-pointer";
         if (selected) card.classList.add("selected");
@@ -1371,13 +1366,14 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       if(state.size){
         show($("modulesWrap"));
         show($("summaryBar"));
-        if (state.size.id === "s250plus"){
-          show($("plusBox"));
-        } else {
+        if (state.size.id === "s250plus") show($("plusBox"));
+        else {
           hide($("plusBox"));
           $("plusCount").value = "";
           $("plusNotes").value = "";
           hide($("plusWarn"));
+          state.plusApprox = null;
+          state.plusNotes = "";
         }
       } else {
         hide($("modulesWrap"));
@@ -1399,6 +1395,13 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       return base + mods;
     }
 
+    function buildPaySummaryText(){
+      const sizeLabel = state.size?.label || "—";
+      const modules = Array.from(state.selectedModules).map(id => MODULES.find(m=>m.id===id)?.name).filter(Boolean);
+      const mText = modules.length ? modules.join(", ") : "No modules selected";
+      return `Plan: ${sizeLabel}. Modules: ${mText}.`;
+    }
+
     function updateTotal(){
       const totalEl = $("totalText");
       const mini = $("summaryMini");
@@ -1417,26 +1420,21 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     /******************************************************************
-      250+ CONTACT EMAIL
+      250+ contact
     ******************************************************************/
     function buildContactEmail(){
       const approx = Number($("plusCount").value || 0);
       const notes = ($("plusNotes").value || "").trim();
 
-      if(!approx || approx < 1){
+      if (!approx || approx < 1){
         showErr($("plusWarn"), "Please enter an approximate company size to continue.");
         return null;
       }
       hide($("plusWarn"));
 
-      if(approx < 250){
-        return { confirm: true, approx, notes };
-      }
-
       const selected = Array.from(state.selectedModules).map(id => MODULES.find(m=>m.id===id)?.name).filter(Boolean);
       const subject = "250+ Person Company - Wanting to Sign Up";
-
-      const bodyLines = [
+      const body = [
         "Hello SmartCore Technology,",
         "",
         "We would like to discuss a SmartCore subscription for a 250+ person organisation.",
@@ -1453,12 +1451,11 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
         "(Your name)"
       ].join("\n");
 
-      const mailto = `mailto:support@smartcoretechnology.co.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines)}`;
-      return { mailto };
+      return `mailto:support@smartcoretechnology.co.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
 
     /******************************************************************
-      API HELPERS (Cloudflare Functions)
+      API helper (Cloudflare)
     ******************************************************************/
     async function apiPost(path, payload){
       const res = await fetch(path, {
@@ -1477,15 +1474,21 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     /******************************************************************
-      SIGNUP FLOW (OWNER)
-      FIX: after verify, we now ensure the auth user actually exists
-      and we can start a session (prevents “invalid login credentials”)
+      OWNER SIGNUP FLOW (THIS FIXES YOUR "invalid login credentials" ISSUE)
+      - Step A: validate password on signup screen
+      - Step B: send code
+      - Step C: verify code (NO user created yet)
+      - Step D: payment accept => finalise (create user/company/profile/sub) => login
     ******************************************************************/
     async function ownerSendCode(){
       clearErr($("suMsg"));
 
       if(!state.size){
         showErr($("suMsg"), "Please select a company size first.");
+        return;
+      }
+      if(state.size.id === "s250plus"){
+        showErr($("suMsg"), "250+ companies must use Contact us.");
         return;
       }
 
@@ -1497,20 +1500,16 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       if(!email) return showErr($("suMsg"), "Please enter your email.");
       if(!password || password.length < 8) return showErr($("suMsg"), "Password must be at least 8 characters.");
 
-      if(state.size.id === "s250plus"){
-        showErr($("suMsg"), "Please use Contact us for 250+ companies.");
-        return;
-      }
-
       state.pendingSignup = {
         company_name,
         email,
         password,
+        company_size_label: state.size.label,     // backend expects company_size as text
         company_size_id: state.size.id,
-        company_size_label: state.size.label,
         company_size_price: state.size.price,
-        max_employees: state.size.maxEmployees,
         module_ids: Array.from(state.selectedModules),
+        verify_token: null,
+        code: null
       };
 
       $("suContinue").disabled = true;
@@ -1518,120 +1517,69 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
       try{
         await apiPost("/api/send-code", { email, purpose:"owner_signup" });
+
         closeModal($("signupModalBackdrop"));
         setText($("vEmail"), email);
         $("vCode").value = "";
         clearErr($("vMsg"));
         openModal($("verifyModalBackdrop"));
+
       }catch(e){
-        const msg = String(e.message || "");
-        if(msg.toLowerCase().includes("already") || msg.toLowerCase().includes("registered")){
-          showErr($("suMsg"), "This email is already registered to a SmartCore account — log in instead?");
-          return;
-        }
-        showErr($("suMsg"), msg || "Failed to send code.");
+        showErr($("suMsg"), String(e.message || "Failed to send code."));
       }finally{
         $("suContinue").disabled = false;
         $("suContinue").classList.remove("opacity-60");
       }
     }
 
-    async function ownerVerifyAndCreate() {
-  clearErr($("vMsg"));
+    // Verify only (no login, no finalise here)
+    async function ownerVerifyOnly(){
+      clearErr($("vMsg"));
 
-  const code = $("vCode").value.trim();
-  if (!code || code.length !== 6) {
-    showErr($("vMsg"), "Please enter the 6-digit code.");
-    return;
-  }
+      const code = $("vCode").value.trim();
+      if(!code || code.length !== 6) return showErr($("vMsg"), "Please enter the 6-digit code.");
 
-  // Pending signup details (must have been set in ownerSendCode)
-  const email = state.pendingSignup?.email;
-  const password = state.pendingSignup?.password;
-  const company_name = state.pendingSignup?.company_name;
+      if(!state.pendingSignup?.email){
+        return showErr($("vMsg"), "Signup details missing. Please close and try again.");
+      }
 
-  // Your backend verify-code.js expects: company_size (text)
-  // If you stored size id/label differently, we fall back safely.
-  const company_size =
-    state.pendingSignup?.company_size ||
-    state.pendingSignup?.company_size_label ||
-    state.pendingSignup?.company_size_id ||
-    state.size?.id ||
-    "";
+      $("vVerify").disabled = true;
+      $("vVerify").classList.add("opacity-60");
 
-  const module_ids = state.pendingSignup?.module_ids || [];
+      try{
+        const verifyRes = await apiPost("/api/verify-code", {
+          phase: "verify",
+          purpose: "owner_signup",
+          email: state.pendingSignup.email,
+          code
+        });
 
-  if (!email || !password || !company_name) {
-    showErr($("vMsg"), "Signup details missing. Please close and try again.");
-    return;
-  }
+        if(!verifyRes?.ok || !verifyRes?.verify_token){
+          throw new Error(verifyRes?.error || "Verification failed.");
+        }
 
-  $("vVerify").disabled = true;
-  $("vVerify").classList.add("opacity-60");
+        state.pendingSignup.verify_token = verifyRes.verify_token;
+        state.pendingSignup.code = code;
 
-  try {
-    // 1) VERIFY (checks code, returns verify_token)
-    const verifyRes = await apiPost("/api/verify-code", {
-      phase: "verify",
-      purpose: "owner_signup",
-      email,
-      code,
-    });
+        closeModal($("verifyModalBackdrop"));
 
-    if (!verifyRes?.ok || !verifyRes?.verify_token) {
-      throw new Error(verifyRes?.error || "Verification failed.");
+        const total = computeTotal();
+        setText($("payTotal"), `${money(total)} / month`);
+        setText($("paySummary"), buildPaySummaryText());
+        clearErr($("payMsg"));
+        openModal($("payModalBackdrop"));
+
+      }catch(e){
+        showErr($("vMsg"), String(e.message || e));
+      }finally{
+        $("vVerify").disabled = false;
+        $("vVerify").classList.remove("opacity-60");
+      }
     }
-
-    // 2) FINALISE (creates auth user + company + profile)
-    const finalRes = await apiPost("/api/verify-code", {
-      phase: "finalise",
-      purpose: "owner_signup",
-      email,
-      code,
-      verify_token: verifyRes.verify_token,
-
-      // required by backend
-      password,
-      full_name: "Owner",
-      company_name,
-      company_size,
-      module_ids,
-
-      // optional extras (won’t hurt if backend ignores)
-      company_size_label: state.pendingSignup?.company_size_label || state.size?.label || company_size,
-      company_size_price: Number(state.pendingSignup?.company_size_price ?? state.size?.price ?? 0),
-      modules_total: Number(state.pendingSignup?.modules_total ?? 0),
-      total_monthly: Number(state.pendingSignup?.total_monthly ?? computeTotal?.() ?? 0),
-    });
-
-    if (!finalRes?.ok) {
-      throw new Error(finalRes?.error || "Finalise failed.");
-    }
-
-    // 3) Now user exists -> login will work
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) throw new Error(error.message);
-
-    // 4) Move to payment screen
-    closeModal($("verifyModalBackdrop"));
-
-    const total = computeTotal();
-    setText($("payTotal"), `${money(total)} / month`);
-    setText($("paySummary"), buildPaySummaryText());
-    clearErr($("payMsg"));
-    openModal($("payModalBackdrop"));
-
-  } catch (e) {
-    showErr($("vMsg"), String(e?.message || e));
-  } finally {
-    $("vVerify").disabled = false;
-    $("vVerify").classList.remove("opacity-60");
-  }
-}
 
     async function resendOwnerCode(){
       clearErr($("vMsg"));
-      if(!state.pendingSignup) return showErr($("vMsg"), "Start signup again first.");
+      if(!state.pendingSignup?.email) return showErr($("vMsg"), "Start signup again first.");
       try{
         await apiPost("/api/send-code", { email: state.pendingSignup.email, purpose:"owner_signup" });
         showOk($("vMsg"), "New code sent. Please check your inbox.");
@@ -1640,73 +1588,78 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       }
     }
 
-    function buildPaySummaryText(){
-      const sizeLabel = state.size?.label || "—";
-      const modules = Array.from(state.selectedModules).map(id => MODULES.find(m=>m.id===id)?.name).filter(Boolean);
-      const mText = modules.length ? modules.join(", ") : "No modules selected";
-      return `Plan: ${sizeLabel}. Modules: ${mText}.`;
-    }
-
-    /******************************************************************
-      PAYMENT (Accept/Decline)
-      FIX: subscriptions table columns match your screenshot
-    ******************************************************************/
+    // Finalise only when payment accepted
     async function paymentAccept(){
       clearErr($("payMsg"));
 
+      const p = state.pendingSignup;
+      if(!p?.email || !p?.password || !p?.company_name || !p?.verify_token || !p?.code){
+        return showErr($("payMsg"), "Signup state missing. Please close and start again.");
+      }
+
+      $("payAccept").disabled = true;
+      $("payAccept").classList.add("opacity-60");
+
       try{
-        const { data: { user }, error: uerr } = await sb.auth.getUser();
-        if(uerr) throw new Error(uerr.message);
-        if(!user) throw new Error("Not signed in.");
-
-        // Ensure account objects loaded (company/profile) but don't hard fail if backend hasn't created rows yet
-        await loadAccount();
-
         const total = computeTotal();
-        const moduleTotal = Array.from(state.selectedModules).reduce((sum, id)=>{
+        const modules_total = Array.from(state.selectedModules).reduce((sum, id)=>{
           const m = MODULES.find(x=>x.id===id);
           return sum + (m?.price || 0);
         }, 0);
 
-        const selectedModules = Array.from(state.selectedModules).map(id=>{
-          const m = MODULES.find(x=>x.id===id);
-          return m ? ({ id: m.id, name: m.name, price: m.price }) : null;
-        }).filter(Boolean);
+        // FINALISE creates auth user + company + profile + subscription (your backend currently inserts subscription here)
+        const finalRes = await apiPost("/api/verify-code", {
+          phase: "finalise",
+          purpose: "owner_signup",
+          email: p.email,
+          code: p.code,
+          verify_token: p.verify_token,
 
-        const subRow = {
-          user_id: user.id,
-          company_size_id: state.size?.id || null,
-          company_size_label: state.size?.label || null,
-          company_size_price: state.size?.price || 0,
-          selected_modules: selectedModules,                 // jsonb
-          selected_modules_ids: Array.from(state.selectedModules), // jsonb (as array)
-          modules_total: moduleTotal,
-          total_monthly: total,
-          currency: "GBP",
-          status: "active"
-        };
+          password: p.password,
 
-        const { error: insErr } = await sb.from("subscriptions").insert(subRow);
-        if(insErr) throw new Error("Subscription save failed: " + insErr.message);
+          // backend requires full_name; we can set placeholder now and let you add proper later
+          full_name: "Owner",
+
+          company_name: p.company_name,
+          company_size: p.company_size_label,     // IMPORTANT: text field backend expects
+          company_size_label: p.company_size_label,
+          company_size_id: p.company_size_id,
+          company_size_price: p.company_size_price,
+          module_ids: p.module_ids,
+          modules_total,
+          total_monthly: total
+        });
+
+        if(!finalRes?.ok) throw new Error(finalRes?.error || "Finalise failed.");
+
+        // Now login (THIS is why your previous version said invalid login credentials: you were logging in too early)
+        const { error } = await sb.auth.signInWithPassword({ email: p.email, password: p.password });
+        if(error) throw new Error(error.message);
 
         closeModal($("payModalBackdrop"));
 
-        // Reload + show dashboard
+        // clear pending signup state
+        state.pendingSignup = null;
+
         await loadAccount();
         showDashboard();
 
       }catch(e){
-        showErr($("payMsg"), String(e.message || "Payment accept failed."));
+        showErr($("payMsg"), String(e.message || e));
+      }finally{
+        $("payAccept").disabled = false;
+        $("payAccept").classList.remove("opacity-60");
       }
     }
 
     async function paymentDecline(){
       closeModal($("payModalBackdrop"));
-      alert("Payment declined (testing). No subscription has been saved.");
+      state.pendingSignup = null;
+      alert("Payment declined (testing). No account was created.");
     }
 
     /******************************************************************
-      LOGIN FLOW
+      LOGIN
     ******************************************************************/
     async function login(){
       clearErr($("liMsg"));
@@ -1722,7 +1675,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       $("liLogin").classList.add("opacity-60");
 
       try{
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        const { error } = await sb.auth.signInWithPassword({ email, password });
         if(error){
           $("liWrong").classList.remove("hidden");
           throw new Error(error.message);
@@ -1742,6 +1695,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
     async function resetPassword(){
       clearErr($("liMsg"));
+
       const email = $("liEmail").value.trim().toLowerCase();
       if(!email) return showErr($("liMsg"), "Enter your email above, then click the reset link again.");
 
@@ -1761,15 +1715,16 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       state.company = null;
       state.subscription = null;
       state.employees = [];
+
       hide($("dashboard"));
       show($("main"));
       window.scrollTo({ top:0, behavior:"smooth" });
     }
 
     /******************************************************************
-      EMPLOYEE SIGNUP
-      FIX: employees table does NOT have company_code column.
-      So: company_code -> find company.id -> then employees where company_id + exact name (case-insensitive in JS)
+      EMPLOYEE SIGNUP (UI + verify phase)
+      NOTE: Your backend verify-code.js currently finalises ONLY owner_signup.
+      If you want employees to complete signup, your backend must handle employee finalise.
     ******************************************************************/
     async function employeeSendCode(){
       clearErr($("empMsg"));
@@ -1786,80 +1741,43 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       if(!password || password.length < 8) return showErr($("empMsg"), "Password must be at least 8 characters.");
 
       try{
-        const { data: comp, error: cErr } = await sb
-          .from("companies")
-          .select("id, company_name, company_code")
-          .eq(DB.companies.code, company_code)
-          .maybeSingle();
-
-        if(cErr) throw new Error(cErr.message);
-        if(!comp) return showErr($("empMsg"), EMP_NOT_FOUND_MSG);
-
-        const { data: emps, error: eErr } = await sb
-          .from("employees")
-          .select("id, full_name")
-          .eq("company_id", comp.id);
-
-        if(eErr) throw new Error(eErr.message);
-
-        const needle = full_name.replace(/\s+/g," ").trim().toLowerCase();
-        const match = (emps || []).find(x => (x.full_name||"").replace(/\s+/g," ").trim().toLowerCase() === needle);
-
-        if(!match){
-          showErr($("empMsg"), EMP_NOT_FOUND_MSG);
-          return;
-        }
+        // Your send-code.js already validates employee exists when purpose=employee_signup
+        await apiPost("/api/send-code", { email, purpose:"employee_signup", company_code, full_name });
 
         state.pendingEmployee = { company_code, full_name, email, password };
 
-        await apiPost("/api/send-code", { email, purpose:"employee_signup", company_code });
-
         show($("empVerifyBox"));
         $("empCode").value = "";
-        $("empMsg").classList.add("hidden");
 
       }catch(e){
         showErr($("empMsg"), String(e.message || "Failed to send code."));
       }
     }
 
-    async function employeeVerifyAndCreate(){
+    async function employeeVerify(){
       clearErr($("empVerifyMsg"));
-      if(!state.pendingEmployee) return showErr($("empVerifyMsg"), "Start again from the employee sign-up form.");
 
       const code = $("empCode").value.trim();
       if(!code || code.length !== 6) return showErr($("empVerifyMsg"), "Enter the 6-digit code.");
 
+      if(!state.pendingEmployee) return showErr($("empVerifyMsg"), "Start again from the employee sign-up form.");
+
       try{
-        await apiPost("/api/verify-code", {
+        const verifyRes = await apiPost("/api/verify-code", {
+          phase: "verify",
           purpose: "employee_signup",
           email: state.pendingEmployee.email,
-          code,
-          company_code: state.pendingEmployee.company_code,
-          full_name: state.pendingEmployee.full_name
+          code
         });
 
-        // Ensure auth user exists + log in (same fallback idea)
-        const email = state.pendingEmployee.email;
-        const password = state.pendingEmployee.password;
-
-        const { data: si, error: siErr } = await sb.auth.signInWithPassword({ email, password });
-        if(siErr){
-          const { data: su, error: suErr } = await sb.auth.signUp({ email, password });
-          if(suErr){
-            const { error: si2Err } = await sb.auth.signInWithPassword({ email, password });
-            if(si2Err) throw new Error(si2Err.message || "Invalid login credentials.");
-          } else if(!su.session){
-            throw new Error("Account created, but email confirmation is required in Supabase Auth settings. Confirm email then log in.");
-          }
+        if(!verifyRes?.ok || !verifyRes?.verify_token){
+          throw new Error(verifyRes?.error || "Verification failed.");
         }
 
-        closeModal($("empModalBackdrop"));
-        await loadAccount();
-        showDashboard();
+        showOk($("empVerifyMsg"), "Verified. Your admin needs to enable employee finalise in the backend to complete signup.");
 
       }catch(e){
-        showErr($("empVerifyMsg"), String(e.message || "Verification failed."));
+        showErr($("empVerifyMsg"), String(e.message || e));
       }
     }
 
@@ -1867,7 +1785,12 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       clearErr($("empVerifyMsg"));
       if(!state.pendingEmployee) return showErr($("empVerifyMsg"), "Start again first.");
       try{
-        await apiPost("/api/send-code", { email: state.pendingEmployee.email, purpose:"employee_signup", company_code: state.pendingEmployee.company_code });
+        await apiPost("/api/send-code", {
+          email: state.pendingEmployee.email,
+          purpose:"employee_signup",
+          company_code: state.pendingEmployee.company_code,
+          full_name: state.pendingEmployee.full_name
+        });
         showOk($("empVerifyMsg"), "New code sent. Please check your inbox.");
       }catch(e){
         showErr($("empVerifyMsg"), String(e.message || "Failed to resend code."));
@@ -1875,8 +1798,11 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     /******************************************************************
-      ACCOUNT LOADING + DASHBOARD
-      FIX: profiles primary key is user_id, NOT id
+      ACCOUNT LOADING
+      IMPORTANT FIX FOR YOUR SCHEMA:
+      - profiles primary key is NOT "id" in your project
+      - you have profiles.user_id and profiles.is_admin is TEXT
+      - employees.is_admin is BOOLEAN
     ******************************************************************/
     async function loadAccount(){
       const { data: { session } } = await sb.auth.getSession();
@@ -1892,38 +1818,33 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
       const uid = state.session.user.id;
 
-      // profile by user_id (NOT id)
+      // profiles by user_id (NOT id)
       const { data: prof, error: pErr } = await sb
         .from("profiles")
         .select("*")
-        .eq(DB.profiles.userId, uid)
+        .eq("user_id", uid)
         .maybeSingle();
 
       if(pErr) throw new Error("Profile load failed: " + pErr.message);
       state.profile = prof || null;
 
-      // company by profile.company_id or owner_user_id
+      // company (via profile.company_id or owner_user_id)
       let comp = null;
-      if(state.profile?.[DB.profiles.companyId]){
-        const { data, error } = await sb
-          .from("companies")
-          .select("*")
-          .eq("id", state.profile[DB.profiles.companyId])
-          .maybeSingle();
+
+      if(state.profile?.company_id){
+        const { data, error } = await sb.from("companies").select("*").eq("id", state.profile.company_id).maybeSingle();
         if(error) throw new Error("Company load failed: " + error.message);
         comp = data;
       } else {
-        const { data, error } = await sb
-          .from("companies")
-          .select("*")
-          .eq(DB.companies.owner, uid)
-          .maybeSingle();
+        const { data, error } = await sb.from("companies").select("*").eq("owner_user_id", uid).maybeSingle();
         if(error) throw new Error("Company load failed: " + error.message);
         comp = data;
       }
+
       state.company = comp || null;
 
-      // subscription by user_id (your table has user_id, not company_id)
+      // subscription: newest for that user or company
+      // your backend inserts subscriptions.user_id, so query by user_id
       const { data: sub, error: sErr } = await sb
         .from("subscriptions")
         .select("*")
@@ -1934,7 +1855,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
       state.subscription = sErr ? null : (sub || null);
 
-      // employees by company_id
+      // employees for company
       if(state.company?.id){
         const { data: emps, error: eErr } = await sb
           .from("employees")
@@ -1952,25 +1873,20 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       hide($("main"));
       show($("dashboard"));
 
-      const c = state.company || {};
-      const plan = state.subscription?.company_size_label || c[DB.companies.size] || "(not set)";
-      const max = c[DB.companies.maxEmp] ?? null;
+      setText($("dashCompanyName"), state.company?.company_name || "(not set)");
+      setText($("dashCompanyCode"), state.company?.company_code || "(not set)");
+      setText($("dashCompanySize"), state.company?.company_size || "(not set)");
 
-      setText($("dashCompanyName"), c[DB.companies.name] || "(not set)");
-      setText($("dashCompanyAddress"), c[DB.companies.address] || "(not set)");
-      setText($("dashCompanyCode"), c[DB.companies.code] || "(not set)");
+      const plan = state.subscription?.company_size_label || "(not set)";
       setText($("dashPlan"), plan);
-      setText($("dashMaxEmp"), (max ? String(max) : "Unlimited"));
 
-      const total = state.subscription?.total_monthly ?? null;
+      const total = state.subscription?.total_monthly ?? state.subscription?.total ?? null;
       setText($("dashTotal"), total ? `${money(total)} / month` : "");
 
       setText($("dashSub"), "Manage your company, systems, and employees.");
 
       renderSystems();
       renderEmployees();
-      computeOnboardingStep();
-      renderOnboardingStep();
 
       window.location.hash = "#dashboard";
       window.scrollTo({ top:0, behavior:"smooth" });
@@ -1980,12 +1896,11 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       const wrap = $("dashSystems");
       wrap.innerHTML = "";
 
-      // Your subs table stores selected_modules_ids (jsonb) OR selected_modules
-      const ownedIds = Array.isArray(state.subscription?.selected_modules_ids)
-        ? state.subscription.selected_modules_ids
-        : (Array.isArray(state.subscription?.selected_modules)
-            ? state.subscription.selected_modules.map(x=>x?.id).filter(Boolean)
-            : []);
+      const ownedIds =
+        Array.isArray(state.subscription?.selected_module_ids) ? state.subscription.selected_module_ids :
+        Array.isArray(state.subscription?.selected_modules) ? state.subscription.selected_modules :
+        Array.isArray(state.subscription?.module_ids) ? state.subscription.module_ids :
+        [];
 
       const owned = MODULES.filter(m => ownedIds.includes(m.id));
 
@@ -1993,7 +1908,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
         wrap.innerHTML = `
           <div class="glass2 p-4 sm:col-span-2 lg:col-span-3">
             <div class="font-semibold">No modules found</div>
-            <div class="mt-1 text-sm opacity-75">Once you complete payment (testing), your modules will appear here.</div>
+            <div class="mt-1 text-sm opacity-75">Once you accept payment (testing), your modules will appear here.</div>
           </div>
         `;
         return;
@@ -2001,260 +1916,25 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
       owned.forEach(m=>{
         const a = document.createElement("a");
-        a.href = "https://smartfits.co.uk";
-        a.target = "_blank";
-        a.rel = "noopener";
+        a.href = "#";
         a.className = "glass2 p-4 hover:bg-white/6 transition block";
         a.innerHTML = `
           <div class="font-semibold">${m.name}</div>
-          <div class="mt-1 text-sm opacity-75">Open system</div>
+          <div class="mt-1 text-sm opacity-75">Open system (coming next)</div>
         `;
+        a.onclick = (e)=>{ e.preventDefault(); alert("Module system page will be linked next."); };
         wrap.appendChild(a);
       });
     }
 
     /******************************************************************
-      ONBOARDING WIZARD
-      FIX: companies columns are company_name, address, logo_url
-      profiles columns are user_id, full_name, job_title, job_category, role, is_admin (text)
-    ******************************************************************/
-    function computeOnboardingStep(){
-      const c = state.company || {};
-      const p = state.profile || {};
-
-      if(!c[DB.companies.name]) { state.onboardingStep = 1; return; }
-      if(!c[DB.companies.address]) { state.onboardingStep = 2; return; }
-      if(!c[DB.companies.logo]) { state.onboardingStep = 3; return; }
-      if(!p[DB.profiles.fullName] || !p[DB.profiles.jobTitle] || !p[DB.profiles.jobCat]) { state.onboardingStep = 4; return; }
-      if(!state.employees || state.employees.length < 1) { state.onboardingStep = 5; return; }
-
-      state.onboardingStep = 6;
-    }
-
-    function renderOnboardingStep(){
-      const box = $("onbStepBox");
-      const label = $("onbStepLabel");
-      box.innerHTML = "";
-
-      if(state.onboardingStep === 6){
-        setText(label, "Completed");
-        box.innerHTML = `
-          <div class="font-semibold">Onboarding complete</div>
-          <div class="mt-2 text-sm opacity-75">Your company is set up and ready to use.</div>
-        `;
-        return;
-      }
-
-      setText(label, `Step ${state.onboardingStep} of 5`);
-
-      if(state.onboardingStep === 1){
-        box.innerHTML = `
-          <div class="font-semibold">Company name</div>
-          <div class="mt-2 text-sm opacity-75">Enter your full company name.</div>
-          <div class="mt-3">
-            <input id="onbCompanyName" class="inp" placeholder="Full company name" value="${(state.company?.[DB.companies.name]||"")}" />
-          </div>
-          <div class="mt-4">
-            <button id="onbNext1" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
-            <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
-          </div>
-        `;
-        $("onbNext1").onclick = async ()=>{
-          const v = $("onbCompanyName").value.trim();
-          if(!v) return showErr($("onbMsg"), "Please enter your company name.");
-          await updateCompany({ [DB.companies.name]: v });
-        };
-        return;
-      }
-
-      if(state.onboardingStep === 2){
-        box.innerHTML = `
-          <div class="font-semibold">Company address</div>
-          <div class="mt-2 text-sm opacity-75">Enter the full company address.</div>
-          <div class="mt-3">
-            <input id="onbCompanyAddr" class="inp" placeholder="Full company address" value="${(state.company?.[DB.companies.address]||"")}" />
-          </div>
-          <div class="mt-4">
-            <button id="onbNext2" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
-            <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
-          </div>
-        `;
-        $("onbNext2").onclick = async ()=>{
-          const v = $("onbCompanyAddr").value.trim();
-          if(!v) return showErr($("onbMsg"), "Please enter your company address.");
-          await updateCompany({ [DB.companies.address]: v });
-        };
-        return;
-      }
-
-      if(state.onboardingStep === 3){
-        box.innerHTML = `
-          <div class="font-semibold">Company logo</div>
-          <div class="mt-2 text-sm opacity-75">Upload a logo (preferably with no background).</div>
-          <div class="mt-3 flex flex-wrap items-center gap-3">
-            <label class="fileBtn">
-              <input id="onbLogoFile" type="file" accept="image/*" />
-              <span class="text-sm font-medium">Choose logo</span>
-            </label>
-            <div id="onbLogoName" class="text-sm opacity-70">No file selected</div>
-          </div>
-          <div class="mt-4">
-            <button id="onbNext3" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
-            <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
-          </div>
-        `;
-        $("onbLogoFile").onchange = ()=>{
-          const f = $("onbLogoFile").files?.[0];
-          setText($("onbLogoName"), f ? f.name : "No file selected");
-        };
-        $("onbNext3").onclick = async ()=>{
-          const f = $("onbLogoFile").files?.[0];
-          if(!f) return showErr($("onbMsg"), "Please choose a logo file.");
-          await uploadCompanyLogo(f);
-        };
-        return;
-      }
-
-      if(state.onboardingStep === 4){
-        box.innerHTML = `
-          <div class="font-semibold">Tell us about you</div>
-          <div class="mt-2 text-sm opacity-75">This helps set the owner profile and permissions.</div>
-
-          <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="sm:col-span-2">
-              <label class="text-xs opacity-70">Full name</label>
-              <input id="onbFullName" class="inp mt-1" placeholder="e.g. Finley Hassall" value="${(state.profile?.[DB.profiles.fullName]||"")}" />
-            </div>
-            <div>
-              <label class="text-xs opacity-70">Job title</label>
-              <input id="onbJobTitle" class="inp mt-1" placeholder="e.g. Founder" value="${(state.profile?.[DB.profiles.jobTitle]||"")}" />
-            </div>
-            <div>
-              <label class="text-xs opacity-70">Job category</label>
-              <input id="onbJobCategory" class="inp mt-1" placeholder="e.g. Senior management team" value="${(state.profile?.[DB.profiles.jobCat]||"")}" />
-            </div>
-
-            <div class="sm:col-span-2 mt-1">
-              <div class="chkWrap" id="onbAdminWrap">
-                <div class="chk on" id="onbAdminChk">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M20 6L9 17l-5-5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="text-sm font-medium">Admin access</div>
-                  <div class="text-xs opacity-70">Owners are admins by default. You can adjust employee admins later.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-4">
-            <button id="onbNext4" class="px-4 py-3 rounded-2xl border border-[rgba(120,170,255,.35)] bg-[rgba(120,170,255,.16)] hover:bg-[rgba(120,170,255,.22)] text-sm font-medium">Continue</button>
-            <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
-          </div>
-        `;
-        $("onbNext4").onclick = async ()=>{
-          const full_name = $("onbFullName").value.trim();
-          const job_title = $("onbJobTitle").value.trim();
-          const job_category = $("onbJobCategory").value.trim();
-          if(!full_name) return showErr($("onbMsg"), "Please enter your full name.");
-          if(!job_title) return showErr($("onbMsg"), "Please enter your job title.");
-          if(!job_category) return showErr($("onbMsg"), "Please enter your job category.");
-
-          // is_admin is TEXT in your table: store "true"/"false"
-          await updateProfile({
-            [DB.profiles.fullName]: full_name,
-            [DB.profiles.jobTitle]: job_title,
-            [DB.profiles.jobCat]: job_category,
-            [DB.profiles.role]: "owner",
-            [DB.profiles.isAdmin]: "true"
-          });
-        };
-        return;
-      }
-
-      if(state.onboardingStep === 5){
-        box.innerHTML = `
-          <div class="font-semibold">Add employees</div>
-          <div class="mt-2 text-sm opacity-75">Add at least one employee. You can add more at any time.</div>
-
-          <div class="mt-4">
-            <button id="onbAddEmp" class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium">
-              Add your first employee
-            </button>
-          </div>
-
-          <div id="onbMsg" class="mt-3 text-sm text-red-300 hidden"></div>
-        `;
-        $("onbAddEmp").onclick = ()=> openEmployeeEditor(null);
-        return;
-      }
-    }
-
-    async function updateCompany(patch){
-      const c = state.company;
-      if(!c?.id) return;
-      const { error } = await sb.from("companies").update(patch).eq("id", c.id);
-      if(error) return showErr($("onbMsg"), error.message);
-      await loadAccount();
-      showDashboard();
-    }
-
-    async function updateProfile(patch){
-      const uid = state.session?.user?.id;
-      if(!uid) return;
-
-      const { error } = await sb.from("profiles").update(patch).eq(DB.profiles.userId, uid);
-      if(error) return showErr($("onbMsg"), error.message);
-
-      await loadAccount();
-      showDashboard();
-    }
-
-    async function uploadCompanyLogo(file){
-      try{
-        const companyId = state.company?.id;
-        if(!companyId) throw new Error("Company not found.");
-
-        const ext = (file.name.split(".").pop() || "png").toLowerCase();
-        const path = `${companyId}/logo.${ext}`;
-
-        const up = await sb.storage.from("company-logos").upload(path, file, { upsert:true, contentType: file.type });
-        if(up.error) throw new Error(up.error.message);
-
-        const pub = sb.storage.from("company-logos").getPublicUrl(path);
-        const url = pub?.data?.publicUrl;
-        if(!url) throw new Error("Could not get logo URL.");
-
-        await updateCompany({ [DB.companies.logo]: url });
-
-      }catch(e){
-        showErr($("onbMsg"), String(e.message || "Logo upload failed."));
-      }
-    }
-
-    /******************************************************************
-      EMPLOYEE CRUD
-      NOTE: your employees table currently DOES NOT have is_admin.
-      We keep the UI, but writes are “safe”:
-      - try with is_admin, if column missing -> retry without
+      EMPLOYEE CRUD (employees.is_admin is BOOLEAN)
     ******************************************************************/
     function renderEmployees(){
       const tbody = $("empTable");
       tbody.innerHTML = "";
 
-      const max = Number(state.company?.[DB.companies.maxEmp] || 0) || null;
-      const count = state.employees?.length || 0;
-
-      if(max && count >= max){
-        showErr($("empLimitMsg"), `You’ve reached your plan limit (${max} employees). Upgrade your plan to add more.`);
-      } else {
-        clearErr($("empLimitMsg"));
-      }
-
       (state.employees || []).forEach(emp=>{
-        const isAdmin = (emp.is_admin === true || emp.is_admin === "true"); // handles if you add column later
         const tr = document.createElement("tr");
         tr.className = "border-t border-white/5";
         tr.innerHTML = `
@@ -2263,7 +1943,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           <td class="py-3 pr-3">${emp.job_category || ""}</td>
           <td class="py-3 pr-3 font-mono text-xs opacity-80">${emp.employee_code || ""}</td>
           <td class="py-3 pr-3">
-            ${isAdmin ? `<span class="px-2 py-1 rounded-lg bg-[rgba(120,170,255,.14)] border border-[rgba(120,170,255,.20)] text-xs">Admin</span>` : `<span class="text-xs opacity-60">—</span>`}
+            ${emp.is_admin ? `<span class="px-2 py-1 rounded-lg bg-[rgba(120,170,255,.14)] border border-[rgba(120,170,255,.20)] text-xs">Admin</span>` : `<span class="text-xs opacity-60">—</span>`}
           </td>
           <td class="py-3 pr-1 text-right">
             <div class="inline-flex gap-2">
@@ -2279,13 +1959,6 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     function openEmployeeEditor(emp){
-      const max = Number(state.company?.[DB.companies.maxEmp] || 0) || null;
-      const count = state.employees?.length || 0;
-      if(!emp && max && count >= max){
-        alert(`You’ve reached your plan limit (${max} employees). Upgrade your plan to add more.`);
-        return;
-      }
-
       state.editingEmployee = emp ? { ...emp } : null;
       setText($("empEditTitle"), emp ? "Edit employee" : "Add employee");
 
@@ -2293,8 +1966,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       $("empETitle").value = emp?.job_title || "";
       $("empECategory").value = emp?.job_category || "";
 
-      const isOn = (emp?.is_admin === true || emp?.is_admin === "true");
-      setAdminChk(!!isOn);
+      setAdminChk(!!emp?.is_admin);
 
       clearErr($("empEditMsg"));
       openModal($("empEditModalBackdrop"));
@@ -2319,28 +1991,21 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       const full_name = $("empEName").value.trim();
       const job_title = $("empETitle").value.trim();
       const job_category = $("empECategory").value.trim();
-      const is_admin = $("empEAdminChk").dataset.on === "1";
+      const is_admin = $("empEAdminChk").dataset.on === "1"; // BOOLEAN for employees table
 
       if(!full_name) return showErr($("empEditMsg"), "Please enter the employee name.");
-      const company = state.company;
-      if(!company?.id) return showErr($("empEditMsg"), "Company not loaded.");
+      if(!state.company?.id) return showErr($("empEditMsg"), "Company not loaded.");
 
       try{
         if(state.editingEmployee){
-          // update
-          const patchA = { full_name, job_title, job_category, is_admin };
-          let { error } = await sb.from("employees").update(patchA).eq("id", state.editingEmployee.id);
+          const { error } = await sb.from("employees").update({
+            full_name, job_title, job_category, is_admin
+          }).eq("id", state.editingEmployee.id);
 
-          // if is_admin column doesn't exist -> retry without it
-          if(error && (error.message || "").toLowerCase().includes("column") && (error.message || "").toLowerCase().includes("is_admin")){
-            const patchB = { full_name, job_title, job_category };
-            const r2 = await sb.from("employees").update(patchB).eq("id", state.editingEmployee.id);
-            error = r2.error;
-          }
           if(error) throw new Error(error.message);
 
         } else {
-          const prefix = companyPrefix(company[DB.companies.name] || "COM");
+          const prefix = companyPrefix(state.company.company_name || "COM");
           let code = "";
           let tries = 0;
 
@@ -2353,8 +2018,9 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
           }
           if(!code) throw new Error("Could not generate a unique employee ID.");
 
-          const rowA = {
-            company_id: company.id,
+          const row = {
+            company_id: state.company.id,
+            company_code: state.company.company_code,
             full_name,
             job_title,
             job_category,
@@ -2362,15 +2028,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
             is_admin
           };
 
-          let { error: insErr } = await sb.from("employees").insert(rowA);
-
-          // retry if is_admin column missing
-          if(insErr && (insErr.message || "").toLowerCase().includes("column") && (insErr.message || "").toLowerCase().includes("is_admin")){
-            const rowB = { company_id: company.id, full_name, job_title, job_category, employee_code: code };
-            const r2 = await sb.from("employees").insert(rowB);
-            insErr = r2.error;
-          }
-
+          const { error: insErr } = await sb.from("employees").insert(row);
           if(insErr) throw new Error(insErr.message);
         }
 
@@ -2384,17 +2042,17 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     function confirmRemoveEmployee(emp){
-      const cname = state.company?.[DB.companies.name] || "this company";
+      const cname = state.company?.company_name || "this company";
       const endsWithS = cname.trim().toLowerCase().endsWith("s");
       const possessive = endsWithS ? `${cname}'` : `${cname}'s`;
 
-      const msg = `Are you sure you would like to remove ${emp.full_name} from ${possessive} SmartDatabase? This action cannot be undone.`;
-      setText($("confirmText"), msg);
+      setText($("confirmText"), `Are you sure you would like to remove ${emp.full_name} from ${possessive} SmartDatabase? This action cannot be undone.`);
 
       state.confirmAction = async () => {
         try{
           const { error } = await sb.from("employees").delete().eq("id", emp.id);
           if(error) throw new Error(error.message);
+
           closeModal($("confirmModalBackdrop"));
           await loadAccount();
           showDashboard();
@@ -2407,15 +2065,12 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
     }
 
     /******************************************************************
-      COMPANY SETTINGS
+      SETTINGS (companies.company_size exists in your backend)
     ******************************************************************/
     function openSettings(){
       clearErr($("setMsg"));
-      $("setName").value = state.company?.[DB.companies.name] || "";
-      $("setAddr").value = state.company?.[DB.companies.address] || "";
-      $("setPrimary").value = state.company?.[DB.companies.primary] || "";
-      $("setSecondary").value = state.company?.[DB.companies.secondary] || "";
-      $("setText").value = state.company?.[DB.companies.text] || "";
+      $("setName").value = state.company?.company_name || "";
+      $("setSize").value = state.company?.company_size || "";
       openModal($("settingsModalBackdrop"));
     }
 
@@ -2423,21 +2078,209 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
       clearErr($("setMsg"));
 
       const patch = {
-        [DB.companies.name]: $("setName").value.trim(),
-        [DB.companies.address]: $("setAddr").value.trim(),
-        [DB.companies.primary]: $("setPrimary").value.trim() || null,
-        [DB.companies.secondary]: $("setSecondary").value.trim() || null,
-        [DB.companies.text]: $("setText").value.trim() || null
+        company_name: $("setName").value.trim(),
+        company_size: $("setSize").value.trim()
       };
 
-      if(!patch[DB.companies.name]) return showErr($("setMsg"), "Company name is required.");
-      if(!patch[DB.companies.address]) return showErr($("setMsg"), "Company address is required.");
+      if(!patch.company_name) return showErr($("setMsg"), "Company name is required.");
+      if(!patch.company_size) return showErr($("setMsg"), "Company size is required.");
 
       try{
         const { error } = await sb.from("companies").update(patch).eq("id", state.company.id);
         if(error) throw new Error(error.message);
+
         closeModal($("settingsModalBackdrop"));
         await loadAccount();
+        showDashboard();
+      }catch(e){
+        showErr($("setMsg"), String(e.message || "Save failed."));
+      }
+    }
+
+    /******************************************************************
+      BUY MORE
+    ******************************************************************/
+    function buyMore(){
+      hide($("dashboard"));
+      show($("main"));
+      window.location.hash = "#packages";
+      $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+
+    /******************************************************************
+      EVENTS / WIRING
+    ******************************************************************/
+    function wire(){
+      // hero
+      $("heroBuild").onclick = ()=> $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
+      $("heroEmployee").onclick = ()=> openModal($("empModalBackdrop"));
+      $("heroDown").onclick = ()=> $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
+
+      // nav
+      $("navHome").onclick = ()=> { hide($("dashboard")); show($("main")); window.scrollTo({ top:0, behavior:"smooth" }); };
+      $("navLogin").onclick = ()=> openModal($("loginModalBackdrop"));
+
+      // company size
+      document.querySelectorAll("[data-size]").forEach(btn=>{
+        btn.addEventListener("click", ()=> setCompanySize(btn.dataset.size));
+      });
+
+      // plus inputs
+      $("plusCount").addEventListener("input", ()=> hide($("plusWarn")));
+      $("plusNotes").addEventListener("input", ()=> state.plusNotes = $("plusNotes").value);
+
+      // summary / checkout
+      $("checkoutBtn").onclick = ()=>{
+        if(!state.size) return alert("Select a company size first.");
+
+        if(state.size.id === "s250plus"){
+          const mailto = buildContactEmail();
+          if(!mailto) return;
+          window.location.href = mailto;
+          return;
+        }
+
+        openModal($("signupModalBackdrop"));
+      };
+
+      // module modal
+      $("mmClose").onclick = ()=> closeModal($("moduleModalBackdrop"));
+
+      // signup modal
+      $("suClose").onclick = ()=> closeModal($("signupModalBackdrop"));
+      $("suContinue").onclick = ownerSendCode;
+      $("suGoLogin").onclick = ()=>{
+        closeModal($("signupModalBackdrop"));
+        openModal($("loginModalBackdrop"));
+      };
+      $("suEye").onclick = ()=>{
+        const p = $("suPassword");
+        p.type = (p.type === "password") ? "text" : "password";
+      };
+
+      // verify modal
+      $("vClose").onclick = ()=> closeModal($("verifyModalBackdrop"));
+      $("vVerify").onclick = ownerVerifyOnly;
+      $("vResend").onclick = resendOwnerCode;
+
+      // payment modal
+      $("payClose").onclick = ()=> closeModal($("payModalBackdrop"));
+      $("payAccept").onclick = paymentAccept;
+      $("payDecline").onclick = paymentDecline;
+
+      // login modal
+      $("liClose").onclick = ()=> closeModal($("loginModalBackdrop"));
+      $("liEye").onclick = ()=>{
+        const p = $("liPassword");
+        p.type = (p.type === "password") ? "text" : "password";
+      };
+      $("liLogin").onclick = login;
+      $("liReset").onclick = resetPassword;
+      $("liNoAcc").onclick = ()=>{
+        closeModal($("loginModalBackdrop"));
+        openModal($("noAccModalBackdrop"));
+      };
+
+      // no account modal
+      $("noAccClose").onclick = ()=> closeModal($("noAccModalBackdrop"));
+      $("noAccEmployee").onclick = ()=>{
+        closeModal($("noAccModalBackdrop"));
+        openModal($("empModalBackdrop"));
+      };
+      $("noAccBuild").onclick = ()=>{
+        closeModal($("noAccModalBackdrop"));
+        $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
+      };
+
+      // employee modal
+      $("empClose").onclick = ()=> closeModal($("empModalBackdrop"));
+      $("empSend").onclick = employeeSendCode;
+      $("empVerify").onclick = employeeVerify;
+      $("empResend").onclick = employeeResend;
+      $("empEye").onclick = ()=>{
+        const p = $("empPassword");
+        p.type = (p.type === "password") ? "text" : "password";
+      };
+
+      // dashboard
+      $("dashSignOut").onclick = signOut;
+      $("dashBuyMore").onclick = buyMore;
+      $("dashSettingsBtn").onclick = openSettings;
+
+      // settings
+      $("setClose").onclick = ()=> closeModal($("settingsModalBackdrop"));
+      $("setSave").onclick = saveSettings;
+
+      // employee editor
+      $("empAddBtn").onclick = ()=> openEmployeeEditor(null);
+      $("empEditClose").onclick = ()=> closeModal($("empEditModalBackdrop"));
+      $("empESave").onclick = saveEmployee;
+      $("empEAdminWrap").onclick = ()=>{
+        const cur = $("empEAdminChk").dataset.on === "1";
+        setAdminChk(!cur);
+      };
+
+      // confirm modal
+      $("confirmClose").onclick = ()=> closeModal($("confirmModalBackdrop"));
+      $("confirmNo").onclick = ()=> closeModal($("confirmModalBackdrop"));
+      $("confirmYes").onclick = async ()=>{
+        if(typeof state.confirmAction === "function") await state.confirmAction();
+      };
+
+      // backdrop click to close
+      [
+        $("moduleModalBackdrop"),
+        $("signupModalBackdrop"),
+        $("verifyModalBackdrop"),
+        $("payModalBackdrop"),
+        $("loginModalBackdrop"),
+        $("noAccModalBackdrop"),
+        $("empModalBackdrop"),
+        $("settingsModalBackdrop"),
+        $("empEditModalBackdrop"),
+        $("confirmModalBackdrop")
+      ].forEach(b=>{
+        b.addEventListener("click", (e)=>{
+          if(e.target === b) closeModal(b);
+        });
+      });
+
+      // hero parallax
+      window.addEventListener("mousemove", bubbleParallax, { passive:true });
+      window.addEventListener("resize", buildBubbles, { passive:true });
+    }
+
+    /******************************************************************
+      INIT
+    ******************************************************************/
+    async function init(){
+      buildBubbles();
+      initAnim();
+      initNavHide();
+      wire();
+
+      renderModules();
+      updateTotal();
+
+      await loadAccount();
+      if(state.session?.user){
+        showDashboard();
+      }
+
+      if(window.location.hash === "#packages"){
+        $("packages").scrollIntoView({ behavior:"smooth", block:"start" });
+      }
+    }
+
+    init().catch(err=>{
+      console.error(err);
+      alert("Init error: " + (err.message || err));
+    });
+  </script>
+
+</body>
+</html>
+
         showDashboard();
       }catch(e){
         showErr($("setMsg"), String(e.message || "Save failed."));
@@ -2585,6 +2428,7 @@ No medical data, no intrusive questions — just a clear, visual pulse check des
 
 </body>
 </html>
+
 
 
 
